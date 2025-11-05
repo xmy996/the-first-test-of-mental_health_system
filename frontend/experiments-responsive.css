@@ -1,0 +1,643 @@
+/* 心理实验中心响应式样式 */
+
+/* 基础响应式设置 */
+@media (max-width: 1200px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+@media (max-width: 992px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    max-width: 100%;
+  }
+}
+
+/* 实验大厅响应式样式 */
+.experiment-card {
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .experiment-categories {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .experiment-list {
+    width: 100%;
+  }
+  
+  .experiment-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .experiment-card {
+    margin-bottom: 1.5rem;
+  }
+  
+  .experiment-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  .experiment-details {
+    padding: 1rem;
+  }
+  
+  .experiment-duration, 
+  .experiment-difficulty {
+    font-size: 0.875rem;
+  }
+  
+  .experiment-description {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .experiment-header {
+    padding: 1rem 0.5rem;
+  }
+  
+  .experiment-title {
+    font-size: 1.5rem;
+  }
+  
+  .experiment-subtitle {
+    font-size: 0.875rem;
+  }
+  
+  .help-button {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+}
+
+/* 斯特鲁普实验响应式样式 */
+.stroop-container {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .stroop-box {
+    width: 250px;
+    height: 80px;
+  }
+  
+  .color-word {
+    font-size: 1.75rem;
+  }
+  
+  .color-buttons {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .color-button {
+    width: 50px;
+    height: 50px;
+    font-size: 0.875rem;
+  }
+  
+  .progress-container {
+    margin: 1rem 0;
+  }
+  
+  .stage-navigation button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stroop-box {
+    width: 200px;
+    height: 60px;
+  }
+  
+  .color-word {
+    font-size: 1.25rem;
+  }
+  
+  .color-button {
+    width: 45px;
+    height: 45px;
+    font-size: 0.75rem;
+  }
+}
+
+/* 记忆广度实验响应式样式 */
+.memory-span-container {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .memory-display {
+    height: 150px;
+    font-size: 2rem;
+  }
+  
+  .number-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  
+  .number-button {
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .sequence-feedback {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .memory-display {
+    height: 120px;
+    font-size: 1.5rem;
+  }
+  
+  .number-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  
+  .number-button {
+    height: 36px;
+    font-size: 0.875rem;
+  }
+}
+
+/* 视觉搜索实验响应式样式 */
+.visual-search-container {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .search-area {
+    height: 400px;
+    max-width: 100%;
+  }
+  
+  .shape {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .response-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .response-button {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-area {
+    height: 300px;
+  }
+  
+  .shape {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .response-button {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* 面部表情识别实验响应式样式 */
+.emotion-recognition-container {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .face-image-container {
+    max-width: 250px;
+    height: 250px;
+  }
+  
+  .emotion-options {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .emotion-option {
+    padding: 0.75rem;
+  }
+  
+  .emotion-label {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .face-image-container {
+    max-width: 200px;
+    height: 200px;
+  }
+  
+  .emotion-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 情绪启动实验响应式样式 */
+.affective-priming-container {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .priming-display {
+    height: 250px;
+    font-size: 1.5rem;
+  }
+  
+  .rating-scale {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  
+  .rating-option {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .priming-display {
+    height: 200px;
+    font-size: 1.25rem;
+  }
+}
+
+/* 阿希从众实验响应式样式 */
+.asch-conformity-container {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .line-comparison {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .standard-line, .comparison-lines {
+    align-items: center;
+  }
+  
+  .line {
+    width: 150px;
+  }
+  
+  .comparison-line {
+    width: 120px;
+  }
+  
+  .participant-choices {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  
+  .choice-button {
+    padding: 0.75rem;
+  }
+  
+  .participant-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .line {
+    width: 120px;
+  }
+  
+  .comparison-line {
+    width: 100px;
+  }
+  
+  .participant-row {
+    flex-wrap: wrap;
+  }
+}
+
+/* 囚徒困境游戏响应式样式 */
+.prisoners-dilemma-container {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .decision-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .decision-button {
+    padding: 1rem;
+  }
+  
+  .game-board {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  
+  .player-area {
+    padding: 1rem;
+  }
+  
+  .score-display {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .decision-button {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .score-display {
+    font-size: 1.25rem;
+  }
+  
+  .round-info {
+    font-size: 0.875rem;
+  }
+}
+
+/* 内隐联想测验响应式样式 */
+.iat-container {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .category-box {
+    min-height: 80px;
+    padding: 1rem;
+  }
+  
+  .target-container {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .target-word {
+    font-size: 2rem;
+  }
+  
+  .key-prompt {
+    font-size: 0.75rem;
+  }
+  
+  .key-e, .key-i {
+    width: 12px;
+    height: 12px;
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-box {
+    min-height: 60px;
+    padding: 0.75rem;
+  }
+  
+  .target-container {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .target-word {
+    font-size: 1.5rem;
+  }
+  
+  .key-e, .key-i {
+    width: 10px;
+    height: 10px;
+    font-size: 1.25rem;
+  }
+}
+
+/* 结果页面通用响应式样式 */
+.results-container {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .result-card {
+    margin-bottom: 1rem;
+  }
+  
+  .result-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .chart-container {
+    height: 250px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .action-buttons button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .result-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .result-stats {
+    font-size: 1.5rem;
+  }
+  
+  .chart-container {
+    height: 200px;
+  }
+}
+
+/* 通用响应式改进 */
+@media (max-width: 768px) {
+  /* 导航调整 */
+  .nav-link {
+    font-size: 0.875rem;
+  }
+  
+  /* 按钮调整 */
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  /* 标题调整 */
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+  }
+  
+  /* 文本调整 */
+  p {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 标题进一步调整 */
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+  }
+  
+  h3 {
+    font-size: 1.125rem;
+  }
+  
+  /* 间距调整 */
+  .mb-8 { margin-bottom: 2rem; }
+  .mb-6 { margin-bottom: 1.5rem; }
+  .mb-4 { margin-bottom: 1rem; }
+  
+  .mt-8 { margin-top: 2rem; }
+  .mt-6 { margin-top: 1.5rem; }
+  .mt-4 { margin-top: 1rem; }
+  
+  /* 填充调整 */
+  .p-6 { padding: 1.5rem; }
+  .p-4 { padding: 1rem; }
+  .p-2 { padding: 0.5rem; }
+}
+
+/* 移动设备上的特殊调整 */
+@media (max-width: 480px) {
+  /* 隐藏移动设备上不适合的实验 */
+  .visual-search-experiment {
+    display: none;
+  }
+  
+  /* 调整触摸目标大小 */
+  .button, .option, .choice {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* 增加关键元素的可触摸区域 */
+  .touch-target {
+    position: relative;
+  }
+  
+  .touch-target::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+  }
+  
+  /* 简化布局，减少视觉干扰 */
+  .simplified-layout {
+    background-color: white;
+    box-shadow: none;
+  }
+}
+
+/* 平板设备特殊调整 */
+@media (min-width: 481px) and (max-width: 768px) {
+  .tablet-optimized {
+    padding: 1.5rem;
+  }
+  
+  .experiment-card {
+    min-height: 220px;
+  }
+}
+
+/* 高分辨率屏幕支持 */
+@media (-webkit-device-pixel-ratio: 2), (resolution: 192dpi) {
+  .high-res-image {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* 暗色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-compatible {
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+  }
+  
+  .dark-mode-card {
+    background-color: #2a2a2a;
+    border-color: #404040;
+  }
+  
+  .dark-mode-text {
+    color: #f0f0f0;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .printable {
+    page-break-inside: avoid;
+  }
+  
+  body {
+    font-size: 12pt;
+    color: black;
+    background: white;
+  }
+}

@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心社区 - 心理健康支持平台</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 基础 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        error: '#ef4444',
+                        info: '#3b82f6',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- 全局样式文件 -->
+    <link rel="stylesheet" href="common.css">
+    
+    <!-- 导航栏交互脚本 -->
+    <script src="components/navbar.js" defer></script>
+    <!-- 修复重复用户菜单脚本 -->
+    <script src="components/fix_duplicate_user_menu.js" defer></script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+        }
+    </style>
+    
+    <!-- 页面特定样式 -->
+    <style>
+        .hero-shape-1 {
+            top: -5%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            animation: float-slow 8s ease-in-out infinite;
+        }
+        .hero-shape-2 {
+            bottom: -10%;
+            right: -5%;
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #ec4899, #f472b6);
+            animation: float 6s ease-in-out infinite reverse;
+        }
+            .hover-scale {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .hover-scale:hover {
+                transform: translateY(-5px) scale(1.02);
+            }
+        }
+    </style>
+
+<style>
+
+    /* 全局样式重置 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 全局颜色变量 */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background-color: var(--bg-primary);
+    }
+    
+    /* 统一按钮样式 */
+    button {
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        outline: none;
+    }
+    
+    /* 主按钮样式 - 注册按钮 */
+    .btn-primary {
+        background-color: var(--secondary-color);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #7c3aed;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+    }
+    
+    /* 次要按钮样式 - 登录按钮 */
+    .btn-secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        transform: translateY(-1px);
+    }
+    
+    /* 导航栏样式 */
+    nav {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .btn-primary,
+        .btn-secondary {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* 卡片样式 */
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+    }
+    
+    /* 输入框样式 */
+    input,
+    textarea,
+    select {
+        font-family: inherit;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+</style>
+</head>
+<body class="bg-light font-sans text-dark overflow-x-hidden">
+    <!-- 动态背景 -->
+    <div class="dynamic-bg bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div class="shape bg-primary/20 w-[30vw] h-[30vw] top-[-5vw] left-[-5vw]"></div>
+        <div class="shape bg-secondary/20 w-[40vw] h-[40vw] bottom-[-10vw] right-[-10vw]"></div>
+        <div class="shape bg-accent/20 w-[25vw] h-[25vw] top-[40vh] right-[15vw]"></div>
+    </div>
+    <!-- 导航栏 -->
+    <!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300 py-3">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <!-- Logo -->
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                <i class="fa fa-heart-o text-xl"></i>
+            </div>
+            <span class="text-xl font-bold text-primary tracking-wide">心社区</span>
+        </div>
+        
+        <!-- 桌面端导航 -->
+        <div class="hidden md:flex nav-links items-center space-x-1">
+            <a href="index.html" class="text-primary border-b-2 border-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center">
+                <i class="fa fa-home mr-2"></i>首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-list-alt mr-2"></i>心理测评
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-user-md mr-2"></i>咨询服务
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-users mr-2"></i>团体活动
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-music mr-2"></i>放松体验
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            
+            <!-- 更多服务下拉菜单 -->
+            <div class="relative" id="desktop-more-menu">
+                <button id="desktop-more-menu-button" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center gap-1 relative group">
+                    更多服务
+                    <i class="fa fa-angle-down transition-transform duration-300 group-hover:rotate-180"></i>
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </button>
+                <div id="desktop-more-dropdown" class="hidden absolute top-full left-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="healing_treehole.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-tree mr-2"></i>治愈树洞
+                    </a>
+                    <a href="sandbox_simulation_immersive.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-cubes mr-2"></i>沙盘模拟
+                    </a>
+                    <a href="mental_stories.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-book mr-2"></i>心理资源
+                    </a>
+                    <a href="mental_games.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-gamepad mr-2"></i>心理游戏
+                    </a>
+                                    <a href="psychology_experiments.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-flask mr-2"></i>心理实验
+                    </a>
+                    </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单按钮 -->
+        <div class="md:hidden">
+            <button id="menu-toggle" class="text-gray-700 focus:outline-none transition-transform duration-300 hover:rotate-90 p-2 rounded-md hover:bg-gray-100">
+                <i class="fa fa-bars text-xl"></i>
+                <span class="sr-only">打开菜单</span>
+            </button>
+        </div>
+        
+        <!-- 用户菜单 -->
+        <div id="user-menu" class="hidden md:flex items-center space-x-4">
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none group p-1 rounded-full hover:bg-white/30 transition-all duration-300 focus:ring-2 focus:ring-primary/50">
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="user-name" class="text-gray-700 group-hover:text-primary transition-colors"></span>
+                    <i class="fa fa-angle-down text-gray-500 group-hover:text-primary transition-transform duration-300 group-hover:rotate-180"></i>
+                </button>
+                <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="user_profile.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-user-circle w-4 mr-3 text-center"></i>
+                        <span>个人中心</span>
+                    </a>
+                    <a href="assessment_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-list-alt w-4 mr-3 text-center"></i>
+                        <span>测评记录</span>
+                    </a>
+                    <a href="booking_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-check-o w-4 mr-3 text-center"></i>
+                        <span>预约记录</span>
+                    </a>
+                    <a href="activity_registration.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-plus-o w-4 mr-3 text-center"></i>
+                        <span>活动报名</span>
+                    </a>
+                    <hr class="my-1 border-gray-200">
+                    <a href="#" id="logout-button" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-danger transition-all duration-200 flex items-center">
+                        <i class="fa fa-sign-out mr-3 w-4 text-center"></i>
+                        <span>退出登录</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 登录/注册按钮 -->
+        <div id="auth-buttons" class="hidden md:flex items-center space-x-3">
+            <button class="px-4 py-2.5 text-primary border-2 border-primary rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='login.html'">
+                    <i class="fa fa-sign-in mr-2"></i>登录
+                </button>
+            <button class="px-4 py-2.5 bg-gradient-to-r from-primary to-indigo-600 text-indigo-900 rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 font-bold shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='register.html'">
+                    <i class="fa fa-user-plus mr-2"></i>注册
+                </button>
+            <a href="admin_login.html" class="text-gray-600 hover:text-gray-800 transition-all duration-300 text-xs hover:underline px-2">管理员入口</a>
+        </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="md:hidden hidden glass-effect shadow-lg absolute w-full">
+        <div class="container mx-auto px-4 py-3 flex flex-col space-y-1">
+            <a href="index.html" class="bg-primary/5 text-primary py-2 px-3 rounded-lg font-medium flex items-center">
+                <i class="fa fa-home w-5 mr-3 text-center"></i>
+                首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-list-alt w-5 mr-3 text-center"></i>
+                心理测评
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-user-md w-5 mr-3 text-center"></i>
+                咨询服务
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-users w-5 mr-3 text-center"></i>
+                团体活动
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-music w-5 mr-3 text-center"></i>
+                放松体验
+            </a>
+            <a href="healing_treehole.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-tree w-5 mr-3 text-center"></i>
+                治愈树洞
+            </a>
+            <a href="sandbox_simulation_immersive.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-th-large w-5 mr-3 text-center"></i>
+                沙盘模拟
+            </a>
+            <a href="mental_stories.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-book w-5 mr-3 text-center"></i>
+                心理资源
+            </a>
+            <a href="mental_games.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-gamepad w-5 mr-3 text-center"></i>
+                心理游戏
+            </a>
+            
+            <!-- 移动端登录/注册按钮 -->
+            <div class="flex space-x-3 py-3 mt-2">
+                <button class="px-4 py-2.5 text-primary border-2 border-primary rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='login.html'">
+                    <i class="fa fa-sign-in mr-2"></i>登录
+                </button>
+                <button class="px-4 py-2.5 bg-gradient-to-r from-primary to-indigo-600 text-indigo-900 rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 font-bold shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='register.html'">
+                    <i class="fa fa-user-plus mr-2"></i>注册
+                </button>
+            </div>
+            
+            <!-- 移动端用户菜单（登录后显示） -->
+            <div id="mobile-user-menu" class="hidden py-2 animate-fade-in">
+                <div class="flex items-center space-x-3 mb-3 pb-3 border-b border-gray-200 bg-white/30 rounded-lg p-2">
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="mobile-user-name" class="text-gray-700 font-medium"></span>
+                </div>
+                <a href="user_profile.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-user-circle mr-2 w-5 text-center"></i>个人中心
+                </a>
+                <a href="assessment_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-list-alt mr-2 w-5 text-center"></i>测评记录
+                </a>
+                <a href="booking_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-check-o mr-2 w-5 text-center"></i>预约记录
+                </a>
+                <a href="activity_registration.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-plus-o mr-2 w-5 text-center"></i>活动报名
+                </a>
+                <a href="#" id="mobile-logout-button" class="block px-4 py-2 text-gray-700 hover:bg-white/50 hover:text-danger transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-sign-out mr-2 w-5 text-center"></i>退出登录
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 导航栏必要的脚本引用 -->
+<script src="components/navbar.js" defer></script>
+<script src="components/fix_duplicate_user_menu.js" defer></script>
+
+    <!-- 主内容区 -->
+    <main>
+        <!-- 首页/欢迎区 -->
+        <section id="home" class="pt-24 pb-16 md:pt-32 md:pb-24 relative overflow-hidden">
+            <!-- 动态背景 -->
+            <div class="absolute inset-0 bg-gradient-animated opacity-80 z-0"></div>
+            <!-- 装饰性形状 -->
+            <div class="absolute top-1/4 right-1/4 w-64 h-64 bg-blue-300 rounded-full filter blur-3xl opacity-20 animate-pulse"></div>
+            <div class="absolute bottom-1/4 left-1/4 w-80 h-80 bg-purple-300 rounded-full filter blur-3xl opacity-20 animate-pulse" style="animation-delay: 1s;"></div>
+            
+            <div class="container mx-auto px-4 relative z-10">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-1/2 mb-8 md:mb-0">
+                        <h1 class="text-4xl md:text-5xl font-bold mb-6 text-primary animate-fade-in slide-up">
+                            "心"家园，"馨"守护
+                        </h1>
+                        <p class="text-xl mb-8 text-gray-700 animate-fade-in slide-up" style="animation-delay: 0.2s;">
+                            心理健康服务平台，为您提供专业的心理健康服务，
+                            让每个人都能拥有健康的心理状态和幸福的生活。
+                        </p>
+                        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 animate-fade-in slide-up" style="animation-delay: 0.4s;">
+                            <button class="px-6 py-3 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-lg font-medium" onclick="window.location.href='assessment_list.html'">
+                                开始心理测评
+                            </button>
+                            <button class="px-6 py-3 glass-effect text-primary border border-primary/30 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-lg font-medium">
+                                了解更多服务
+                            </button>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 flex justify-center animate-fade-in slide-up" style="animation-delay: 0.6s;">
+                        <!-- 替换图片为动态图形 -->
+                        <div class="relative w-full aspect-square max-w-md mx-auto">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-3/4 h-3/4 bg-gradient-to-br from-primary/20 to-indigo-600/20 rounded-full flex items-center justify-center">
+                                    <div class="w-2/3 h-2/3 bg-gradient-to-br from-primary/30 to-indigo-600/30 rounded-full flex items-center justify-center">
+                                        <div class="w-1/2 h-1/2 bg-gradient-to-br from-primary/40 to-indigo-600/40 rounded-full flex items-center justify-center">
+                                            <i class="fa fa-heart text-4xl text-primary animate-pulse"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 装饰性元素 -->
+                            <div class="absolute top-1/4 left-1/4 w-16 h-16 bg-blue-400/30 rounded-full animate-bounce" style="animation-delay: 0.5s;"></div>
+                            <div class="absolute top-1/3 right-1/4 w-12 h-12 bg-purple-400/30 rounded-full animate-bounce" style="animation-delay: 0.8s;"></div>
+                            <div class="absolute bottom-1/4 left-1/3 w-14 h-14 bg-pink-400/30 rounded-full animate-bounce" style="animation-delay: 1.2s;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 统计数据卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20 animate-fade-in slide-up" style="animation-delay: 0.8s;">
+                    <div class="glass-effect rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-700 font-semibold">专业心理咨询师</h3>
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                <i class="fa fa-user-md text-primary"></i>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800">50+</p>
+                    </div>
+                    <div class="glass-effect rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-700 font-semibold">心理测评工具</h3>
+                            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                <i class="fa fa-list-alt text-purple-500"></i>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800">30+</p>
+                    </div>
+                    <div class="glass-effect rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-700 font-semibold">服务用户</h3>
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                                <i class="fa fa-users text-green-500"></i>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800">10,000+</p>
+                    </div>
+                </div>
+                
+                <!-- 服务概览 -->
+                <div class="mt-20 relative">
+                    <h2 class="text-3xl font-bold text-center mb-12 text-primary animate-fade-in slide-up">我们的服务</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- 心理测评区 -->
+                        <div class="glass-effect rounded-xl p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in slide-up" style="animation-delay: 0.2s;">
+                            <div class="w-16 h-16 bg-gradient-to-br from-primary/20 to-blue-200/30 rounded-full flex items-center justify-center mb-6 mx-auto">
+                                <i class="fa fa-line-chart text-primary text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-center mb-4">心理测评区</h3>
+                            <p class="text-gray-600 text-center">
+                                提供专业的心理测评工具，帮助您了解自己的心理状态，
+                                获取个性化的心理健康评估报告。
+                            </p>
+                            <div class="mt-6 text-center">
+                                <a href="assessment_list.html" class="text-primary hover:text-blue-700 font-medium inline-flex items-center transition-all duration-300 hover:translate-x-1">
+                                    开始测评 <i class="fa fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 咨询服务区 -->
+                        <div class="glass-effect rounded-xl p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in slide-up" style="animation-delay: 0.4s;">
+                            <div class="w-16 h-16 bg-gradient-to-br from-secondary/20 to-green-200/30 rounded-full flex items-center justify-center mb-6 mx-auto">
+                                <i class="fa fa-comments text-secondary text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-center mb-4">咨询服务区</h3>
+                            <p class="text-gray-600 text-center">
+                                提供一对一的心理咨询服务，帮助您解决心理困扰，
+                                由专业心理咨询师为您提供支持和指导。
+                            </p>
+                            <div class="mt-6 text-center">
+                                <a href="consultant_list.html" class="text-secondary hover:text-green-700 font-medium inline-flex items-center transition-all duration-300 hover:translate-x-1">
+                                    预约咨询 <i class="fa fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 团体活动区 -->
+                        <div class="glass-effect rounded-xl p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in slide-up" style="animation-delay: 0.6s;">
+                            <div class="w-16 h-16 bg-gradient-to-br from-accent/20 to-pink-200/30 rounded-full flex items-center justify-center mb-6 mx-auto">
+                                <i class="fa fa-users text-accent text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-center mb-4">团体活动区</h3>
+                            <p class="text-gray-600 text-center">
+                                开展心理健康教育讲座、团体辅导等活动，
+                                帮助您学习心理健康知识，结交志同道合的朋友。
+                            </p>
+                            <div class="mt-6 text-center">
+                                <a href="activity_list.html" class="text-accent hover:text-pink-700 font-medium inline-flex items-center transition-all duration-300 hover:translate-x-1">
+                                    查看活动 <i class="fa fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 放松体验区 -->
+                        <div class="glass-effect rounded-xl p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in slide-up" style="animation-delay: 0.8s;">
+                            <div class="w-16 h-16 bg-gradient-to-br from-yellow-500/20 to-yellow-200/30 rounded-full flex items-center justify-center mb-6 mx-auto">
+                                <i class="fa fa-leaf text-yellow-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-center mb-4">放松体验区</h3>
+                            <p class="text-gray-600 text-center">
+                                提供舒适的放松空间，配备音乐治疗、生物反馈等设备，
+                                帮助您缓解压力，放松身心。
+                            </p>
+                            <div class="mt-6 text-center">
+                                <a href="relaxation_music.html" class="text-yellow-600 hover:text-yellow-700 font-medium inline-flex items-center transition-all duration-300 hover:translate-x-1">
+                                    体验放松 <i class="fa fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 治愈树洞区 -->
+                        <div class="glass-effect rounded-xl p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in slide-up" style="animation-delay: 1.0s;">
+                            <div class="w-16 h-16 bg-gradient-to-br from-green-500/20 to-green-200/30 rounded-full flex items-center justify-center mb-6 mx-auto">
+                                <i class="fa fa-tree text-green-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-center mb-4">治愈树洞区</h3>
+                            <p class="text-gray-600 text-center">
+                                匿名分享内心感受，获得温暖回应，
+                                在安全的环境中释放情绪，找回内心平静。
+                            </p>
+                            <div class="mt-6 text-center">
+                                <a href="healing_treehole.html" class="text-green-600 hover:text-green-700 font-medium inline-flex items-center transition-all duration-300 hover:translate-x-1">
+                                    开始倾诉 <i class="fa fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 沙盘模拟区 -->
+                        <div class="glass-effect rounded-xl p-6 hover:shadow-xl transition-all-300 transform hover:-translate-y-2 animate-fade-in slide-up" style="animation-delay: 1.2s;">
+                            <div class="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-indigo-200/30 rounded-full flex items-center justify-center mb-6 mx-auto">
+                                <i class="fa fa-magic text-indigo-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-center mb-4">沙盘模拟区</h3>
+                            <p class="text-gray-600 text-center">
+                                通过虚拟沙盘表达内心世界，AI辅助解读，
+                                促进自我认知与心理成长。
+                            </p>
+                            <div class="mt-6 text-center">
+                                <a href="sandbox_simulation_immersive.html" class="text-indigo-600 hover:text-indigo-700 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                    体验沙盘 <i class="fa fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 放松体验区详情 -->
+                <div class="mt-20">
+                    <h2 class="text-3xl font-bold text-center mb-12 text-primary">放松体验区</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- 音乐治疗 -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                            <img src="https://p3-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2168462819606528022~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777630774&x-signature=33NvkMONkdqVPB8T4DBsTbyBHHY%3D" alt="音乐治疗" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-3">音乐治疗</h3>
+                                <p class="text-gray-600 mb-4">
+                                    通过音乐聆听、音乐创作等方式，帮助您放松身心，
+                                    释放情绪，促进心理疗愈和自我表达。
+                                </p>
+                                <a href="relaxation_music.html" class="text-primary hover:text-blue-700 font-medium inline-flex items-center">
+                                    开始体验 <i class="fa fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 冥想放松 -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                            <img src="https://p26-doubao-search-sign.byteimg.com/labis/d3133b043f433c3f19a96bd6826f9240~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777630774&x-signature=uugjTpKO8bg55ICGQME7rbyweM0%3D" alt="冥想放松" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-3">冥想放松</h3>
+                                <p class="text-gray-600 mb-4">
+                                    通过引导冥想、呼吸练习等方式，帮助您培养专注力，
+                                    减轻压力，提高情绪调节能力。
+                                </p>
+                                <a href="relaxation_meditation.html" class="text-primary hover:text-blue-700 font-medium inline-flex items-center">
+                                    开始体验 <i class="fa fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 生物反馈 -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                            <img src="https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/1782549949236641802~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777630774&x-signature=UwGsso4qpG%2BXKMQpgJRysZGrrNw%3D" alt="生物反馈" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-3">生物反馈</h3>
+                                <p class="text-gray-600 mb-4">
+                                    通过生物反馈设备，帮助您了解自己的生理反应，
+                                    学习自我调节技巧，提高身心放松能力。
+                                </p>
+                                <a href="relaxation_biofeedback.html" class="text-primary hover:text-blue-700 font-medium inline-flex items-center">
+                                    开始体验 <i class="fa fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI心理测评平台介绍 -->
+                <div class="mt-20 bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-8 shadow-lg">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 mb-8 md:mb-0">
+                            <h2 class="text-3xl font-bold mb-6 text-primary">AI心理测评平台</h2>
+                            <p class="text-lg mb-6 text-gray-700">
+                                基于人工智能的心理测评系统，能够快速、准确地评估您的心理状态，
+                                生成个性化的建议报告，为您的心理健康提供科学指导。
+                            </p>
+                            <ul class="space-y-4">
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-secondary mt-1 mr-3"></i>
+                                    <span>智能评估：采用先进的AI算法，提供精准的心理状态评估</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-secondary mt-1 mr-3"></i>
+                                    <span>个性化报告：根据测评结果，生成针对性的建议和干预方案</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-secondary mt-1 mr-3"></i>
+                                    <span>隐私保护：严格保护用户数据安全和隐私</span>
+                                </li>
+                            </ul>
+                            <button class="mt-8 px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300 text-lg font-medium" onclick="window.location.href='assessment_list.html'">
+                                立即体验AI测评
+                            </button>
+                        </div>
+                        <div class="md:w-1/2 flex justify-center">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/8bbb3bc738e544a484b5e1b79123fb4c~tplv-a9rns2rl98-image.image?rcl=202511021051458F2FB69365DFCE83C087&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1764643957&amp;x-signature=A%2FLmu1qHpOR1GwtCGx06vHtvRME%3D" alt="AI心理测评平台" class="w-full max-w-md rounded-lg shadow-xl">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 心理测评区 -->
+        <section id="assessment" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-4 text-primary">心理测评区</h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                    通过专业的心理测评工具，帮助您了解自己的心理状态，获取个性化的心理健康评估报告。
+                </p>
+                
+                <!-- 测评分类 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                    <!-- 情绪健康测评 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <div class="h-48 bg-blue-100 flex items-center justify-center">
+                            <i class="fa fa-smile-o text-primary text-6xl"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-3">情绪健康测评</h3>
+                            <p class="text-gray-600 mb-4">
+                                评估您当前的情绪状态，包括焦虑、抑郁、压力等方面，
+                                帮助您了解自己的情绪健康水平。
+                            </p>
+                            <button class="w-full py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300" onclick="startAssessment('emotion')">
+                                开始测评
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 心理健康测评 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <div class="h-48 bg-green-100 flex items-center justify-center">
+                            <i class="fa fa-heart text-secondary text-6xl"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-3">心理健康测评</h3>
+                            <p class="text-gray-600 mb-4">
+                                全面评估您的心理健康状况，包括认知功能、人际关系、
+                                生活满意度等多个维度。
+                            </p>
+                            <button class="w-full py-2 bg-secondary text-white rounded-md hover:bg-green-600 transition-all-300" onclick="startAssessment('mental')">
+                                开始测评
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 压力水平测评 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <div class="h-48 bg-pink-100 flex items-center justify-center">
+                            <i class="fa fa-tachometer text-accent text-6xl"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-3">压力水平测评</h3>
+                            <p class="text-gray-600 mb-4">
+                                评估您当前的压力水平，分析压力来源，
+                                提供有效的压力管理建议。
+                            </p>
+                            <button class="w-full py-2 bg-accent text-white rounded-md hover:bg-pink-600 transition-all-300" onclick="startAssessment('stress')">
+                                开始测评
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 测评问卷模态框 -->
+                <div id="assessment-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+                    <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 id="assessment-title" class="text-2xl font-bold text-primary">情绪健康测评</h3>
+                                <button id="close-assessment" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                    <i class="fa fa-times text-xl"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-gray-600">问题 <span id="current-question">1</span>/<span id="total-questions">10</span></span>
+                                    <span class="text-gray-600">完成度: <span id="progress-percentage">10%</span></span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div id="progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 10%"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="question-container">
+                                <h4 id="question-text" class="text-xl font-medium mb-6">在过去的两周里，您是否经常感到紧张、焦虑或坐立不安？</h4>
+                                <div class="space-y-3">
+                                    <div class="flex items-center">
+                                        <input type="radio" id="option-1" name="answer" value="1" class="w-4 h-4 text-primary focus:ring-primary">
+                                        <label for="option-1" class="ml-2 text-gray-700">从不</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="option-2" name="answer" value="2" class="w-4 h-4 text-primary focus:ring-primary">
+                                        <label for="option-2" class="ml-2 text-gray-700">偶尔</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="option-3" name="answer" value="3" class="w-4 h-4 text-primary focus:ring-primary">
+                                        <label for="option-3" class="ml-2 text-gray-700">经常</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio" id="option-4" name="answer" value="4" class="w-4 h-4 text-primary focus:ring-primary">
+                                        <label for="option-4" class="ml-2 text-gray-700">总是</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="result-container" class="hidden">
+                                <h4 class="text-xl font-medium mb-4">测评结果</h4>
+                                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                                    <p class="text-gray-700 mb-2">您的情绪健康指数：<span id="emotion-score" class="font-bold text-primary">75</span>/100</p>
+                                    <p id="emotion-level" class="font-medium">良好</p>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <h5 class="font-medium mb-2">情绪健康分析</h5>
+                                    <p id="emotion-analysis" class="text-gray-700">
+                                        根据您的回答，您的情绪健康状况总体良好。您能够有效地管理日常压力，
+                                        保持积极的情绪状态。建议您继续保持现有的生活方式和应对策略，
+                                        定期进行自我评估，关注情绪变化。
+                                    </p>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <h5 class="font-medium mb-2">个性化建议</h5>
+                                    <ul id="emotion-suggestions" class="list-disc list-inside space-y-2 text-gray-700">
+                                        <li>保持规律的作息时间，确保充足的睡眠</li>
+                                        <li>每天进行适量的体育锻炼，如散步、瑜伽等</li>
+                                        <li>培养兴趣爱好，丰富生活内容</li>
+                                        <li>与亲朋好友保持良好的沟通和互动</li>
+                                        <li>学习简单的放松技巧，如深呼吸、冥想等</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="flex justify-between">
+                                    <button id="download-report" class="px-4 py-2 text-primary border border-primary rounded-md hover:bg-primary hover:text-white transition-all-300">
+                                        <i class="fa fa-download mr-2"></i> 下载报告
+                                    </button>
+                                    <button id="share-result" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300">
+                                        <i class="fa fa-share-alt mr-2"></i> 分享结果
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 flex justify-between">
+                                <button id="prev-question" class="px-4 py-2 text-gray-500 border border-gray-300 rounded-md hover:bg-gray-100 transition-all-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    上一题
+                                </button>
+                                <button id="next-question" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300">
+                                    下一题
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI测评平台介绍 -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-primary">AI智能测评</h3>
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-2/3 mb-6 md:mb-0 md:pr-8">
+                            <p class="text-gray-700 mb-4">
+                                我们的AI智能测评系统采用先进的人工智能技术，能够快速、准确地评估您的心理状态，
+                                为您提供个性化的心理健康建议。
+                            </p>
+                            <ul class="space-y-3 mb-6">
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-secondary mt-1 mr-3"></i>
+                                    <span>智能分析：AI系统能够分析您的回答模式，识别潜在的心理状态</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-secondary mt-1 mr-3"></i>
+                                    <span>实时反馈：测评完成后立即生成结果报告，提供即时反馈</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-secondary mt-1 mr-3"></i>
+                                    <span>持续学习：系统会根据最新的心理学研究成果不断优化测评算法</span>
+                                </li>
+                            </ul>
+                            <button class="px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300 text-lg font-medium" onclick="window.location.href='assessment_list.html'">
+                                开始AI智能测评
+                            </button>
+                        </div>
+                        <div class="md:w-1/3">
+                            <div class="bg-blue-50 rounded-lg p-6 text-center">
+                                <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fa fa-robot text-primary text-4xl"></i>
+                                </div>
+                                <h4 class="font-bold mb-2">AI心理顾问</h4>
+                                <p class="text-gray-600 text-sm">
+                                    24小时在线，随时为您提供心理健康评估和建议
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 咨询服务区 -->
+        <section id="consultation" class="py-16">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-4 text-primary">咨询服务区</h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                    我们提供一对一的心理咨询服务，由专业心理咨询师为您提供支持和指导，帮助您解决心理困扰。
+                </p>
+                
+                <!-- 咨询师列表 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                    <!-- 咨询师1 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <div class="h-48 bg-gray-200 relative">
+                            <img src="https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2041059452256911370~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&amp;x-expires=1777603931&amp;x-signature=fx46xAxUy6YnVKiG26KqMd6FrqI%3D" alt="张医生" class="w-full h-full object-cover">
+                            <div class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">
+                                在线
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-xl font-bold">张医生</h3>
+                                <span class="text-sm text-gray-500">心理咨询师</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                专注于情绪障碍、压力管理和人际关系问题，拥有10年临床经验。
+                            </p>
+                            <div class="flex items-center mb-4">
+                                <div class="flex text-yellow-400">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-half-o"></i>
+                                </div>
+                                <span class="text-gray-600 ml-2">4.8 (120评价)</span>
+                            </div>
+                            <button class="w-full py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300" onclick="bookConsultation('张医生')">
+                                预约咨询
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 咨询师2 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <div class="h-48 bg-gray-200 relative">
+                            <img src="https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2266598956742475790~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&amp;x-expires=1777603931&amp;x-signature=8SGVf%2FRl%2B1lBfurwCfOMtJUTW8Y%3D" alt="李医生" class="w-full h-full object-cover">
+                            <div class="absolute top-4 right-4 bg-gray-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">
+                                离线
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-xl font-bold">李医生</h3>
+                                <span class="text-sm text-gray-500">临床心理学家</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                擅长处理抑郁、焦虑和创伤后应激障碍等问题，拥有心理学博士学位。
+                            </p>
+                            <div class="flex items-center mb-4">
+                                <div class="flex text-yellow-400">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <span class="text-gray-600 ml-2">5.0 (98评价)</span>
+                            </div>
+                            <button class="w-full py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300" onclick="bookConsultation('李医生')">
+                                预约咨询
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 咨询师3 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <div class="h-48 bg-gray-200 relative">
+                            <img src="https://p26-doubao-search-sign.byteimg.com/labis/20525343131163341122~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&amp;x-expires=1777603931&amp;x-signature=W2pzrD%2B%2Bq2X5lL3o9p4z2Y3w%2F34%3D" alt="王医生" class="w-full h-full object-cover">
+                            <div class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">
+                                在线
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-xl font-bold">王医生</h3>
+                                <span class="text-sm text-gray-500">婚姻家庭咨询师</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                专注于婚姻关系、亲子关系等家庭问题的咨询，拥有丰富的家庭治疗经验。
+                            </p>
+                            <div class="flex items-center mb-4">
+                                <div class="flex text-yellow-400">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-o"></i>
+                                </div>
+                                <span class="text-gray-600 ml-2">4.2 (75评价)</span>
+                            </div>
+                            <button class="w-full py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300" onclick="bookConsultation('王医生')">
+                                预约咨询
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 查看更多咨询师按钮 -->
+                <div class="text-center">
+                    <button class="px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300 text-lg font-medium" onclick="window.location.href='consultant_list.html'">
+                        查看更多咨询师
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 团体活动区 -->
+        <section id="activity" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-4 text-primary">团体活动区</h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                    参加我们的团体活动，与他人分享经验，学习心理健康知识和技能，共同成长。
+                </p>
+                
+                <!-- 活动列表 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                    <!-- 活动1 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/40d64852770f46f8af7409de48de22e5~tplv-a9rns2rl98-image.image?rcl=202511021051458F2FB69365DFCE83C087&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1764643954&amp;x-signature=X4g03RVtksJbXiwOtKAUPwp6qQU%3D" alt="正念减压工作坊" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold">正念减压工作坊</h3>
+                                <span class="bg-green-100 text-secondary text-xs font-medium px-2.5 py-0.5 rounded">压力管理</span>
+                            </div>
+                            <div class="flex items-center text-gray-500 mb-4">
+                                <div class="flex items-center mr-4">
+                                    <i class="fa fa-calendar mr-1"></i>
+                                    <span>2025-11-15</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fa fa-clock-o mr-1"></i>
+                                    <span>14:00-16:00</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                本工作坊将介绍正念减压的基本原理和方法，通过正念冥想、身体扫描等练习，
+                                帮助参与者缓解压力，提高专注力和情绪调节能力。
+                            </p>
+                            <button class="w-full py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300" onclick="window.location.href='activity_detail.html?id=1'">
+                                查看详情
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 活动2 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/94576625753e47f4a264146886000b54~tplv-a9rns2rl98-image.image?rcl=202511021051458F2FB69365DFCE83C087&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1764643953&amp;x-signature=3y0m722vKcH2vJwH%2Bqg8b%2Fe%2FZcU%3D" alt="情绪管理小组" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold">情绪管理小组</h3>
+                                <span class="bg-blue-100 text-primary text-xs font-medium px-2.5 py-0.5 rounded">心理成长</span>
+                            </div>
+                            <div class="flex items-center text-gray-500 mb-4">
+                                <div class="flex items-center mr-4">
+                                    <i class="fa fa-calendar mr-1"></i>
+                                    <span>2025-11-18</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fa fa-clock-o mr-1"></i>
+                                    <span>19:00-21:00</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                本小组将帮助参与者认识和理解自己的情绪，学习情绪调节的技巧和方法，
+                                提高情绪管理能力，促进心理健康成长。
+                            </p>
+                            <button class="w-full py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300" onclick="window.location.href='activity_detail.html?id=2'">
+                                查看详情
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 活动3 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/4a3f79419491433686498d3647f08000~tplv-a9rns2rl98-image.image?rcl=202511021051458F2FB69365DFCE83C087&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1764643952&amp;x-signature=1549tFqRqE7zW9%2FP8I87z3zL2Ic%3D" alt="艺术疗愈工作坊" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold">艺术疗愈工作坊</h3>
+                                <span class="bg-pink-100 text-pink-700 text-xs font-medium px-2.5 py-0.5 rounded">艺术疗愈</span>
+                            </div>
+                            <div class="flex items-center text-gray-500 mb-4">
+                                <div class="flex items-center mr-4">
+                                    <i class="fa fa-calendar mr-1"></i>
+                                    <span>2025-11-20</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fa fa-clock-o mr-1"></i>
+                                    <span>10:00-12:00</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                本工作坊通过绘画、手工等艺术形式，帮助参与者表达内心感受，释放情绪压力，
+                                促进自我探索和心理疗愈。无需艺术基础，适合所有年龄段。
+                            </p>
+                            <button class="w-full py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300" onclick="window.location.href='activity_detail.html?id=3'">
+                                查看详情
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 查看更多活动按钮 -->
+                <div class="text-center">
+                    <button class="px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300 text-lg font-medium" onclick="window.location.href='activity_list.html'">
+                        查看更多活动
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <!-- 统一页脚组件 -->
+<footer class="bg-[#1e293b] text-white py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <!-- 左侧Logo和文字 -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                    <i class="fa fa-heart"></i>
+                </div>
+                <span class="text-white">心社区</span>
+            </div>
+            
+            <!-- 中间版权信息 -->
+            <div class="text-center">
+                <p class="text-white">© 2025 心社区心理健康支持中心. 保留所有权利.</p>
+            </div>
+            
+            <!-- 右侧图标 -->
+            <div class="flex space-x-4">
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-bell"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- JavaScript -->
+    <script src="common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化导航栏
+            initNavigation();
+            
+            // 移动端菜单切换
+            document.getElementById('menu-toggle').addEventListener('click', function() {
+                const mobileMenu = document.getElementById('mobile-menu');
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // 测评问卷相关功能
+            const assessmentModal = document.getElementById('assessment-modal');
+            const closeAssessment = document.getElementById('close-assessment');
+            const nextQuestion = document.getElementById('next-question');
+            const prevQuestion = document.getElementById('prev-question');
+            const questionContainer = document.getElementById('question-container');
+            const resultContainer = document.getElementById('result-container');
+            
+            // 测评问题数据
+            const questions = [
+                {
+                    id: 1,
+                    text: "在过去的两周里，您是否经常感到紧张、焦虑或坐立不安？",
+                    options: ["从不", "偶尔", "经常", "总是"]
+                },
+                {
+                    id: 2,
+                    text: "在过去的两周里，您是否对做事情失去了兴趣或乐趣？",
+                    options: ["从不", "偶尔", "经常", "总是"]
+                },
+                {
+                    id: 3,
+                    text: "在过去的两周里，您是否经常感到疲倦或精力不足？",
+                    options: ["从不", "偶尔", "经常", "总是"]
+                },
+                {
+                    id: 4,
+                    text: "在过去的两周里，您是否经常感到自卑，或认为自己是个失败者？",
+                    options: ["从不", "偶尔", "经常", "总是"]
+                },
+                {
+                    id: 5,
+                    text: "在过去的两周里，您是否难以集中注意力？",
+                    options: ["从不", "偶尔", "经常", "总是"]
+                },
+                {
+                    id: 6,
+                    text: "在过去的两周里，您是否有入睡困难、睡不安稳或睡太多的问题？",
+                    options: ["从不", "偶尔", "经常", "总是"]
+                },
+                {
+                    id: 7,
+                    text: "在过去的两周里，您是否对自己的未来感到悲观？",
+                    options: ["从不", "偶尔", "经常", "总是"]
+                },
+                {
+                    id: 8,
+                    text: "在过去的两周里，您是否感到情绪低落、抑郁或绝望？",
+                    options: ["从不", "偶尔", "经常", "总是"]
+                },
+                {
+                    id: 9,
+                    text: "在过去的两周里，您是否有过伤害自己的想法？",
+                    options: ["从不", "偶尔", "经常", "总是"]
+                },
+                {
+                    id: 10,
+                    text: "在过去的两周里，您是否能够享受生活中的美好事物？",
+                    options: ["总是", "经常", "偶尔", "从不"]
+                }
+            ];
+            
+            let currentQuestion = 1;
+            const totalQuestions = questions.length;
+            const answers = {};
+            
+            // 更新问题显示
+            function updateQuestion() {
+                const question = questions[currentQuestion - 1];
+                document.getElementById('question-text').textContent = question.text;
+                document.getElementById('current-question').textContent = currentQuestion;
+                document.getElementById('total-questions').textContent = totalQuestions;
+                
+                // 更新进度条
+                const progress = (currentQuestion / totalQuestions) * 100;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+                document.getElementById('progress-percentage').textContent = `${Math.round(progress)}%`;
+                
+                // 更新按钮状态
+                prevQuestion.disabled = currentQuestion === 1;
+                
+                if (currentQuestion === totalQuestions) {
+                    nextQuestion.textContent = '提交';
+                } else {
+                    nextQuestion.textContent = '下一题';
+                }
+                
+                // 清除之前的选择
+                document.querySelectorAll('input[name="answer"]').forEach(input => {
+                    input.checked = false;
+                });
+                
+                // 如果有之前的答案，选中对应的选项
+                if (answers[currentQuestion]) {
+                    document.getElementById(`option-${answers[currentQuestion]}`).checked = true;
+                }
+            }
+            
+            // 显示测评结果
+            function showResults() {
+                questionContainer.classList.add('hidden');
+                resultContainer.classList.remove('hidden');
+                
+                // 计算得分
+                let score = 0;
+                for (const key in answers) {
+                    score += parseInt(answers[key]);
+                }
+                
+                // 根据得分设置结果
+                const emotionScore = document.getElementById('emotion-score');
+                const emotionLevel = document.getElementById('emotion-level');
+                const emotionAnalysis = document.getElementById('emotion-analysis');
+                const emotionSuggestions = document.getElementById('emotion-suggestions');
+                
+                // 转换为0-100分制
+                const normalizedScore = Math.round((score / (totalQuestions * 4)) * 100);
+                emotionScore.textContent = normalizedScore;
+                
+                // 设置情绪健康水平
+                if (normalizedScore >= 80) {
+                    emotionLevel.textContent = '优秀';
+                    emotionLevel.className = 'font-medium text-green-600';
+                    emotionAnalysis.textContent = '根据您的回答，您的情绪健康状况非常好。您能够有效地管理日常压力，保持积极的情绪状态。建议您继续保持现有的生活方式和应对策略，定期进行自我评估，关注情绪变化。';
+                } else if (normalizedScore >= 60) {
+                    emotionLevel.textContent = '良好';
+                    emotionLevel.className = 'font-medium text-blue-600';
+                    emotionAnalysis.textContent = '根据您的回答，您的情绪健康状况总体良好。您能够较好地管理日常压力，保持相对积极的情绪状态。建议您继续保持现有的生活方式和应对策略，定期进行自我评估，关注情绪变化。';
+                } else if (normalizedScore >= 40) {
+                    emotionLevel.textContent = '一般';
+                    emotionLevel.className = 'font-medium text-yellow-600';
+                    emotionAnalysis.textContent = '根据您的回答，您的情绪健康状况一般。您可能在某些方面存在一定的情绪困扰或压力。建议您关注自己的情绪变化，学习一些情绪管理技巧，必要时可以寻求专业心理咨询师的帮助。';
+                } else {
+                    emotionLevel.textContent = '需要关注';
+                    emotionLevel.className = 'font-medium text-red-600';
+                    emotionAnalysis.textContent = '根据您的回答，您的情绪健康状况可能存在一定问题。您可能正经历较多的情绪困扰或压力。建议您尽快寻求专业心理咨询师的帮助，同时可以尝试一些放松技巧，如深呼吸、冥想等，来缓解压力和情绪困扰。';
+                }
+                
+                // 隐藏导航按钮
+                document.querySelector('.mt-8.flex.justify-between').classList.add('hidden');
+            }
+            
+            // 开始测评
+            window.startAssessment = function(type) {
+                assessmentModal.classList.remove('hidden');
+                currentQuestion = 1;
+                answers = {};
+                
+                // 设置测评标题
+                if (type === 'emotion') {
+                    document.getElementById('assessment-title').textContent = '情绪健康测评';
+                } else if (type === 'mental') {
+                    document.getElementById('assessment-title').textContent = '心理健康测评';
+                } else if (type === 'stress') {
+                    document.getElementById('assessment-title').textContent = '压力水平测评';
+                }
+                
+                // 显示问题容器，隐藏结果容器
+                questionContainer.classList.remove('hidden');
+                resultContainer.classList.add('hidden');
+                
+                // 显示导航按钮
+                document.querySelector('.mt-8.flex.justify-between').classList.remove('hidden');
+                
+                // 更新第一个问题
+                updateQuestion();
+            };
+            
+            // 关闭测评
+            closeAssessment.addEventListener('click', function() {
+                assessmentModal.classList.add('hidden');
+            });
+            
+            // 下一题
+            nextQuestion.addEventListener('click', function() {
+                // 获取当前选中的选项
+                const selectedOption = document.querySelector('input[name="answer"]:checked');
+                
+                if (!selectedOption) {
+                    alert('请选择一个选项');
+                    return;
+                }
+                
+                // 保存答案
+                answers[currentQuestion] = selectedOption.value;
+                
+                if (currentQuestion === totalQuestions) {
+                    // 显示结果
+                    showResults();
+                } else {
+                    // 下一题
+                    currentQuestion++;
+                    updateQuestion();
+                }
+            });
+            
+            // 上一题
+            prevQuestion.addEventListener('click', function() {
+                if (currentQuestion > 1) {
+                    currentQuestion--;
+                    updateQuestion();
+                }
+            });
+            
+            // 预约咨询
+            window.bookConsultation = function(doctorName) {
+                alert(`您已成功预约${doctorName}的咨询服务，请等待确认通知。`);
+                window.location.href = 'booking.html';
+            };
+            
+            // 下载报告
+            document.getElementById('download-report').addEventListener('click', function() {
+                alert('报告下载功能即将上线，敬请期待！');
+            });
+            
+            // 分享结果
+            document.getElementById('share-result').addEventListener('click', function() {
+                alert('分享功能即将上线，敬请期待！');
+            });
+        });
+    </script>
+    <!-- 全局脚本文件 -->
+    <script src="common.js"></script>
+</body>
+</html>

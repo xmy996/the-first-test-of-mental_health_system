@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心社区 - 心理健康支持平台</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 全局样式文件 -->
+    <link rel="stylesheet" href="common.css">
+    <!-- 修复重复用户菜单脚本 -->
+    <script src="fix_duplicate_user_menu.js"></script>
+    <!-- 导入公共功能 -->
+    <script src="common.js"></script>
+    
+    <!-- 活动数据和动态加载逻辑 -->
+    <script>
+        // 活动数据
+        const activities = [
+            {
+                id: 1,
+                title: "正念减压工作坊",
+                category: "正念疗愈",
+                categoryClass: "bg-teal-100 text-teal-700",
+                date: "2025-11-20",
+                time: "14:00-16:00",
+                location: "心社区活动室",
+                participants: "15/20人",
+                price: 80,
+                image: "https://img.freepik.com/free-photo/mindfulness-meditation-yoga-concept_23-2149218116.jpg?w=800&auto=format&fit=crop",
+                instructorName: "张医生",
+                instructorTitle: "心理学博士 | 高级心理咨询师",
+                instructorDesc: "专注于正念减压、情绪管理和心理健康教育",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本工作坊将介绍正念减压的基本原理和方法，通过正念冥想、身体扫描等练习，帮助参与者缓解压力，提高专注力和情绪调节能力。",
+                    "正念减压（MBSR）是一种基于正念的心理治疗方法，由乔恩·卡巴金博士于1979年创立。它通过系统的正念训练，帮助人们培养觉察当下的能力，减少压力反应，提高生活质量。",
+                    "本工作坊适合："
+                ],
+                suitableFor: [
+                    "感到压力较大的职场人士",
+                    "希望提高专注力和情绪调节能力的人",
+                    "对正念冥想感兴趣的初学者",
+                    "希望改善睡眠质量的人"
+                ],
+                process: [
+                    { time: "14:00-14:15", title: "签到与自我介绍", description: "参与者签到，领取资料，进行简短的自我介绍" },
+                    { time: "14:15-14:45", title: "正念减压理论介绍", description: "介绍正念减压的基本原理、发展历程和科学依据" },
+                    { time: "14:45-15:15", title: "正念呼吸练习", description: "引导参与者进行正念呼吸练习，培养觉察当下的能力" },
+                    { time: "15:15-15:30", title: "休息与分享", description: "短暂休息，参与者分享练习体验" },
+                    { time: "15:30-16:00", title: "身体扫描练习", description: "引导参与者进行身体扫描练习，提高身体觉察能力" },
+                    { time: "16:00-16:15", title: "总结与问答", description: "总结活动内容，解答参与者问题，提供后续练习建议" }
+                ],
+                comments: [
+                    { name: "李女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "这个工作坊非常棒！张医生的引导很专业，正念练习让我感到非常放松。学习到的方法对我应对工作压力很有帮助，强烈推荐给大家！", date: "2025-10-15" },
+                    { name: "王先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 4, content: "作为一个初学者，这个工作坊给了我很好的入门体验。身体扫描练习特别有帮助，让我对自己的身体有了更深的觉察。场地环境也很舒适安静。", date: "2025-10-20" },
+                    { name: "张女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 4.5, content: "工作坊内容很实用，老师讲解清晰，练习指导也很到位。通过正念练习，我学会了更好地管理自己的情绪和压力。希望能有进阶课程！", date: "2025-10-25" }
+                ]
+            },
+            {
+                id: 2,
+                title: "情绪管理小组",
+                category: "情绪管理",
+                categoryClass: "bg-purple-100 text-purple-700",
+                date: "2025-11-22",
+                time: "19:00-21:00",
+                location: "心社区活动室",
+                participants: "8/12人",
+                price: 100,
+                image: "https://img.freepik.com/free-photo/mental-health-counseling-support-group-therapy_23-2149551341.jpg?w=800&auto=format&fit=crop",
+                instructorName: "李医生",
+                instructorTitle: "临床心理学硕士 | 国家二级心理咨询师",
+                instructorDesc: "专注于情绪管理、人际关系和心理成长",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本小组将帮助参与者认识和理解自己的情绪，学习情绪调节的技巧和方法，提高情绪管理能力，促进心理健康成长。",
+                    "情绪管理是心理健康的重要组成部分，良好的情绪管理能力可以帮助我们更好地应对生活中的各种挑战和压力。",
+                    "本小组适合："
+                ],
+                suitableFor: [
+                    "情绪波动较大的人群",
+                    "希望提高情绪管理能力的人",
+                    "经常感到焦虑或抑郁的人",
+                    "希望改善人际关系的人"
+                ],
+                process: [
+                    { time: "19:00-19:15", title: "开场与热身", description: "参与者互相认识，建立安全信任的小组氛围" },
+                    { time: "19:15-19:45", title: "情绪的本质与功能", description: "讲解情绪的心理学知识，帮助参与者理解情绪的重要性" },
+                    { time: "19:45-20:15", title: "情绪识别练习", description: "通过互动活动，帮助参与者识别和命名自己的情绪" },
+                    { time: "20:15-20:30", title: "休息与反思", description: "短暂休息，参与者记录个人情绪体验" },
+                    { time: "20:30-20:50", title: "情绪调节技巧训练", description: "学习并练习有效的情绪调节方法" },
+                    { time: "20:50-21:00", title: "总结与行动计划", description: "制定个人情绪管理行动计划" }
+                ],
+                comments: [
+                    { name: "陈女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "这个小组让我对自己的情绪有了全新的认识，学到了很多实用的调节技巧，现在面对压力时能更好地控制自己的情绪了。", date: "2025-10-18" },
+                    { name: "刘先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 4, content: "老师很专业，小组氛围很好，大家都很坦诚。学到了一些有用的情绪管理方法，推荐给情绪管理有困扰的朋友。", date: "2025-10-22" },
+                    { name: "赵女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "参加这个小组是我做过的最好的决定之一。我学会了如何接纳和表达自己的情绪，不再压抑。感谢这个平台提供这么好的活动！", date: "2025-10-28" }
+                ]
+            },
+            {
+                id: 3,
+                title: "艺术疗愈工作坊",
+                category: "艺术疗愈",
+                categoryClass: "bg-pink-100 text-pink-700",
+                date: "2025-11-24",
+                time: "10:00-12:00",
+                location: "心社区活动室",
+                participants: "10/15人",
+                price: 150,
+                image: "https://img.freepik.com/free-photo/young-people-art-therapy_23-2149697741.jpg?w=800&auto=format&fit=crop",
+                instructorName: "王老师",
+                instructorTitle: "艺术治疗师 | 心理咨询师",
+                instructorDesc: "专注于艺术疗法、表达性艺术治疗和创造性心理干预",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本工作坊通过绘画、手工等艺术形式，帮助参与者表达内心感受，释放情绪压力，促进自我探索和心理疗愈。无需艺术基础，适合所有年龄段。",
+                    "艺术疗愈是一种非语言的心理治疗方式，通过创造性的表达帮助人们探索内心世界，处理情绪问题，促进心理成长。",
+                    "本工作坊适合："
+                ],
+                suitableFor: [
+                    "希望探索内心世界的人群",
+                    "有情绪压力需要释放的人",
+                    "对艺术创作感兴趣的初学者",
+                    "希望提高自我认知的人"
+                ],
+                process: [
+                    { time: "10:00-10:15", title: "工作坊介绍与热身", description: "介绍艺术疗愈的概念和流程，进行简单的创意热身活动" },
+                    { time: "10:15-10:45", title: "自由绘画表达", description: "在引导下进行自由绘画，表达当下的情绪和感受" },
+                    { time: "10:45-11:15", title: "手工创作环节", description: "使用各种材料进行立体创作，进一步探索内在世界" },
+                    { time: "11:15-11:45", title: "作品分享与解读", description: "自愿分享创作过程和作品意义，促进互相理解和支持" },
+                    { time: "11:45-12:00", title: "总结与整合", description: "总结创作体验，探讨如何将艺术疗愈应用到日常生活中" }
+                ],
+                comments: [
+                    { name: "孙女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "从未想过艺术创作能有如此强大的疗愈效果！在老师的引导下，我通过绘画释放了长期积压的情绪，感觉整个人都轻松了。", date: "2025-10-20" },
+                    { name: "杨先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 4, content: "作为一个完全没有艺术基础的人，我本来很担心，但老师的指导让我放下了顾虑。创作过程很愉快，也收获了很多对自己的新认识。", date: "2025-10-25" },
+                    { name: "林女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "这个工作坊的氛围非常温暖和接纳，让我可以自由地表达自己。通过艺术创作，我发现了很多平时没有意识到的内心感受。强烈推荐！", date: "2025-11-01" }
+                ]
+            },
+            {
+                id: 4,
+                title: "人际沟通技巧训练",
+                category: "人际沟通",
+                categoryClass: "bg-purple-100 text-purple-700",
+                date: "2025-11-25",
+                time: "14:00-16:00",
+                location: "心社区活动室",
+                participants: "12/20人",
+                price: 100,
+                image: "https://img.freepik.com/free-photo/group-people-having-discussion_23-2149319115.jpg?w=800&auto=format&fit=crop",
+                instructorName: "陈老师",
+                instructorTitle: "人际关系专家 | 心理咨询师",
+                instructorDesc: "专注于人际沟通、冲突解决和关系建立",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本训练课程将帮助参与者学习有效的沟通技巧，包括积极倾听、表达自己、处理冲突等，提高人际交往能力，改善人际关系质量。",
+                    "良好的沟通能力是建立健康人际关系的基础，也是职业成功的重要因素。本课程通过理论讲解和实践练习，帮助参与者掌握实用的沟通技巧。",
+                    "本训练适合："
+                ],
+                suitableFor: [
+                    "希望改善人际关系的人群",
+                    "沟通中经常遇到困难的人",
+                    "想提高职场沟通能力的职场人士",
+                    "希望增强亲密关系沟通的伴侣"
+                ],
+                process: [
+                    { time: "14:00-14:20", title: "沟通的基本概念与重要性", description: "介绍有效沟通的要素和常见障碍" },
+                    { time: "14:20-14:50", title: "积极倾听技巧训练", description: "学习并练习积极倾听的方法和技巧" },
+                    { time: "14:50-15:20", title: "非暴力沟通实践", description: "学习如何清晰、尊重地表达自己的需求和感受" },
+                    { time: "15:20-15:30", title: "休息时间", description: "短暂休息，自由交流" },
+                    { time: "15:30-15:50", title: "冲突处理技巧", description: "学习如何建设性地处理人际冲突" },
+                    { time: "15:50-16:00", title: "总结与应用", description: "总结关键技巧，讨论如何在日常生活中应用" }
+                ],
+                comments: [
+                    { name: "郑先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 5, content: "这个训练改变了我对沟通的理解！学习了积极倾听和非暴力沟通的技巧后，我和家人的关系明显改善了。非常实用的课程！", date: "2025-10-22" },
+                    { name: "吴女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 4, content: "老师讲解很生动，互动练习也很有帮助。学到了很多实用的沟通技巧，特别是处理冲突的部分对我很有启发。", date: "2025-10-28" },
+                    { name: "黄先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "作为一名管理者，这个课程对我帮助很大。现在我能更好地理解团队成员的需求，沟通更顺畅，团队氛围也改善了。值得推荐！", date: "2025-11-05" }
+                ]
+            },
+            {
+                id: 5,
+                title: "亲子关系工作坊",
+                category: "家庭关系",
+                categoryClass: "bg-yellow-100 text-yellow-700",
+                date: "2025-11-25",
+                time: "14:00-16:00",
+                location: "心社区活动室",
+                participants: "8/12组",
+                price: 180,
+                image: "https://img.freepik.com/free-photo/family-therapy-session_23-2149551335.jpg?w=800&auto=format&fit=crop",
+                instructorName: "刘老师",
+                instructorTitle: "家庭治疗师 | 儿童心理学专家",
+                instructorDesc: "专注于亲子关系、儿童发展和家庭治疗",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本工作坊将帮助家长了解儿童心理发展特点，学习有效的亲子沟通技巧和正面管教方法，建立健康、和谐的亲子关系。",
+                    "良好的亲子关系是儿童健康成长的基础，也是家庭幸福的重要保障。本工作坊通过科学的理论和实践方法，帮助家长提升育儿能力。",
+                    "本工作坊适合："
+                ],
+                suitableFor: [
+                    "希望改善亲子关系的父母",
+                    "面临育儿挑战的家长",
+                    "即将成为父母的准父母",
+                    "与孩子沟通存在困难的家长"
+                ],
+                process: [
+                    { time: "10:00-10:20", title: "亲子关系的重要性", description: "介绍亲子关系对儿童发展的影响" },
+                    { time: "10:20-10:50", title: "儿童心理发展特点", description: "讲解不同年龄段儿童的心理需求和行为特点" },
+                    { time: "10:50-11:20", title: "有效的亲子沟通技巧", description: "学习如何与孩子建立良好的沟通" },
+                    { time: "11:20-11:40", title: "正面管教方法", description: "介绍非惩罚性的管教方式和原则" },
+                    { time: "11:40-12:00", title: "案例分享与问答", description: "家长分享育儿挑战，老师提供建议和指导" }
+                ],
+                comments: [
+                    { name: "周女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "参加这个工作坊是我作为母亲做过的最好的决定之一！学到了很多实用的沟通技巧，现在和孩子的关系好多了，冲突也少了很多。", date: "2025-10-25" },
+                    { name: "钱先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 4, content: "作为一名父亲，我一直不知道如何与青春期的孩子沟通。这个工作坊给了我很多启发，现在我们的关系正在慢慢改善。", date: "2025-10-30" },
+                    { name: "徐女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "老师很有经验，分享的案例很真实，方法也很实用。回家后我就开始尝试，效果真的很好！推荐所有家长都来参加！", date: "2025-11-08" }
+                ]
+            },
+            {
+                id: 6,
+                title: "职业生涯规划小组",
+                category: "职业发展",
+                categoryClass: "bg-indigo-100 text-indigo-700",
+                date: "2025-12-05",
+                time: "14:00-16:00",
+                location: "心社区活动室",
+                participants: "12/20人",
+                price: 100,
+                image: "https://img.freepik.com/free-photo/mindfulness-meditation-yoga-concept_23-2149218116.jpg?w=800&auto=format&fit=crop",
+                instructorName: "赵医生",
+                instructorTitle: "青少年心理专家 | 国家二级心理咨询师",
+                instructorDesc: "专注于青少年心理健康、学习压力管理和青春期心理辅导",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本讲座将深入探讨青少年常见的心理健康问题，包括学习压力、情绪管理、人际关系等方面，帮助家长和教育工作者更好地理解和支持青少年的心理健康发展。",
+                    "青少年时期是心理发展的关键阶段，了解这一时期的心理特点和需求，对于促进青少年健康成长至关重要。",
+                    "本讲座适合："
+                ],
+                suitableFor: [
+                    "青少年家长",
+                    "教育工作者",
+                    "关心青少年心理健康的人士",
+                    "青少年心理辅导工作者"
+                ],
+                process: [
+                    { time: "19:00-19:10", title: "开场介绍", description: "介绍讲座主题和讲师背景" },
+                    { time: "19:10-19:40", title: "青少年心理发展特点", description: "讲解青少年期的心理发展规律和特点" },
+                    { time: "19:40-20:10", title: "常见心理问题及应对策略", description: "分析青少年常见心理问题，提供有效的应对方法" },
+                    { time: "20:10-20:30", title: "互动问答", description: "解答听众问题，提供个性化建议" }
+                ],
+                comments: [
+                    { name: "孙妈妈", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "赵医生的讲座非常精彩！让我对青春期孩子的心理有了更深入的了解，学到了很多实用的沟通技巧，回家后和孩子的关系有了明显改善。", date: "2025-10-28" },
+                    { name: "李老师", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 4, content: "作为一名中学老师，这个讲座对我的教学工作很有帮助。现在我能更好地理解学生的行为背后的心理因素，更有效地与学生沟通。", date: "2025-11-01" },
+                    { name: "王爸爸", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "讲座内容非常实用，案例分析很生动，解答了我长期以来的困惑。强烈推荐给所有有青春期孩子的家长！", date: "2025-11-10" }
+                ]
+            },
+            {
+                id: 7,
+                title: "压力管理技巧训练",
+                category: "压力管理",
+                categoryClass: "bg-orange-100 text-orange-700",
+                date: "2025-12-07",
+                time: "10:00-12:00",
+                location: "心社区活动室",
+                participants: "15/25人",
+                price: 80,
+                image: "https://img.freepik.com/free-photo/stress-relief-meditation-practice_23-2149405910.jpg?w=800&auto=format&fit=crop",
+                instructorName: "郑老师",
+                instructorTitle: "沙盘游戏治疗师 | 心理咨询师",
+                instructorDesc: "专注于沙盘游戏治疗、心理评估和创伤修复",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本工作坊将介绍沙盘游戏治疗的基本原理和技术，通过实际操作体验，帮助参与者了解沙盘游戏作为一种非语言治疗工具的魅力和效果。",
+                    "沙盘游戏治疗是一种通过沙子、水和沙具进行心理治疗的方法，能够帮助来访者表达潜意识，促进心理自愈和成长。",
+                    "本工作坊适合："
+                ],
+                suitableFor: [
+                    "心理咨询师和心理治疗师",
+                    "学校心理教师",
+                    "对沙盘游戏治疗感兴趣的心理健康工作者",
+                    "希望探索内心世界的个人"
+                ],
+                process: [
+                    { time: "14:00-14:30", title: "沙盘游戏治疗概述", description: "介绍沙盘游戏治疗的历史、理论基础和基本原则" },
+                    { time: "14:30-15:00", title: "沙具的象征意义", description: "讲解常见沙具的象征含义和解读方法" },
+                    { time: "15:00-15:30", title: "演示：个案工作过程", description: "现场演示沙盘游戏治疗的实际操作过程" },
+                    { time: "15:30-15:45", title: "茶歇", description: "短暂休息和交流" },
+                    { time: "15:45-16:45", title: "实践体验", description: "参与者在指导下进行个人沙盘创作和分享" },
+                    { time: "16:45-17:00", title: "总结与讨论", description: "回顾工作坊内容，讨论沙盘游戏的应用前景" }
+                ],
+                comments: [
+                    { name: "张咨询师", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "郑老师的工作坊非常专业！通过亲身体验，我对沙盘游戏治疗有了更深入的理解，学到了很多实用的技术和方法，可以直接应用到我的咨询工作中。", date: "2025-10-30" },
+                    { name: "陈老师", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 5, content: "作为学校心理老师，这个工作坊对我帮助很大。沙盘游戏是一种非常适合学生的心理辅导方式，通过这次学习，我可以更好地为学生提供服务。", date: "2025-11-05" },
+                    { name: "刘女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 4.5, content: "第一次接触沙盘游戏治疗，感觉非常神奇！在老师的引导下，我通过创作沙盘，对自己有了很多新的认识。这个工作坊既有理论深度，又有实践体验，很棒！", date: "2025-11-15" }
+                ]
+            },
+            {
+                id: 8,
+                title: "自我探索与成长小组",
+                category: "心理成长",
+                categoryClass: "bg-blue-100 text-primary",
+                date: "2025-12-09",
+                time: "19:00-21:00",
+                location: "心社区活动室",
+                participants: "8/12人",
+                price: 120,
+                image: "https://img.freepik.com/free-photo/group-people-discussing-ideas-seminar_23-2148854975.jpg?w=800&auto=format&fit=crop",
+                instructorName: "吴老师",
+                instructorTitle: "职场心理专家 | 企业EAP培训师",
+                instructorDesc: "专注于职场压力管理、职业倦怠预防和团队心理建设",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本课程将帮助职场人士识别和管理工作压力，学习有效的压力应对策略和放松技巧，提高工作效率和生活质量，预防职业倦怠。",
+                    "在职场竞争日益激烈的今天，有效管理心理压力已成为职业发展的必备技能。本课程结合心理学理论和实践方法，为职场人士提供实用的压力管理方案。",
+                    "本课程适合："
+                ],
+                suitableFor: [
+                    "感到工作压力较大的职场人士",
+                    "希望提高工作效率和生活质量的人",
+                    "企业管理人员和HR",
+                    "希望预防职业倦怠的专业人士"
+                ],
+                process: [
+                    { time: "19:00-19:20", title: "职场压力的来源与影响", description: "分析职场压力的常见来源及其对身心健康的影响" },
+                    { time: "19:20-19:40", title: "压力识别与评估", description: "学习如何识别压力信号，评估自身压力水平" },
+                    { time: "19:40-20:10", title: "实用压力管理技巧", description: "教授深呼吸、正念、时间管理等有效的压力应对方法" },
+                    { time: "20:10-20:20", title: "休息时间", description: "短暂休息和交流" },
+                    { time: "20:20-20:50", title: "职场沟通与边界设定", description: "学习如何通过有效沟通和合理设定边界减轻压力" },
+                    { time: "20:50-21:00", title: "个人行动计划", description: "制定个性化的压力管理计划" }
+                ],
+                comments: [
+                    { name: "林先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 5, content: "这个课程对我帮助很大！吴老师教授的压力管理技巧非常实用，我现在能够更好地应对工作压力，工作效率提高了，睡眠质量也改善了。", date: "2025-11-02" },
+                    { name: "黄女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 4, content: "作为部门经理，我学到了很多帮助团队成员管理压力的方法。课程内容很实用，老师讲解清晰，互动环节也很有帮助。", date: "2025-11-10" },
+                    { name: "杨先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "正处于职业倦怠边缘的我参加了这个课程，收获很大！学到的时间管理和边界设定技巧让我重新找回了工作与生活的平衡。强烈推荐给所有职场人士！", date: "2025-11-20" }
+                ]
+            },
+            {
+                id: 9,
+                title: "冲突解决技巧训练",
+                category: "人际沟通",
+                categoryClass: "bg-purple-100 text-purple-700",
+                date: "2025-12-11",
+                time: "14:00-16:00",
+                location: "心社区活动室",
+                participants: "10/15人",
+                price: 100,
+                image: "https://img.freepik.com/free-photo/group-people-conflict-resolution_23-2149319124.jpg?w=800&auto=format&fit=crop",
+                instructorName: "马老师",
+                instructorTitle: "认知行为治疗师 | 心理学教授",
+                instructorDesc: "专注于认知行为疗法、抑郁症和焦虑症治疗",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本工作坊将系统介绍认知行为疗法（CBT）的理论基础和实践技术，通过案例分析和实操演练，帮助参与者掌握CBT的核心技能，提升心理咨询和自我帮助的能力。",
+                    "认知行为疗法是一种循证心理治疗方法，广泛应用于抑郁症、焦虑症等心理问题的治疗。它关注思维、情绪和行为之间的关系，通过改变认知模式来改善情绪和行为。",
+                    "本工作坊适合："
+                ],
+                suitableFor: [
+                    "心理咨询师和心理治疗师",
+                    "心理健康教育工作者",
+                    "心理学专业学生",
+                    "希望学习自我心理调适方法的个人"
+                ],
+                process: [
+                    { time: "9:00-9:30", title: "认知行为疗法概述", description: "介绍CBT的发展历史、理论基础和基本原理" },
+                    { time: "9:30-10:30", title: "认知模式与认知歪曲", description: "讲解认知三角理论和常见的认知歪曲类型" },
+                    { time: "10:30-10:45", title: "茶歇", description: "短暂休息和交流" },
+                    { time: "10:45-12:00", title: "CBT评估与个案概念化", description: "学习CBT评估技术和个案概念化方法" },
+                    { time: "12:00-13:30", title: "午休", description: "午餐和休息时间" },
+                    { time: "13:30-14:30", title: "认知重构技术", description: "教授识别和挑战负面思维的具体方法" },
+                    { time: "14:30-15:30", title: "行为激活与暴露疗法", description: "介绍行为干预技术和应用场景" },
+                    { time: "15:30-15:45", title: "茶歇", description: "短暂休息和交流" },
+                    { time: "15:45-16:00", title: "案例讨论与总结", description: "通过案例讨论巩固所学内容，总结工作坊要点" }
+                ],
+                comments: [
+                    { name: "郑咨询师", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 5, content: "马老师的工作坊非常专业！内容深入浅出，案例丰富，实操环节设计合理。通过这次学习，我的CBT技能有了明显提升，对咨询工作很有帮助。", date: "2025-11-05" },
+                    { name: "王学生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "作为心理学专业的学生，这个工作坊让我对认知行为疗法有了系统的了解。老师讲解清晰，内容实用，是一次非常有价值的学习体验。", date: "2025-11-15" },
+                    { name: "刘女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 4.5, content: "参加这个工作坊主要是想学习自我调适的方法，收获很大！学到的认知重构技术帮助我改变了很多负面思维模式，情绪状态有了明显改善。", date: "2025-11-25" }
+                ]
+            },
+            {
+                id: 10,
+                title: "绘画疗愈工作坊",
+                category: "艺术疗愈",
+                categoryClass: "bg-pink-100 text-pink-700",
+                date: "2025-12-10",
+                time: "10:00-12:00",
+                location: "心社区活动室",
+                participants: "10/15人",
+                price: 150,
+                image: "https://img.freepik.com/free-photo/watercolor-painting-therapy_23-2149697745.jpg?w=800&auto=format&fit=crop",
+                instructorName: "朱老师",
+                instructorTitle: "冥想导师 | 心灵成长教练",
+                instructorDesc: "专注于冥想指导、心灵成长和个人潜能开发",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本工作坊将带领参与者通过各种冥想练习，探索内心世界，培养觉察力和专注力，促进心灵成长和自我认知，提升生活质量。",
+                    "冥想是一种古老而有效的心灵修炼方法，通过专注当下、观察内心，帮助人们减轻压力，提高幸福感，实现身心平衡。",
+                    "本工作坊适合："
+                ],
+                suitableFor: [
+                    "对冥想感兴趣的初学者",
+                    "希望减轻压力、提高专注力的人群",
+                    "追求心灵成长和自我提升的人士",
+                    "希望改善睡眠质量的人"
+                ],
+                process: [
+                    { time: "14:00-14:20", title: "冥想的基本概念与益处", description: "介绍冥想的定义、历史和科学研究证实的益处" },
+                    { time: "14:20-14:50", title: "基础呼吸冥想练习", description: "引导参与者进行呼吸冥想，培养专注当下的能力" },
+                    { time: "14:50-15:20", title: "身体扫描冥想", description: "通过系统性地关注身体各部位，提高身体觉察力" },
+                    { time: "15:20-15:30", title: "休息与分享", description: "短暂休息，参与者分享初步体验" },
+                    { time: "15:30-16:00", title: "正念行走冥想", description: "学习在行走中保持正念的方法" },
+                    { time: "16:00-16:20", title: "日常冥想实践指导", description: "讨论如何在日常生活中建立冥想习惯" },
+                    { time: "16:20-16:30", title: "总结与答疑", description: "回答参与者问题，提供后续学习资源" }
+                ],
+                comments: [
+                    { name: "何女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "朱老师的引导非常专业和温和！第一次尝试冥想就有很好的体验，工作坊结束后我开始每天练习，睡眠质量和情绪状态都有明显改善。", date: "2025-11-10" },
+                    { name: "张先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 4, content: "作为一名IT从业者，工作压力很大，这个工作坊教会了我如何通过冥想放松身心。朱老师的讲解清晰易懂，各种冥想技巧都很实用。", date: "2025-11-20" },
+                    { name: "罗女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "工作坊氛围非常温馨舒适，朱老师的声音很有疗愈力。通过这次学习，我对自己有了更深的认识，也找到了一种适合自己的心灵成长方式。强烈推荐！", date: "2025-12-01" }
+                ]
+            },
+            {
+                id: 11,
+                title: "家庭沟通技巧工作坊",
+                category: "家庭关系",
+                categoryClass: "bg-yellow-100 text-yellow-700",
+                date: "2025-12-12",
+                time: "19:00-21:00",
+                location: "心社区活动室",
+                participants: "8/12组",
+                price: 200,
+                image: "https://img.freepik.com/free-photo/family-therapy-session_23-2149551335.jpg?w=800&auto=format&fit=crop",
+                instructorName: "刘老师",
+                instructorTitle: "家庭治疗师 | 儿童心理学专家",
+                instructorDesc: "专注于亲子关系、儿童发展和家庭治疗",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本工作坊针对家庭成员，通过互动游戏和讨论，帮助家庭成员学习有效的沟通技巧，改善家庭沟通模式，解决家庭冲突，增强家庭凝聚力。",
+                    "良好的家庭沟通是建立和谐家庭关系的基础，也是家庭成员心理健康的重要保障。",
+                    "本工作坊适合："
+                ],
+                suitableFor: [
+                    "希望改善家庭沟通的家庭成员",
+                    "面临家庭冲突的家庭",
+                    "想建立更好亲子关系的父母",
+                    "希望增强家庭凝聚力的家庭"
+                ],
+                process: [
+                    { time: "19:00-19:15", title: "开场与热身", description: "家庭成员互相认识，建立安全信任的小组氛围" },
+                    { time: "19:15-19:45", title: "有效沟通的基本要素", description: "讲解有效沟通的技巧和常见障碍" },
+                    { time: "19:45-20:15", title: "倾听与表达练习", description: "通过互动活动，练习积极倾听和清晰表达" },
+                    { time: "20:15-20:30", title: "休息与反思", description: "短暂休息，家庭成员交流感受" },
+                    { time: "20:30-20:50", title: "家庭冲突解决技巧", description: "学习建设性解决家庭冲突的方法" },
+                    { time: "20:50-21:00", title: "总结与行动计划", description: "制定改善家庭沟通的行动计划" }
+                ],
+                comments: [
+                    { name: "王家庭", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "参加这个工作坊后，我们全家的沟通方式有了很大改变，现在能够更理解彼此的感受，冲突也少了很多。", date: "2025-11-15" },
+                    { name: "李家庭", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 4, content: "刘老师的指导很专业，活动设计也很有趣，孩子们也很喜欢。学到的方法很实用，回家后我们经常练习。", date: "2025-11-20" },
+                    { name: "张家庭", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "这是我们参加过的最有价值的家庭活动！通过这次工作坊，我们学会了如何更好地理解和支持彼此，家庭氛围明显改善。", date: "2025-11-28" }
+                ]
+            },
+            {
+                id: 12,
+                title: "正念冥想小组",
+                category: "正念疗愈",
+                categoryClass: "bg-teal-100 text-teal-700",
+                date: "2025-12-15",
+                time: "19:00-20:00",
+                location: "心社区活动室",
+                participants: "12/20人",
+                price: 60,
+                image: "https://img.freepik.com/free-photo/group-meditation-practice_23-2149148871.jpg?w=800&auto=format&fit=crop",
+                instructorName: "张老师",
+                instructorTitle: "正念冥想导师 | 心理咨询师",
+                instructorDesc: "专注于正念冥想、压力管理和情绪调节",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本小组将介绍正念冥想的基本原理和方法，通过指导式冥想练习，帮助参与者培养专注力，减轻压力，提高情绪调节能力，促进心理健康。",
+                    "正念冥想是一种通过关注当下、觉察内心的练习方式，科学研究表明它可以有效减轻焦虑、抑郁等情绪问题。",
+                    "本小组适合："
+                ],
+                suitableFor: [
+                    "对正念冥想感兴趣的初学者",
+                    "希望减轻压力、提高专注力的人群",
+                    "经常感到焦虑或抑郁的人",
+                    "希望改善睡眠质量的人"
+                ],
+                process: [
+                    { time: "19:00-19:05", title: "开场与准备", description: "参与者签到，调整坐姿，准备冥想" },
+                    { time: "19:05-19:15", title: "正念冥想简介", description: "介绍正念冥想的基本概念和益处" },
+                    { time: "19:15-19:40", title: "引导式冥想练习", description: "在老师引导下进行正念呼吸和身体扫描练习" },
+                    { time: "19:40-19:55", title: "体验分享", description: "参与者自愿分享冥想体验和感受" },
+                    { time: "19:55-20:00", title: "总结与指导", description: "总结练习要点，提供日常练习建议" }
+                ],
+                comments: [
+                    { name: "陈女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "张老师的引导非常专业和温和，第一次参加冥想小组就有很好的体验。现在我每天都会练习，睡眠质量和情绪状态都有明显改善。", date: "2025-11-20" },
+                    { name: "王先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 4, content: "作为一名程序员，工作压力很大，这个小组教会了我如何在忙碌的工作中保持正念。非常实用的技能！", date: "2025-11-25" },
+                    { name: "刘女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "小组氛围非常温馨舒适，张老师的声音很有疗愈力。通过持续参加，我对自己的情绪有了更好的觉察和管理能力。强烈推荐！", date: "2025-12-01" }
+                ]
+            },
+            {
+                id: 13,
+                title: "职场压力管理工作坊",
+                category: "职业发展",
+                categoryClass: "bg-indigo-100 text-indigo-700",
+                date: "2025-12-18",
+                time: "14:00-16:00",
+                location: "心社区活动室",
+                participants: "15/25人",
+                price: 120,
+                image: "https://p3-doubao-search-sign.byteimg.com/labis/b342e6da6f72ed251beabcab88fa96b2~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777631430&x-signature=tztK7Txuw2dXFnyHe9%2BoUe%2BleGU%3D",
+                instructorName: "吴老师",
+                instructorTitle: "职场心理专家 | 企业EAP培训师",
+                instructorDesc: "专注于职场压力管理、职业倦怠预防和团队心理建设",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本工作坊针对职场人士，介绍职场压力的特点和影响，帮助参与者识别职场压力源，学习有效的职场压力管理技巧，提高工作效率和职业满意度。",
+                    "在职场竞争日益激烈的今天，有效管理心理压力已成为职业发展的必备技能。",
+                    "本工作坊适合："
+                ],
+                suitableFor: [
+                    "感到工作压力较大的职场人士",
+                    "希望提高工作效率和生活质量的人",
+                    "企业管理人员和HR",
+                    "希望预防职业倦怠的专业人士"
+                ],
+                process: [
+                    { time: "14:00-14:20", title: "职场压力的来源与影响", description: "分析职场压力的常见来源及其对身心健康的影响" },
+                    { time: "14:20-14:40", title: "压力识别与评估", description: "学习如何识别压力信号，评估自身压力水平" },
+                    { time: "14:40-15:10", title: "实用压力管理技巧", description: "教授深呼吸、正念、时间管理等有效的压力应对方法" },
+                    { time: "15:10-15:20", title: "休息时间", description: "短暂休息和交流" },
+                    { time: "15:20-15:50", title: "职场沟通与边界设定", description: "学习如何通过有效沟通和合理设定边界减轻压力" },
+                    { time: "15:50-16:00", title: "个人行动计划", description: "制定个性化的压力管理计划" }
+                ],
+                comments: [
+                    { name: "林先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 5, content: "这个工作坊对我帮助很大！吴老师教授的压力管理技巧非常实用，我现在能够更好地应对工作压力，工作效率提高了，睡眠质量也改善了。", date: "2025-11-02" },
+                    { name: "黄女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 4, content: "作为部门经理，我学到了很多帮助团队成员管理压力的方法。课程内容很实用，老师讲解清晰，互动环节也很有帮助。", date: "2025-11-10" },
+                    { name: "杨先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "正处于职业倦怠边缘的我参加了这个工作坊，收获很大！学到的时间管理和边界设定技巧让我重新找回了工作与生活的平衡。强烈推荐给所有职场人士！", date: "2025-11-20" }
+                ]
+            },
+            {
+                id: 14,
+                title: "正念行走工作坊",
+                category: "正念疗愈",
+                categoryClass: "bg-teal-100 text-teal-700",
+                date: "2025-12-20",
+                time: "10:00-11:30",
+                location: "城市公园",
+                participants: "10/15人",
+                price: 80,
+                image: "https://img.freepik.com/free-photo/people-practicing-mindfulness-meditation-nature_23-2149148877.jpg?w=800&auto=format&fit=crop",
+                instructorName: "张老师",
+                instructorTitle: "正念冥想导师 | 自然疗愈引导师",
+                instructorDesc: "专注于正念冥想、自然疗愈和户外活动引导",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本工作坊将介绍正念行走的基本原理和方法，通过户外正念行走练习，帮助参与者培养专注力，减轻压力，提高情绪调节能力，感受大自然的疗愈力量。",
+                    "正念行走是一种将正念理念应用于日常行走的练习方式，结合大自然的疗愈力量，效果显著。",
+                    "本工作坊适合："
+                ],
+                suitableFor: [
+                    "对正念练习感兴趣的人群",
+                    "喜欢户外活动的人",
+                    "希望减轻压力、放松身心的职场人士",
+                    "想改善情绪状态的人"
+                ],
+                process: [
+                    { time: "10:00-10:15", title: "集合与简介", description: "参与者集合，介绍正念行走的概念和注意事项" },
+                    { time: "10:15-10:30", title: "热身与准备", description: "进行简单的身体热身，调整心态" },
+                    { time: "10:30-11:00", title: "正念行走练习", description: "在老师引导下进行慢走和快走交替的正念行走" },
+                    { time: "11:00-11:15", title: "自然观察与正念", description: "学习在自然环境中保持正念，观察周围事物" },
+                    { time: "11:15-11:30", title: "总结与分享", description: "分享体验，总结要点，提供日常练习建议" }
+                ],
+                comments: [
+                    { name: "赵女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "这是一次非常特别的体验！在美丽的公园中进行正念行走，张老师的引导让我完全沉浸在当下，感受到了大自然的疗愈力量。整个过程非常放松，压力完全释放了。", date: "2025-11-25" },
+                    { name: "钱先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 4, content: "平时工作很忙，很少有机会亲近自然。这次工作坊让我重新认识了行走的意义，学会了在日常生活中保持正念。非常有价值的体验！", date: "2025-12-01" },
+                    { name: "孙女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "张老师很专业，引导清晰，节奏把握得很好。正念行走结合大自然的环境，效果比室内冥想更好。结束后心情特别平静，推荐给所有喜欢户外活动的朋友！", date: "2025-12-08" }
+                ]
+            },
+            {
+                id: 15,
+                title: "积极心理学工作坊",
+                category: "心理成长",
+                categoryClass: "bg-blue-100 text-primary",
+                date: "2025-12-22",
+                time: "14:00-16:00",
+                location: "心社区活动室",
+                participants: "12/20人",
+                price: 120,
+                image: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-tjoges91tu/abd4f9c33214efbb7d594cbe4142e088~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777631430&x-signature=9UookuD92FMlxiy9%2BK9h8xJmAZg%3D",
+                instructorName: "李老师",
+                instructorTitle: "积极心理学专家 | 心理咨询师",
+                instructorDesc: "专注于积极心理学、幸福感提升和心理资本开发",
+                instructorAvatar: "https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D",
+                description: [
+                    "本工作坊基于积极心理学理论，帮助参与者培养积极情绪、个人优势和幸福感，学习感恩、乐观、希望等积极心理品质，提高生活质量和心理健康水平。",
+                    "积极心理学关注人类的积极力量和美德，研究如何帮助人们发挥潜能，获得幸福和满足感。",
+                    "本工作坊适合："
+                ],
+                suitableFor: [
+                    "希望提升幸福感的人群",
+                    "想培养积极心态的人",
+                    "对心理学感兴趣的爱好者",
+                    "希望改善生活质量的职场人士"
+                ],
+                process: [
+                    { time: "14:00-14:20", title: "积极心理学概述", description: "介绍积极心理学的发展历史、核心概念和研究发现" },
+                    { time: "14:20-14:50", title: "识别和培养个人优势", description: "通过活动帮助参与者识别自己的优势和美德" },
+                    { time: "14:50-15:20", title: "积极情绪培养技巧", description: "学习如何培养感恩、乐观等积极情绪" },
+                    { time: "15:20-15:30", title: "休息时间", description: "短暂休息和交流" },
+                    { time: "15:30-15:50", title: "幸福行动规划", description: "制定个人幸福行动计划" },
+                    { time: "15:50-16:00", title: "总结与分享", description: "总结工作坊要点，参与者分享收获" }
+                ],
+                comments: [
+                    { name: "周女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/1260003026af9c18111823227564593~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=YLUO%2Bp%2B6WqgJk8cV8aL%2B0ZcNiU%3D", rating: 5, content: "李老师的工作坊非常有启发性！通过学习积极心理学的知识和技巧，我对自己有了新的认识，开始关注生活中的积极方面。现在我的心情比以前好多了，也更有动力面对生活中的挑战。", date: "2025-11-20" },
+                    { name: "吴先生", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/0638a7b8108c772d5571959547700089~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=07W6V0HycO66l4bV2b5cWZtV8wI%3D", rating: 4, content: "工作坊内容很丰富，活动设计也很有趣。学到了很多实用的方法来培养积极情绪和心态。李老师讲解清晰，案例丰富，互动性强。", date: "2025-11-28" },
+                    { name: "郑女士", avatar: "https://p26-doubao-search-sign.byteimg.com/labis/3129126524234311424342~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D", rating: 5, content: "这是我参加过的最有价值的心理学工作坊之一！积极心理学的理念让我重新思考了生活的意义和幸福的本质。通过实践课上学到的技巧，我的生活质量有了明显提升。强烈推荐给所有想要提升幸福感的人！", date: "2025-12-05" }
+                ]
+            }
+        ];
+
+        // 从URL获取活动ID
+        function getActivityId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = parseInt(urlParams.get('id'));
+            return id && !isNaN(id) && id > 0 ? id : 1; // 确保返回有效ID，否则使用默认值1
+        }
+
+        // 生成星级评分HTML
+        function generateStarRating(rating) {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            
+            // 添加满星
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fa fa-star"></i>';
+            }
+            
+            // 添加半星（如果有）
+            if (hasHalfStar) {
+                stars += '<i class="fa fa-star-half-o"></i>';
+            }
+            
+            // 添加空星
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="fa fa-star-o"></i>';
+            }
+            
+            return stars;
+        }
+
+        // 加载活动数据
+        function loadActivityData() {
+            const activityId = getActivityId();
+            const activity = activities.find(act => act.id === activityId) || activities[0];
+
+            // 更新页面标题
+            document.title = activity.title + ' - 心社区';
+            
+            // 更新活动图片
+            const activityImage = document.querySelector('.activity-image');
+            if (activityImage) {
+                activityImage.src = activity.image;
+                activityImage.alt = activity.title;
+            }
+            
+            // 更新活动标题和基本信息
+            const titleElement = document.querySelector('.activity-title');
+            if (titleElement) {
+                titleElement.textContent = activity.title;
+            }
+            
+            const categoryElement = document.querySelector('.activity-category');
+            if (categoryElement) {
+                categoryElement.textContent = activity.category;
+                // 安全地设置className，避免空值问题
+                const categoryClass = activity.categoryClass || 'bg-blue-100 text-blue-700';
+                categoryElement.className = categoryClass + ' text-sm font-medium px-3 py-1 rounded-full';
+            }
+            
+            const dateElement = document.querySelector('.activity-date');
+            if (dateElement) {
+                dateElement.textContent = activity.date;
+            }
+            
+            const timeElement = document.querySelector('.activity-time');
+            if (timeElement) {
+                timeElement.textContent = activity.time;
+            }
+            
+            const locationElement = document.querySelector('.activity-location');
+            if (locationElement) {
+                locationElement.textContent = activity.location;
+            }
+            
+            const participantsElement = document.querySelector('.activity-participants');
+            if (participantsElement) {
+                participantsElement.textContent = activity.participants;
+            }
+            
+            const priceElement = document.querySelector('.activity-price');
+            if (priceElement) {
+                priceElement.textContent = '¥' + activity.price + '/人';
+            }
+            
+            // 更新讲师信息
+            const instructorAvatar = document.querySelector('.instructor-avatar');
+            if (instructorAvatar) {
+                instructorAvatar.src = activity.instructorAvatar;
+                instructorAvatar.alt = activity.instructorName;
+            }
+            
+            const instructorName = document.querySelector('.instructor-name');
+            if (instructorName) {
+                instructorName.textContent = activity.instructorName;
+            }
+            
+            const instructorTitle = document.querySelector('.instructor-title');
+            if (instructorTitle) {
+                instructorTitle.textContent = activity.instructorTitle;
+            }
+            
+            const instructorDesc = document.querySelector('.instructor-desc');
+            if (instructorDesc) {
+                instructorDesc.textContent = activity.instructorDesc;
+            }
+            
+            // 更新活动详情描述
+            const descriptionContainer = document.querySelector('.activity-description');
+            if (descriptionContainer) {
+                descriptionContainer.innerHTML = '';
+                activity.description.forEach(para => {
+                    const p = document.createElement('p');
+                    p.className = 'text-gray-700 mb-4';
+                    p.textContent = para;
+                    descriptionContainer.appendChild(p);
+                });
+                
+                // 添加适合人群列表
+                const ul = document.createElement('ul');
+                ul.className = 'list-disc pl-6 text-gray-700 space-y-1';
+                activity.suitableFor.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    ul.appendChild(li);
+                });
+                descriptionContainer.appendChild(ul);
+            }
+            
+            // 更新活动流程
+            const processContainer = document.querySelector('.activity-process .space-y-6');
+            if (processContainer) {
+                processContainer.innerHTML = '';
+                activity.process.forEach((step, index) => {
+                    const processItem = document.createElement('div');
+                    processItem.className = 'flex';
+                    processItem.innerHTML = 
+                        '<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold z-10">' + (index + 1) + '</div>' +
+                        '<div class="ml-6">' +
+                            '<h3 class="text-lg font-medium text-gray-800">' + step.time + ' ' + step.title + '</h3>' +
+                            '<p class="text-gray-600 mt-1">' + step.description + '</p>' +
+                        '</div>';
+                    processContainer.appendChild(processItem);
+                });
+            }
+            
+            // 更新参与者评价
+            const commentsContainer = document.querySelector('.activity-comments .space-y-6');
+            if (commentsContainer) {
+                commentsContainer.innerHTML = '';
+                activity.comments.forEach(comment => {
+                    const commentItem = document.createElement('div');
+                    commentItem.className = 'flex';
+                    commentItem.innerHTML = 
+                        '<div class="flex-shrink-0">' +
+                            '<img src="' + comment.avatar + '" alt="用户头像" class="w-12 h-12 rounded-full object-cover">' +
+                        '</div>' +
+                        '<div class="ml-4">' +
+                            '<div class="flex items-center">' +
+                                '<h3 class="text-lg font-medium text-gray-800">' + comment.name + '</h3>' +
+                                '<div class="flex text-yellow-400 ml-2">' +
+                                    generateStarRating(comment.rating) +
+                                '</div>' +
+                            '</div>' +
+                            '<p class="text-gray-600 mt-1">' + comment.content + '</p>' +
+                            '<p class="text-gray-500 text-sm mt-1">' + comment.date + '</p>' +
+                        '</div>';
+                    commentsContainer.appendChild(commentItem);
+                });
+            }
+            
+            // 更新报名表单中的价格信息
+            const pricePerPerson = document.querySelector('.price-per-person');
+            if (pricePerPerson) {
+                pricePerPerson.textContent = '¥' + activity.price + '/人';
+            }
+            
+            const totalPrice = document.getElementById('total-price');
+            if (totalPrice) {
+                totalPrice.textContent = '¥' + activity.price;
+            }
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadActivityData();
+            
+            // 更新参与人数变化时的总价
+            const participantsSelect = document.getElementById('participants');
+            const participantsCount = document.getElementById('participants-count');
+            const totalPrice = document.getElementById('total-price');
+            
+            participantsSelect.addEventListener('change', function() {
+                const activityId = getActivityId();
+                const activity = activities.find(act => act.id === activityId) || activities[0];
+                const count = parseInt(this.value);
+                participantsCount.textContent = count + '人';
+                totalPrice.textContent = '¥' + (activity.price * count);
+            });
+            
+            // 报名表单提交逻辑
+            const registrationForm = document.getElementById('registration-form');
+            if (registrationForm) {
+                registrationForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    
+                    // 获取表单数据
+                    const name = document.getElementById('name').value.trim();
+                    const phone = document.getElementById('phone').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    const participants = document.getElementById('participants').value;
+                    const notes = document.getElementById('notes').value.trim();
+                    const agreeTerms = document.getElementById('agree-terms').checked;
+                    
+                    // 简单验证
+                    if (!name || !phone || !email || !agreeTerms) {
+                        alert('请填写所有必填信息并同意条款！');
+                        return;
+                    }
+                    
+                    // 获取当前活动信息
+                    const activityId = getActivityId();
+                    const activity = activities.find(act => act.id === activityId) || activities[0];
+                    
+                    // 模拟报名成功
+                    alert('报名成功！\n活动名称：' + activity.title + '\n时间：' + activity.date + ' ' + activity.time + '\n总价：¥' + (activity.price * parseInt(participants)));
+                    
+                    // 跳转回活动列表
+                    window.location.href = 'activity_list.html';
+                });
+            }
+        });
+    </script>
+    <!-- 基础 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        error: '#ef4444',
+                        info: '#3b82f6',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .glass-effect {
+                @apply bg-white/80 backdrop-blur-md shadow-lg;
+            }
+            .transition-all-300 {
+                transition: all 0.3s ease;
+            }
+        }
+    </style>
+<style>
+
+    /* 全局样式重置 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 全局颜色变量 */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background-color: var(--bg-primary);
+    }
+    
+    /* 统一按钮样式 */
+    button {
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        outline: none;
+    }
+    
+    /* 主按钮样式 - 注册按钮 */
+    .btn-primary {
+        background-color: var(--secondary-color);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #7c3aed;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+    }
+    
+    /* 次要按钮样式 - 登录按钮 */
+    .btn-secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        transform: translateY(-1px);
+    }
+    
+    /* 导航栏样式 */
+    nav {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .btn-primary,
+        .btn-secondary {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* 卡片样式 */
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+    }
+    
+    /* 输入框样式 */
+    input,
+    textarea,
+    select {
+        font-family: inherit;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+</style>
+</head>
+<body class="bg-light font-sans text-dark overflow-x-hidden">
+    <!-- 动态背景 -->
+    <div class="dynamic-bg bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div class="shape bg-primary/20 w-[30vw] h-[30vw] top-[-5vw] left-[-5vw]"></div>
+        <div class="shape bg-secondary/20 w-[40vw] h-[40vw] bottom-[-10vw] right-[-10vw]"></div>
+        <div class="shape bg-accent/20 w-[25vw] h-[25vw] top-[40vh] right-[15vw]"></div>
+    </div>
+    <!-- 导航栏 -->
+    <!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300 py-3">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <!-- Logo -->
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                <i class="fa fa-heart-o text-xl"></i>
+            </div>
+            <span class="text-xl font-bold text-primary tracking-wide">心社区</span>
+        </div>
+        
+        <!-- 桌面端导航 -->
+        <div class="hidden md:flex nav-links items-center space-x-1">
+            <a href="index.html" class="text-primary border-b-2 border-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center">
+                <i class="fa fa-home mr-2"></i>首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-list-alt mr-2"></i>心理测评
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-user-md mr-2"></i>咨询服务
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-users mr-2"></i>团体活动
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-music mr-2"></i>放松体验
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            
+            <!-- 更多服务下拉菜单 -->
+            <div class="relative" id="desktop-more-menu">
+                <button id="desktop-more-menu-button" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center gap-1 relative group">
+                    更多服务
+                    <i class="fa fa-angle-down transition-transform duration-300 group-hover:rotate-180"></i>
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </button>
+                <div id="desktop-more-dropdown" class="hidden absolute top-full left-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="healing_treehole.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-tree mr-2"></i>治愈树洞
+                    </a>
+                    <a href="sandbox_simulation_immersive.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-cubes mr-2"></i>沙盘模拟
+                    </a>
+                    <a href="mental_stories.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-book mr-2"></i>心理资源
+                    </a>
+                    <a href="mental_games.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-gamepad mr-2"></i>心理游戏
+                    </a>
+                                    <a href="psychology_experiments.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-flask mr-2"></i>心理实验
+                    </a>
+                    </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单按钮 -->
+        <div class="md:hidden">
+            <button id="menu-toggle" class="text-gray-700 focus:outline-none transition-transform duration-300 hover:rotate-90 p-2 rounded-md hover:bg-gray-100">
+                <i class="fa fa-bars text-xl"></i>
+                <span class="sr-only">打开菜单</span>
+            </button>
+        </div>
+        
+        <!-- 用户菜单 -->
+        <div id="user-menu" class="hidden md:flex items-center space-x-4">
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none group p-1 rounded-full hover:bg-white/30 transition-all duration-300 focus:ring-2 focus:ring-primary/50">
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="user-name" class="text-gray-700 group-hover:text-primary transition-colors"></span>
+                    <i class="fa fa-angle-down text-gray-500 group-hover:text-primary transition-transform duration-300 group-hover:rotate-180"></i>
+                </button>
+                <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="user_profile.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-user-circle w-4 mr-3 text-center"></i>
+                        <span>个人中心</span>
+                    </a>
+                    <a href="assessment_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-list-alt w-4 mr-3 text-center"></i>
+                        <span>测评记录</span>
+                    </a>
+                    <a href="booking_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-check-o w-4 mr-3 text-center"></i>
+                        <span>预约记录</span>
+                    </a>
+                    <a href="activity_registration.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-plus-o w-4 mr-3 text-center"></i>
+                        <span>活动报名</span>
+                    </a>
+                    <hr class="my-1 border-gray-200">
+                    <a href="#" id="logout-button" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-danger transition-all duration-200 flex items-center">
+                        <i class="fa fa-sign-out mr-3 w-4 text-center"></i>
+                        <span>退出登录</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 登录/注册按钮 -->
+        <div id="auth-buttons" class="hidden md:flex items-center space-x-3">
+            <button class="px-4 py-2 text-primary border-2 border-primary rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-medium shadow-sm hover:shadow transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='login.html'">
+                <i class="fa fa-sign-in mr-1"></i>登录
+            </button>
+            <button class="px-4 py-2 bg-gradient-to-r from-primary to-indigo-600 text-indigo-900 rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='register.html'">
+                <i class="fa fa-user-plus mr-2"></i>注册
+            </button>
+            <a href="admin_login.html" class="text-gray-600 hover:text-gray-800 transition-all duration-300 text-xs hover:underline px-2">管理员入口</a>
+        </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="md:hidden hidden glass-effect shadow-lg absolute w-full">
+        <div class="container mx-auto px-4 py-3 flex flex-col space-y-1">
+            <a href="index.html" class="bg-primary/5 text-primary py-2 px-3 rounded-lg font-medium flex items-center">
+                <i class="fa fa-home w-5 mr-3 text-center"></i>
+                首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-list-alt w-5 mr-3 text-center"></i>
+                心理测评
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-user-md w-5 mr-3 text-center"></i>
+                咨询服务
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-users w-5 mr-3 text-center"></i>
+                团体活动
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-music w-5 mr-3 text-center"></i>
+                放松体验
+            </a>
+            <a href="healing_treehole.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-tree w-5 mr-3 text-center"></i>
+                治愈树洞
+            </a>
+            <a href="sandbox_simulation_immersive.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-th-large w-5 mr-3 text-center"></i>
+                沙盘模拟
+            </a>
+            <a href="mental_stories.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-book w-5 mr-3 text-center"></i>
+                心理资源
+            </a>
+            <a href="mental_games.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-gamepad w-5 mr-3 text-center"></i>
+                心理游戏
+            </a>
+            
+            <!-- 移动端登录/注册按钮 -->
+            <div class="flex space-x-3 py-3 mt-2">
+                <button class="px-4 py-2.5 text-primary border border-primary rounded-lg hover:bg-primary/5 transition-all duration-300 flex-1 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='login.html'">
+                    <i class="fa fa-sign-in mr-2"></i>登录
+                </button>
+                <button class="px-4 py-2.5 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 flex-1 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='register.html'">
+                    <i class="fa fa-user-plus mr-2"></i>注册
+                </button>
+            </div>
+            
+            <!-- 移动端用户菜单（登录后显示） -->
+            <div id="mobile-user-menu" class="hidden py-2 animate-fade-in">
+                <div class="flex items-center space-x-3 mb-3 pb-3 border-b border-gray-200 bg-white/30 rounded-lg p-2">
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="mobile-user-name" class="text-gray-700 font-medium"></span>
+                </div>
+                <a href="user_profile.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-user-circle mr-2 w-5 text-center"></i>个人中心
+                </a>
+                <a href="assessment_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-list-alt mr-2 w-5 text-center"></i>测评记录
+                </a>
+                <a href="booking_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-check-o mr-2 w-5 text-center"></i>预约记录
+                </a>
+                <a href="activity_registration.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-plus-o mr-2 w-5 text-center"></i>活动报名
+                </a>
+                <a href="#" id="mobile-logout-button" class="block px-4 py-2 text-gray-700 hover:bg-white/50 hover:text-danger transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-sign-out mr-2 w-5 text-center"></i>退出登录
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 导航栏必要的脚本引用 -->
+<script src="components/navbar.js" defer></script>
+<script src="components/fix_duplicate_user_menu.js" defer></script>
+
+    <!-- 主内容区 -->
+    <main class="py-24 relative z-10">
+        <div class="container mx-auto px-4">
+            <!-- 活动详情 -->
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- 左侧：活动信息 -->
+                <div class="lg:w-2/3">
+                    <!-- 活动图片 -->
+                    <div class="rounded-xl overflow-hidden shadow-lg mb-6">
+                        <img src="" alt="活动图片" class="w-full h-80 object-cover activity-image">
+                    </div>
+                    
+                    <!-- 活动标题和基本信息 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h1 class="text-3xl font-bold text-gray-800 activity-title">正念减压工作坊</h1>
+                                <span class="bg-green-100 text-secondary text-sm font-medium px-3 py-1 rounded-full activity-category">压力管理</span>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-6 mb-6">
+                            <div class="flex items-center">
+                                <i class="fa fa-calendar text-primary mr-2"></i>
+                                <span class="text-gray-700 activity-date">2025-11-15</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-clock-o text-primary mr-2"></i>
+                                <span class="text-gray-700 activity-time">14:00-16:00</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-map-marker text-primary mr-2"></i>
+                                <span class="text-gray-700 activity-location">心社区活动室（北京市海淀区中关村大街1号）</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-users text-primary mr-2"></i>
+                                <span class="text-gray-700 activity-participants">15/30人</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-money text-primary mr-2"></i>
+                                <span class="text-gray-700 activity-price">¥80/人</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <img src="https://p26-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/2178256461640630297~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1777603931&x-signature=H4LWAobym00V%2B06dT3jKQ0dVPck%3D" alt="张医生" class="w-12 h-12 rounded-full object-cover instructor-avatar">
+                            <div class="ml-3">
+                                <div class="flex items-center">
+                                    <h3 class="text-lg font-medium text-gray-800 instructor-name">张医生</h3>
+                                    <span class="ml-2 text-primary text-sm instructor-title">心理学博士 | 高级心理咨询师</span>
+                                </div>
+                                <p class="text-gray-600 text-sm instructor-desc">专注于正念减压、情绪管理和心理健康教育</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 活动详情 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">活动详情</h2>
+                        
+                        <div class="space-y-4 activity-description">
+                            <p class="text-gray-700">
+                                本工作坊将介绍正念减压的基本原理和方法，通过正念冥想、身体扫描等练习，帮助参与者缓解压力，提高专注力和情绪调节能力。
+                            </p>
+                            
+                            <p class="text-gray-700">
+                                正念减压（MBSR）是一种基于正念的心理治疗方法，由乔恩·卡巴金博士于1979年创立。它通过系统的正念训练，帮助人们培养觉察当下的能力，减少压力反应，提高生活质量。
+                            </p>
+                            
+                            <p class="text-gray-700">
+                                本工作坊适合：
+                            </p>
+                            <ul class="list-disc pl-6 text-gray-700 space-y-1">
+                                <li>感到压力较大的职场人士</li>
+                                <li>希望提高专注力和情绪调节能力的人</li>
+                                <li>对正念冥想感兴趣的初学者</li>
+                                <li>希望改善睡眠质量的人</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- 活动流程 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6 activity-process">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">活动流程</h2>
+                        
+                        <div class="relative">
+                            <!-- 时间线 -->
+                            <div class="absolute left-0 top-0 bottom-0 w-0.5 bg-gray-200 ml-3"></div>
+                            
+                            <div class="space-y-6 relative">
+                                <!-- 流程项 1 -->
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold z-10">1</div>
+                                    <div class="ml-6">
+                                        <h3 class="text-lg font-medium text-gray-800">14:00-14:15 签到与自我介绍</h3>
+                                        <p class="text-gray-600 mt-1">参与者签到，领取资料，进行简短的自我介绍</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- 流程项 2 -->
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold z-10">2</div>
+                                    <div class="ml-6">
+                                        <h3 class="text-lg font-medium text-gray-800">14:15-14:45 正念减压理论介绍</h3>
+                                        <p class="text-gray-600 mt-1">介绍正念减压的基本原理、发展历程和科学依据</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- 流程项 3 -->
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold z-10">3</div>
+                                    <div class="ml-6">
+                                        <h3 class="text-lg font-medium text-gray-800">14:45-15:15 正念呼吸练习</h3>
+                                        <p class="text-gray-600 mt-1">引导参与者进行正念呼吸练习，培养觉察当下的能力</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- 流程项 4 -->
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold z-10">4</div>
+                                    <div class="ml-6">
+                                        <h3 class="text-lg font-medium text-gray-800">15:15-15:30 休息与分享</h3>
+                                        <p class="text-gray-600 mt-1">短暂休息，参与者分享练习体验</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- 流程项 5 -->
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold z-10">5</div>
+                                    <div class="ml-6">
+                                        <h3 class="text-lg font-medium text-gray-800">15:30-16:00 身体扫描练习</h3>
+                                        <p class="text-gray-600 mt-1">引导参与者进行身体扫描练习，提高身体觉察能力</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- 流程项 6 -->
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold z-10">6</div>
+                                    <div class="ml-6">
+                                        <h3 class="text-lg font-medium text-gray-800">16:00-16:15 总结与问答</h3>
+                                        <p class="text-gray-600 mt-1">总结活动内容，解答参与者问题，提供后续练习建议</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 参与者评价 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6 activity-comments">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">参与者评价</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- 评价内容将通过JavaScript动态加载 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧：报名表单 -->
+                <div class="lg:w-1/3">
+                    <div class="bg-white rounded-xl shadow-lg p-6 sticky top-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">活动报名</h2>
+                        
+                        <form id="registration-form">
+                            <div class="mb-4">
+                                <label for="name" class="block text-gray-700 font-medium mb-2">姓名</label>
+                                <input type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="请输入您的姓名">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="phone" class="block text-gray-700 font-medium mb-2">电话</label>
+                                <input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="请输入您的电话号码">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="email" class="block text-gray-700 font-medium mb-2">邮箱</label>
+                                <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="请输入您的邮箱地址">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="participants" class="block text-gray-700 font-medium mb-2">参与人数</label>
+                                <select id="participants" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="1">1人</option>
+                                    <option value="2">2人</option>
+                                    <option value="3">3人</option>
+                                    <option value="4">4人</option>
+                                    <option value="5">5人</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label for="note" class="block text-gray-700 font-medium mb-2">备注信息</label>
+                                <textarea id="note" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="请输入备注信息（如饮食禁忌、特殊需求等）"></textarea>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-gray-700">活动费用</span>
+                                    <span class="text-lg font-bold text-primary price-per-person">¥80/人</span>
+                                </div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-gray-700">参与人数</span>
+                                    <span id="participants-count" class="text-gray-700">1人</span>
+                                </div>
+                                <div class="border-t border-gray-200 pt-2 flex justify-between items-center">
+                                    <span class="text-lg font-medium text-gray-800">总计</span>
+                                    <span id="total-price" class="text-xl font-bold text-primary">¥80</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center mb-6">
+                                <input type="checkbox" id="agree-terms" class="w-4 h-4 text-primary focus:ring-primary">
+                                <label for="agree-terms" class="ml-2 text-gray-700">
+                                    我已阅读并同意 <a href="#" class="text-primary hover:text-indigo-700">活动条款</a> 和 <a href="#" class="text-primary hover:text-indigo-700">隐私政策</a>
+                                </label>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <button type="button" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-all-300" onclick="window.location.href='activity_list.html'">
+                                    返回
+                                </button>
+                                <button type="submit" class="px-8 py-3 bg-primary text-white rounded-md hover:bg-indigo-600 transition-all-300 text-lg font-medium">
+                                    立即报名
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <!-- 统一页脚组件 -->
+<footer class="bg-[#1e293b] text-white py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <!-- 左侧Logo和文字 -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                    <i class="fa fa-heart"></i>
+                </div>
+                <span class="text-white">心社区</span>
+            </div>
+            
+            <!-- 中间版权信息 -->
+            <div class="text-center">
+                <p class="text-white">© 2025 心社区心理健康支持中心. 保留所有权利.</p>
+            </div>
+            
+            <!-- 右侧图标 -->
+            <div class="flex space-x-4">
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-bell"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- AI智能小助手 -->
+    <script src="ai-assistant.js"></script>
+    
+    <!-- JavaScript -->
+    <script>
+        // 获取URL中的活动ID
+        function getActivityId() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const idParam = urlParams.get('id');
+                const parsedId = idParam ? parseInt(idParam, 10) : 1;
+                return isNaN(parsedId) ? 1 : parsedId;
+            } catch (error) {
+                console.error('获取活动ID失败:', error);
+                return 1;
+            }
+        }
+
+        // 根据活动ID加载活动数据
+        function loadActivityData() {
+            try {
+                const activityId = getActivityId();
+                console.log('加载活动ID:', activityId);
+                
+                // 确保activities数组存在
+                if (!Array.isArray(activities)) {
+                    console.error('活动数据格式错误');
+                    return;
+                }
+                
+                const activity = activities.find(act => act && act.id === activityId);
+                
+                if (activity) {
+                    console.log('找到活动:', activity.title);
+                    
+                    // 更新页面标题
+                    if (activity.title) {
+                        document.title = `${activity.title} - 心社区`;
+                    }
+                    
+                    // 更新活动图片，添加安全检查
+                    const activityImage = document.querySelector('.activity-image');
+                    if (activityImage && activity.image) {
+                        activityImage.src = activity.image;
+                        activityImage.alt = activity.title || '活动图片';
+                    }
+                    
+                    // 更新活动基本信息
+                    document.querySelector('.activity-title')?.textContent = activity.title || '活动标题';
+                    
+                    // 更新类别，使用活动数据中的样式
+                    const categoryElement = document.querySelector('.activity-category');
+                    if (categoryElement) {
+                        categoryElement.textContent = activity.category || '类别';
+                        categoryElement.className = `${activity.categoryClass || 'bg-green-100 text-secondary'} text-sm font-medium px-3 py-1 rounded-full activity-category`;
+                    }
+                    
+                    // 更新其他基本信息，添加安全检查
+                    document.querySelector('.activity-date')?.textContent = activity.date || '日期待定';
+                    document.querySelector('.activity-time')?.textContent = activity.time || '时间待定';
+                    document.querySelector('.activity-location')?.textContent = activity.location || '地点待定';
+                    
+                    // 修复参与者信息显示，根据数据结构应该是participants.current/participants.max
+                    const participantsElement = document.querySelector('.activity-participants');
+                    if (participantsElement && activity.participants) {
+                        if (typeof activity.participants === 'object') {
+                            // 新的数据结构
+                            participantsElement.textContent = `${activity.participants.current || 0}/${activity.participants.max || 30}人`;
+                        } else {
+                            // 兼容旧的数据结构
+                            participantsElement.textContent = activity.participants;
+                        }
+                    }
+                    
+                    document.querySelector('.activity-price')?.textContent = '¥' + (activity.price || 0) + '/人';
+                    document.querySelector('.price-per-person')?.textContent = '¥' + (activity.price || 0) + '/人';
+                
+                // 更新导师信息，添加安全检查
+                document.querySelector('.instructor-avatar')?.setAttribute('src', activity.instructorAvatar);
+                document.querySelector('.instructor-avatar')?.setAttribute('alt', activity.instructorName);
+                document.querySelector('.instructor-name')?.textContent = activity.instructorName;
+                document.querySelector('.instructor-title')?.textContent = activity.instructorTitle;
+                document.querySelector('.instructor-desc')?.textContent = activity.instructorDesc;
+                
+                // 更新活动描述，添加安全检查
+                const descriptionContainer = document.querySelector('.activity-description');
+                if (descriptionContainer && activity.description && Array.isArray(activity.description)) {
+                    descriptionContainer.innerHTML = '';
+                    activity.description.forEach(para => {
+                        if (para) {
+                            const p = document.createElement('p');
+                            p.className = 'text-gray-700';
+                            p.textContent = para;
+                            descriptionContainer.appendChild(p);
+                        }
+                    });
+                    
+                    // 如果有适合人群部分，更新它
+                    if (activity.suitableFor && Array.isArray(activity.suitableFor) && activity.suitableFor.length > 0) {
+                        const suitableForList = document.createElement('ul');
+                        suitableForList.className = 'list-disc pl-6 text-gray-700 space-y-1';
+                        activity.suitableFor.forEach(item => {
+                            if (item) {
+                                const li = document.createElement('li');
+                                li.textContent = item;
+                                suitableForList.appendChild(li);
+                            }
+                        });
+                        descriptionContainer.appendChild(suitableForList);
+                    }
+                }
+            }
+        }
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始加载活动数据');
+            loadActivityData();
+        });
+
+        // 参与人数变化事件监听器已在DOMContentLoaded中实现
+        
+        // 报名表单提交
+        try {
+            const registrationForm = document.getElementById('registration-form');
+            if (registrationForm) {
+                registrationForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // 检查用户是否登录
+                    try {
+                        const user = checkLogin();
+                        if (!user) {
+                            if (confirm('请先登录再进行报名，是否前往登录页面？')) {
+                                window.location.href = 'login.html';
+                            }
+                            return;
+                        }
+                    } catch (loginError) {
+                        console.error('检查登录状态失败:', loginError);
+                        alert('检查登录状态失败，请刷新页面重试');
+                        return;
+                    }
+                    
+                    // 获取表单数据
+                    const name = document.getElementById('name')?.value;
+                    const phone = document.getElementById('phone')?.value;
+                    const email = document.getElementById('email')?.value;
+                    const participants = document.getElementById('participants')?.value;
+                    const note = document.getElementById('note')?.value;
+                    const agreeTerms = document.getElementById('agree-terms')?.checked;
+                    
+                    // 表单验证
+                    if (!name || !phone || !email || !agreeTerms) {
+                        alert('请填写所有必填字段并同意活动条款');
+                        return;
+                    }
+                    
+                    // 获取当前活动信息
+                    const activityId = getActivityId();
+                    let activityName = '活动';
+                    let activityDate = '';
+                    let price = 80;
+                    
+                    if (Array.isArray(activities)) {
+                        const activity = activities.find(act => act && act.id === activityId);
+                        if (activity) {
+                            activityName = activity.title || activityName;
+                            activityDate = activity.date || activityDate;
+                            price = activity.price || price;
+                        }
+                    }
+                    
+                    const totalPrice = (parseInt(participants) || 1) * price;
+                    
+                    // 模拟报名请求
+                    console.log('报名请求:', {
+                        userId: user?.id,
+                        userName: user?.name,
+                        userEmail: user?.email,
+                        name,
+                        phone,
+                        email,
+                        participants,
+                        note,
+                        activityId: activityId,
+                        activityName: activityName,
+                        activityDate: activityDate,
+                        totalPrice: totalPrice
+                    });
+                    
+                    // 模拟报名成功
+                    alert('报名成功！您已成功报名参加"' + activityName + '"活动，我们将尽快与您联系确认。');
+                    window.location.href = 'activity_list.html';
+                });
+            }
+        } catch (error) {
+            console.error('设置表单提交事件监听失败:', error);
+        }
+    </script>
+</body>
+</html>

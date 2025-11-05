@@ -1,0 +1,2694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心社区 - 心理健康支持平台</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 全局样式文件 -->
+    <link rel="stylesheet" href="common.css">
+    <!-- 心理资源页面样式 -->
+    <link rel="stylesheet" href="css/mental_resources.css">
+    <!-- 导航栏脚本 -->
+    <script src="navbar.js"></script>
+    <script src="fix_duplicate_user_menu.js"></script>
+    <!-- AI助手脚本 -->
+    <script src="ai-assistant.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        error: '#ef4444',
+                        info: '#3b82f6',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* 页面特定样式 */
+        .story-card {
+            transition: all 0.3s ease;
+        }
+        .story-card:hover {
+            transform: translateY(-8px);
+        }
+        .story-modal-content {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .story-modal-content.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .story-paragraph {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .story-paragraph.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.3s ease;
+        }
+        .choice-btn:hover {
+            transform: translateX(10px);
+        }
+        .audio-control {
+            transition: all 0.3s ease;
+        }
+        .audio-control:hover {
+            transform: scale(1.1);
+        }
+        .bg-music-indicator {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+<style>
+
+    /* 全局样式重置 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 全局颜色变量 */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background-color: var(--bg-primary);
+    }
+    
+    /* 统一按钮样式 */
+    button {
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        outline: none;
+    }
+    
+    /* 主按钮样式 - 注册按钮 */
+    .btn-primary {
+        background-color: var(--secondary-color);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #7c3aed;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+    }
+    
+    /* 次要按钮样式 - 登录按钮 */
+    .btn-secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        transform: translateY(-1px);
+    }
+    
+    /* 导航栏样式 */
+    nav {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .btn-primary,
+        .btn-secondary {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* 卡片样式 */
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+    }
+    
+    /* 输入框样式 */
+    input,
+    textarea,
+    select {
+        font-family: inherit;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+</style>
+</head>
+<body class="bg-light font-sans text-dark overflow-x-hidden">
+    <!-- 动态背景 -->
+    <div class="dynamic-bg bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div class="shape bg-primary/20 w-[30vw] h-[30vw] top-[-5vw] left-[-5vw]"></div>
+        <div class="shape bg-secondary/20 w-[40vw] h-[40vw] bottom-[-10vw] right-[-10vw]"></div>
+        <div class="shape bg-accent/20 w-[25vw] h-[25vw] top-[40vh] right-[15vw]"></div>
+    </div>
+    
+    <!-- 导航栏 -->
+    <!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300 py-3">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <!-- Logo -->
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                <i class="fa fa-heart-o text-xl"></i>
+            </div>
+            <span class="text-xl font-bold text-primary tracking-wide">心社区</span>
+        </div>
+        
+        <!-- 桌面端导航 -->
+        <div class="hidden md:flex nav-links items-center space-x-1">
+            <a href="index.html" class="text-primary border-b-2 border-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center">
+                <i class="fa fa-home mr-2"></i>首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-list-alt mr-2"></i>心理测评
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-user-md mr-2"></i>咨询服务
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-users mr-2"></i>团体活动
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-music mr-2"></i>放松体验
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            
+            <!-- 更多服务下拉菜单 -->
+            <div class="relative" id="desktop-more-menu">
+                <button id="desktop-more-menu-button" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center gap-1 relative group">
+                    更多服务
+                    <i class="fa fa-angle-down transition-transform duration-300 group-hover:rotate-180"></i>
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </button>
+                <div id="desktop-more-dropdown" class="hidden absolute top-full left-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="healing_treehole.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-tree mr-2"></i>治愈树洞
+                    </a>
+                    <a href="sandbox_simulation_immersive.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-cubes mr-2"></i>沙盘模拟
+                    </a>
+                    <a href="mental_stories.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-book mr-2"></i>心理资源
+                    </a>
+                    <a href="mental_games.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-gamepad mr-2"></i>心理游戏
+                    </a>
+                                    <a href="psychology_experiments.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-flask mr-2"></i>心理实验
+                    </a>
+                    </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单按钮 -->
+        <div class="md:hidden">
+            <button id="menu-toggle" class="text-gray-700 focus:outline-none transition-transform duration-300 hover:rotate-90 p-2 rounded-md hover:bg-gray-100">
+                <i class="fa fa-bars text-xl"></i>
+                <span class="sr-only">打开菜单</span>
+            </button>
+        </div>
+        
+        <!-- 用户菜单 -->
+        <div id="user-menu" class="hidden md:flex items-center space-x-4">
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none group p-1 rounded-full hover:bg-white/30 transition-all duration-300 focus:ring-2 focus:ring-primary/50">
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="user-name" class="text-gray-700 group-hover:text-primary transition-colors"></span>
+                    <i class="fa fa-angle-down text-gray-500 group-hover:text-primary transition-transform duration-300 group-hover:rotate-180"></i>
+                </button>
+                <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="user_profile.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-user-circle w-4 mr-3 text-center"></i>
+                        <span>个人中心</span>
+                    </a>
+                    <a href="assessment_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-list-alt w-4 mr-3 text-center"></i>
+                        <span>测评记录</span>
+                    </a>
+                    <a href="booking_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-check-o w-4 mr-3 text-center"></i>
+                        <span>预约记录</span>
+                    </a>
+                    <a href="activity_registration.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-plus-o w-4 mr-3 text-center"></i>
+                        <span>活动报名</span>
+                    </a>
+                    <hr class="my-1 border-gray-200">
+                    <a href="#" id="logout-button" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-danger transition-all duration-200 flex items-center">
+                        <i class="fa fa-sign-out mr-3 w-4 text-center"></i>
+                        <span>退出登录</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 登录/注册按钮 -->
+        <div id="auth-buttons" class="hidden md:flex items-center space-x-3">
+            <button class="px-4 py-2 text-primary border-2 border-primary rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-medium shadow-sm hover:shadow transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='login.html'">
+                <i class="fa fa-sign-in mr-1"></i>登录
+            </button>
+            <button class="px-4 py-2 bg-gradient-to-r from-primary to-indigo-600 text-indigo-900 rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='register.html'">
+                <i class="fa fa-user-plus mr-2"></i>注册
+            </button>
+            <a href="admin_login.html" class="text-gray-600 hover:text-gray-800 transition-all duration-300 text-xs hover:underline px-2">管理员入口</a>
+        </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="md:hidden hidden glass-effect shadow-lg absolute w-full">
+        <div class="container mx-auto px-4 py-3 flex flex-col space-y-1">
+            <a href="index.html" class="bg-primary/5 text-primary py-2 px-3 rounded-lg font-medium flex items-center">
+                <i class="fa fa-home w-5 mr-3 text-center"></i>
+                首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-list-alt w-5 mr-3 text-center"></i>
+                心理测评
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-user-md w-5 mr-3 text-center"></i>
+                咨询服务
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-users w-5 mr-3 text-center"></i>
+                团体活动
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-music w-5 mr-3 text-center"></i>
+                放松体验
+            </a>
+            <a href="healing_treehole.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-tree w-5 mr-3 text-center"></i>
+                治愈树洞
+            </a>
+            <a href="sandbox_simulation_immersive.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-th-large w-5 mr-3 text-center"></i>
+                沙盘模拟
+            </a>
+            <a href="mental_stories.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-book w-5 mr-3 text-center"></i>
+                心理资源
+            </a>
+            <a href="mental_games.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-gamepad w-5 mr-3 text-center"></i>
+                心理游戏
+            </a>
+            
+            <!-- 移动端登录/注册按钮 -->
+            <div class="flex space-x-3 py-3 mt-2">
+                <button class="px-4 py-2.5 text-primary border border-primary rounded-lg hover:bg-primary/5 transition-all duration-300 flex-1 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='login.html'">
+                    <i class="fa fa-sign-in mr-2"></i>登录
+                </button>
+                <button class="px-4 py-2.5 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 flex-1 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='register.html'">
+                    <i class="fa fa-user-plus mr-2"></i>注册
+                </button>
+            </div>
+            
+            <!-- 移动端用户菜单（登录后显示） -->
+            <div id="mobile-user-menu" class="hidden py-2 animate-fade-in">
+                <div class="flex items-center space-x-3 mb-3 pb-3 border-b border-gray-200 bg-white/30 rounded-lg p-2">
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="mobile-user-name" class="text-gray-700 font-medium"></span>
+                </div>
+                <a href="user_profile.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-user-circle mr-2 w-5 text-center"></i>个人中心
+                </a>
+                <a href="assessment_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-list-alt mr-2 w-5 text-center"></i>测评记录
+                </a>
+                <a href="booking_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-check-o mr-2 w-5 text-center"></i>预约记录
+                </a>
+                <a href="activity_registration.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-plus-o mr-2 w-5 text-center"></i>活动报名
+                </a>
+                <a href="#" id="mobile-logout-button" class="block px-4 py-2 text-gray-700 hover:bg-white/50 hover:text-danger transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-sign-out mr-2 w-5 text-center"></i>退出登录
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 导航栏必要的脚本引用 -->
+<script src="components/navbar.js" defer></script>
+<script src="components/fix_duplicate_user_menu.js" defer></script>
+
+    <!-- 主内容区 -->
+    <main class="pt-24 pb-16">
+        <div class="container mx-auto px-4">
+            <!-- 页面标题 -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4 text-primary animate-fade-in slide-up">心理资源</h1>
+                <p class="text-xl text-gray-700 max-w-3xl mx-auto animate-fade-in slide-up" style="animation-delay: 0.2s;">
+                    探索丰富的心理资源，包括真实故事、专业文章、视频课程和推荐书籍，助您心理健康成长
+                </p>
+            </div>
+
+            <!-- 背景音乐控制 -->
+            <div class="fixed bottom-6 right-6 z-40">
+                <button id="bg-music-toggle" class="bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg audio-control">
+                    <i class="fa fa-music text-xl"></i>
+                </button>
+                <span id="music-indicator" class="hidden bg-primary/20 text-primary text-xs px-2 py-1 rounded-full ml-2 bg-music-indicator">背景音乐</span>
+            </div>
+
+            <!-- 资源板块导航 -->
+            <div class="flex flex-wrap justify-center gap-4 mb-16 animate-fade-in slide-up" style="animation-delay: 0.4s;">
+                <button class="section-btn px-8 py-3 bg-primary text-white rounded-full shadow-lg transition-all duration-300" data-section="all">全部资源</button>
+                <button class="section-btn px-8 py-3 glass-effect text-primary rounded-full shadow-lg transition-all duration-300" data-section="stories">心理故事</button>
+                <button class="section-btn px-8 py-3 glass-effect text-primary rounded-full shadow-lg transition-all duration-300" data-section="videos">视频课程</button>
+                <button class="section-btn px-8 py-3 glass-effect text-primary rounded-full shadow-lg transition-all duration-300" data-section="books">心理书籍</button>
+                <button class="section-btn px-8 py-3 glass-effect text-primary rounded-full shadow-lg transition-all duration-300" data-section="articles">精选文章</button>
+            </div>
+
+            <!-- 板块内容区域 -->
+            <!-- 心理故事板块 -->
+            <section class="mb-20 animate-fade-in slide-up" style="animation-delay: 0.5s;" data-section="stories">
+                <div class="mb-8">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-book text-primary text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800">心理故事</h2>
+                    </div>
+                    <p class="text-gray-600 ml-16 mb-6">真实的心理健康故事分享，帮助您了解他人的经历，获得启发和共鸣</p>
+                    
+                    <!-- 心理故事类别 -->
+                    <div class="flex flex-wrap gap-3 ml-16 mb-8">
+                        <button class="story-category-btn px-4 py-2 bg-primary text-white rounded-full text-sm font-medium" data-category="all">全部故事</button>
+                        <button class="story-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="emotion">情绪与压力</button>
+                        <button class="story-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="relationship">人际关系</button>
+                        <button class="story-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="growth">个人成长</button>
+                        <button class="story-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="wellness">心理健康</button>
+                        <button class="story-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="lifestyle">生活质量</button>
+                    </div>
+                </div>
+                
+                <!-- 心理故事卡片网格 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 故事1 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card story-card" data-section="stories" data-category="emotion">
+                        <div class="relative h-48 bg-gradient-to-r from-blue-500 to-indigo-600">
+                            <span class="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">情绪与压力</span>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fa fa-cloud text-white text-6xl opacity-80"></i>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 8 分钟阅读</span>
+                                <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 5,234</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-gray-800">走出焦虑的迷雾</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                讲述了一位年轻人如何在心理咨询师的帮助下，通过认知行为疗法逐步克服考试焦虑的真实经历。
+                            </p>
+                            <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="1">
+                                阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                
+                <!-- 资源2 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="emotion">
+                    <div class="relative h-48 bg-gradient-to-r from-purple-500 to-pink-600">
+                        <span class="absolute top-3 left-3 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">情绪与压力</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-sun-o text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 10 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 6,789</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">心灵的阳光</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位曾经陷入抑郁的女性，通过坚持运动、培养兴趣爱好和社交支持，重新找回生活的色彩和希望。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="2">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源3 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="relationship">
+                    <div class="relative h-48 bg-gradient-to-r from-green-500 to-teal-600">
+                        <span class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">人际关系</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-users text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 12 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 4,321</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">倾听的力量</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一对夫妻通过学习有效沟通和倾听技巧，成功修复了濒临破裂的婚姻关系，重建了彼此之间的信任和理解。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="3">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源4 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="growth">
+                    <div class="relative h-48 bg-gradient-to-r from-amber-500 to-orange-600">
+                        <span class="absolute top-3 left-3 bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-medium">个人成长</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-rocket text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 9 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 7,890</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">突破自我设限</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位职场人士如何通过心理辅导，克服了自我怀疑和恐惧，勇敢挑战新的职业领域并取得成功的故事。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="4">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源5 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="emotion">
+                    <div class="relative h-48 bg-gradient-to-r from-cyan-500 to-blue-600">
+                        <span class="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">情绪与压力</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-heartbeat text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 7 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 5,678</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">呼吸之间</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位惊恐发作患者通过学习呼吸技巧和正念冥想，成功控制住症状，并逐步恢复正常生活的经历。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="5">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源6 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="wellness">
+                    <div class="relative h-48 bg-gradient-to-r from-pink-500 to-rose-600">
+                        <span class="absolute top-3 left-3 bg-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium">心理健康</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-heart text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 11 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 6,345</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">接纳不完美的自己</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            探讨自我接纳的重要性，以及如何在追求进步的同时，学会关爱和接纳自己的不完美之处。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="6">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源7 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="wellness">
+                    <div class="relative h-48 bg-gradient-to-r from-gray-500 to-slate-600">
+                        <span class="absolute top-3 left-3 bg-gray-500 text-white px-3 py-1 rounded-full text-sm font-medium">心理健康</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-shield text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 15 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 3,456</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">疗愈的旅程</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            分享一位经历创伤的人如何在专业帮助和自我努力下，逐步走出阴影，重新找回生活的勇气和意义。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="7">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源8 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="relationship">
+                    <div class="relative h-48 bg-gradient-to-r from-emerald-500 to-green-600">
+                        <span class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">人际关系</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-comments text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 8 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 4,789</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">非暴力沟通的艺术</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            详细介绍非暴力沟通的四个步骤，帮助读者学会用更有效的方式表达自己的感受和需求，减少冲突。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="8">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源9 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="growth">
+                    <div class="relative h-48 bg-gradient-to-r from-violet-500 to-purple-600">
+                        <span class="absolute top-3 left-3 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">个人成长</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-book text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 10 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 5,890</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">阅读与心理成长</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            探讨阅读如何促进心理成长，推荐有助于自我认知和情绪管理的经典书籍，以及如何将书中的智慧应用到生活中。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="9">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源10 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="emotion">
+                    <div class="relative h-48 bg-gradient-to-r from-lime-500 to-green-600">
+                        <span class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">情绪与压力</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-balance-scale text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 6 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 7,234</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">压力管理的日常实践</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            介绍简单易行的压力管理技巧，包括正念呼吸、时间管理、身体活动等，帮助读者在日常生活中有效应对压力。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="10">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源11 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="lifestyle">
+                    <div class="relative h-48 bg-gradient-to-r from-blue-400 to-indigo-600">
+                        <span class="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">生活质量</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-moon-o text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 8 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 8,765</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">打造健康睡眠环境</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            从环境、习惯和心理三个方面，详细介绍如何创建理想的睡眠条件，改善睡眠质量，提高白天的精力水平。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="11">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源12 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="emotion">
+                    <div class="relative h-48 bg-gradient-to-r from-indigo-500 to-blue-600">
+                        <span class="absolute top-3 left-3 bg-indigo-500 text-white px-3 py-1 rounded-full text-sm font-medium">情绪与压力</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-leaf text-white text-6xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 12 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 5,342</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">情绪日记与自我觉察</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            介绍如何通过写情绪日记来增强自我觉察，识别情绪模式，以及如何利用这种觉察来改善情绪状态和生活质量。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="12">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源13 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="lifestyle">
+                    <div class="relative h-48 bg-gradient-to-r from-blue-100 to-indigo-100">
+                        <span class="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">生活质量</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-bed text-blue-300 text-6xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 5 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 9,234</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">改善睡眠质量的7个实用技巧</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">探索科学的睡眠改善方法，建立健康的睡前习惯，摆脱失眠困扰，让您每晚都能享受高质量的睡眠。</p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="13">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源14 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="emotion">
+                    <div class="relative h-48 bg-gradient-to-r from-green-100 to-teal-100">
+                        <span class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">情绪与压力</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-coffee text-green-300 text-6xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 6 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 7,567</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">职场压力管理指南</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">了解职场压力的来源，掌握有效的压力缓解技巧，保持工作与生活的平衡，提升工作效率和生活质量。</p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="14">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 资源15 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 story-card" data-category="growth">
+                    <div class="relative h-48 bg-gradient-to-r from-purple-100 to-pink-100">
+                        <span class="absolute top-3 left-3 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">个人成长</span>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-lightbulb-o text-purple-300 text-6xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 7 分钟阅读</span>
+                            <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 8,210</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">如何培养成长型思维模式</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">深入了解固定型思维与成长型思维的区别，学习如何转变思维模式，激发潜能，实现个人突破与成长。</p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="15">
+                            阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 视频课程板块 -->
+            <div class="mb-16 animate-fade-in slide-up" style="animation-delay: 0.6s;">
+                <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">精选视频课程</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 视频课程1 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300">
+                        <div class="relative h-48 bg-gray-900">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">25:12</span>
+                        </div>
+                        <div class="p-6">
+                            <span class="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-3">入门课程</span>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">正念冥想基础</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">学习正念冥想的基本技巧，帮助你在日常生活中培养专注力和觉察力。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/id/64/100/100" alt="讲师头像" class="w-8 h-8 rounded-full mr-2">
+                                    <span class="text-sm text-gray-700">李明教授</span>
+                                </div>
+                                <span class="text-sm text-gray-500"><i class="fa fa-users mr-1"></i> 3,421 人学习</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 视频课程2 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300">
+                        <div class="relative h-48 bg-gray-900">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">32:45</span>
+                        </div>
+                        <div class="p-6">
+                            <span class="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium mb-3">进阶课程</span>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">情绪管理与调节</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">深入了解情绪产生的机制，掌握科学有效的情绪调节方法，提升情绪韧性。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/id/65/100/100" alt="讲师头像" class="w-8 h-8 rounded-full mr-2">
+                                    <span class="text-sm text-gray-700">张华博士</span>
+                                </div>
+                                <span class="text-sm text-gray-500"><i class="fa fa-users mr-1"></i> 2,876 人学习</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 视频课程3 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300">
+                        <div class="relative h-48 bg-gray-900">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">28:30</span>
+                        </div>
+                        <div class="p-6">
+                            <span class="inline-block bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium mb-3">实用技巧</span>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">健康睡眠指南</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">学习如何打造理想的睡眠环境，建立规律的睡眠习惯，解决常见的睡眠问题。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/id/66/100/100" alt="讲师头像" class="w-8 h-8 rounded-full mr-2">
+                                    <span class="text-sm text-gray-700">王丽老师</span>
+                                </div>
+                                <span class="text-sm text-gray-500"><i class="fa fa-users mr-1"></i> 4,123 人学习</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 视频课程4 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300">
+                        <div class="relative h-48 bg-gray-900">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">35:18</span>
+                        </div>
+                        <div class="p-6">
+                            <span class="inline-block bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm font-medium mb-3">关系课程</span>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">有效沟通技巧</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">掌握非暴力沟通的核心原则，提升倾听和表达能力，改善人际关系质量。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/id/67/100/100" alt="讲师头像" class="w-8 h-8 rounded-full mr-2">
+                                    <span class="text-sm text-gray-700">刘伟教授</span>
+                                </div>
+                                <span class="text-sm text-gray-500"><i class="fa fa-users mr-1"></i> 3,678 人学习</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 视频课程5 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300">
+                        <div class="relative h-48 bg-gray-900">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">22:40</span>
+                        </div>
+                        <div class="p-6">
+                            <span class="inline-block bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium mb-3">压力管理</span>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">职场减压策略</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">学习如何在高压工作环境中保持心理健康，掌握高效的时间管理和压力应对技巧。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/id/68/100/100" alt="讲师头像" class="w-8 h-8 rounded-full mr-2">
+                                    <span class="text-sm text-gray-700">陈明教练</span>
+                                </div>
+                                <span class="text-sm text-gray-500"><i class="fa fa-users mr-1"></i> 2,987 人学习</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 视频课程6 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300">
+                        <div class="relative h-48 bg-gray-900">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">30:25</span>
+                        </div>
+                        <div class="p-6">
+                            <span class="inline-block bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-sm font-medium mb-3">自我成长</span>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">自信力提升训练</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">通过系统的心理训练方法，克服自卑心理，建立健康的自我认知，提升自信水平。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/id/69/100/100" alt="讲师头像" class="w-8 h-8 rounded-full mr-2">
+                                    <span class="text-sm text-gray-700">赵云心理师</span>
+                                </div>
+                                <span class="text-sm text-gray-500"><i class="fa fa-users mr-1"></i> 3,234 人学习</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                    <!-- 故事2 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card story-card" data-section="stories" data-category="depression">
+                        <div class="relative h-48 bg-gradient-to-r from-purple-500 to-pink-600">
+                            <span class="absolute top-3 left-3 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">情绪调节</span>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fa fa-sun-o text-white text-6xl opacity-80"></i>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 10 分钟阅读</span>
+                                <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 6,789</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-gray-800">心灵的阳光</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                一位曾经陷入抑郁的女性，通过坚持运动、培养兴趣爱好和社交支持，重新找回生活的色彩和希望。
+                            </p>
+                            <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="2">
+                                阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 故事3 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card story-card" data-section="stories" data-category="relationship">
+                        <div class="relative h-48 bg-gradient-to-r from-green-500 to-teal-600">
+                            <span class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">人际关系</span>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fa fa-users text-white text-6xl opacity-80"></i>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm text-gray-500"><i class="fa fa-clock-o mr-1"></i> 12 分钟阅读</span>
+                                <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 4,321</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-gray-800">倾听的力量</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                一对夫妻通过学习有效沟通和倾听技巧，成功修复了濒临破裂的婚姻关系，重建了彼此之间的信任和理解。
+                            </p>
+                            <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="3">
+                                阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <button class="px-6 py-3 bg-white text-primary border border-primary rounded-full shadow-md hover:bg-primary/5 transition-all duration-300 font-medium">
+                        查看更多故事 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- 视频课程板块 -->
+            <section class="mb-20 animate-fade-in slide-up" style="animation-delay: 0.6s;" data-section="videos">
+                <div class="mb-8">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-play-circle text-blue-500 text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800">视频课程</h2>
+                    </div>
+                    <p class="text-gray-600 ml-16 mb-6">专业心理老师录制的视频课程，帮助您系统学习心理健康知识和实用技巧</p>
+                    
+                    <!-- 视频课程类别 -->
+                    <div class="flex flex-wrap gap-3 ml-16 mb-8">
+                        <button class="video-category-btn px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-medium" data-category="all">全部课程</button>
+                        <button class="video-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="beginner">入门课程</button>
+                        <button class="video-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="advanced">进阶课程</button>
+                        <button class="video-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="skill">实用技巧</button>
+                    </div>
+                </div>
+                
+                <!-- 视频课程卡片网格 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 视频课程1 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card video-card" data-section="videos" data-category="beginner">
+                        <div class="relative h-48 bg-gray-900">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">25:12</span>
+                            <span class="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">入门课程</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">正念冥想基础</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">学习正念冥想的基本技巧，帮助你在日常生活中培养专注力和觉察力。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/id/64/100/100" alt="讲师头像" class="w-8 h-8 rounded-full mr-2">
+                                    <span class="text-sm text-gray-700">李明教授</span>
+                                </div>
+                                <span class="text-sm text-gray-500"><i class="fa fa-users mr-1"></i> 3,421 人学习</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 视频课程2 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card video-card" data-section="videos" data-category="advanced">
+                        <div class="relative h-48 bg-gray-900">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">32:45</span>
+                            <span class="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">进阶课程</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">情绪管理与调节</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">深入了解情绪产生的机制，掌握科学有效的情绪调节方法，提升情绪韧性。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/id/65/100/100" alt="讲师头像" class="w-8 h-8 rounded-full mr-2">
+                                    <span class="text-sm text-gray-700">张华博士</span>
+                                </div>
+                                <span class="text-sm text-gray-500"><i class="fa fa-users mr-1"></i> 2,876 人学习</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 视频课程3 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card video-card" data-section="videos" data-category="skill">
+                        <div class="relative h-48 bg-gray-900">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
+                                    <i class="fa fa-play text-white text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">28:30</span>
+                            <span class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">实用技巧</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">健康睡眠指南</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">学习如何打造理想的睡眠环境，建立规律的睡眠习惯，解决常见的睡眠问题。</p>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <img src="https://picsum.photos/id/66/100/100" alt="讲师头像" class="w-8 h-8 rounded-full mr-2">
+                                    <span class="text-sm text-gray-700">王丽老师</span>
+                                </div>
+                                <span class="text-sm text-gray-500"><i class="fa fa-users mr-1"></i> 4,123 人学习</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <button class="px-6 py-3 bg-white text-blue-500 border border-blue-500 rounded-full shadow-md hover:bg-blue-50 transition-all duration-300 font-medium">
+                        查看更多课程 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- 心理书籍板块 -->
+            <section class="mb-20 animate-fade-in slide-up" style="animation-delay: 0.7s;" data-section="books">
+                <div class="mb-8">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-book text-green-500 text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800">心理书籍</h2>
+                    </div>
+                    <p class="text-gray-600 ml-16 mb-6">精选心理健康领域的经典书籍，帮助您深入学习心理学知识，提升自我认知</p>
+                    
+                    <!-- 心理书籍类别 -->
+                    <div class="flex flex-wrap gap-3 ml-16 mb-8">
+                        <button class="book-category-btn px-4 py-2 bg-green-500 text-white rounded-full text-sm font-medium" data-category="all">全部书籍</button>
+                        <button class="book-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="selfhelp">自助成长</button>
+                        <button class="book-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="relationship">人际关系</button>
+                        <button class="book-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="psychology">心理学基础</button>
+                    </div>
+                </div>
+                
+                <!-- 心理书籍卡片网格 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 书籍1 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card book-card" data-section="books" data-category="selfhelp">
+                        <div class="relative h-64 bg-gray-100 flex items-center justify-center">
+                            <img src="https://picsum.photos/id/24/300/400" alt="非暴力沟通" class="h-full object-contain p-4">
+                            <span class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">自助成长</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">非暴力沟通</h3>
+                            <p class="text-gray-500 mb-3">作者：马歇尔·卢森堡</p>
+                            <div class="flex items-center mb-3">
+                                <div class="text-yellow-400 flex">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-half-o"></i>
+                                </div>
+                                <span class="text-sm text-gray-500 ml-2">4.5 (3,254 评价)</span>
+                            </div>
+                            <p class="text-gray-600 mb-4 line-clamp-2">本书介绍了非暴力沟通的四个要素：观察、感受、需要和请求，帮助读者建立和谐的人际关系。</p>
+                            <button class="text-green-500 hover:text-green-600 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 书籍2 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card book-card" data-section="books" data-category="relationship">
+                        <div class="relative h-64 bg-gray-100 flex items-center justify-center">
+                            <img src="https://picsum.photos/id/20/300/400" alt="亲密关系" class="h-full object-contain p-4">
+                            <span class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">人际关系</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">亲密关系</h3>
+                            <p class="text-gray-500 mb-3">作者：克里斯多福·孟</p>
+                            <div class="flex items-center mb-3">
+                                <div class="text-yellow-400 flex">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-o"></i>
+                                </div>
+                                <span class="text-sm text-gray-500 ml-2">4.0 (2,876 评价)</span>
+                            </div>
+                            <p class="text-gray-600 mb-4 line-clamp-2">本书探讨了亲密关系的本质，通过真实案例和实用技巧，帮助读者建立健康、长久的亲密关系。</p>
+                            <button class="text-green-500 hover:text-green-600 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 书籍3 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card book-card" data-section="books" data-category="psychology">
+                        <div class="relative h-64 bg-gray-100 flex items-center justify-center">
+                            <img src="https://picsum.photos/id/21/300/400" alt="心理学与生活" class="h-full object-contain p-4">
+                            <span class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">心理学基础</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">心理学与生活</h3>
+                            <p class="text-gray-500 mb-3">作者：理查德·格里格</p>
+                            <div class="flex items-center mb-3">
+                                <div class="text-yellow-400 flex">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <span class="text-sm text-gray-500 ml-2">4.8 (5,123 评价)</span>
+                            </div>
+                            <p class="text-gray-600 mb-4 line-clamp-2">这是一本经典的心理学教材，深入浅出地介绍了心理学的基本概念和研究方法，适合心理学爱好者阅读。</p>
+                            <button class="text-green-500 hover:text-green-600 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 书籍4 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card book-card" data-section="books" data-category="selfhelp">
+                        <div class="relative h-64 bg-gray-100 flex items-center justify-center">
+                            <img src="https://picsum.photos/id/23/300/400" alt="被讨厌的勇气" class="h-full object-contain p-4">
+                            <span class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">自助成长</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">被讨厌的勇气</h3>
+                            <p class="text-gray-500 mb-3">作者：岸见一郎</p>
+                            <div class="flex items-center mb-3">
+                                <div class="text-yellow-400 flex">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-half-o"></i>
+                                </div>
+                                <span class="text-sm text-gray-500 ml-2">4.7 (4,982 评价)</span>
+                            </div>
+                            <p class="text-gray-600 mb-4 line-clamp-2">本书基于阿德勒心理学，探讨如何获得真正的自由和幸福，不再被他人的评价所束缚。</p>
+                            <button class="text-green-500 hover:text-green-600 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <button class="px-6 py-3 bg-white text-green-500 border border-green-500 rounded-full shadow-md hover:bg-green-50 transition-all duration-300 font-medium">
+                        查看更多书籍 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- 精选文章板块 -->
+            <section class="mb-20 animate-fade-in slide-up" style="animation-delay: 0.8s;" data-section="articles">
+                <div class="mb-8">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-file-text-o text-purple-500 text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800">精选文章</h2>
+                    </div>
+                    <p class="text-gray-600 ml-16 mb-6">专业心理咨询师撰写的实用文章，涵盖心理健康的各个方面，提供科学有效的建议</p>
+                    
+                    <!-- 精选文章类别 -->
+                    <div class="flex flex-wrap gap-3 ml-16 mb-8">
+                        <button class="article-category-btn px-4 py-2 bg-purple-500 text-white rounded-full text-sm font-medium" data-category="all">全部文章</button>
+                        <button class="article-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="stress">压力管理</button>
+                        <button class="article-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="sleep">睡眠改善</button>
+                        <button class="article-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors" data-category="growth">个人成长</button>
+                    </div>
+                </div>
+                
+                <!-- 精选文章卡片网格 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 文章1 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card article-card" data-section="articles" data-category="stress">
+                        <div class="relative h-48 bg-gradient-to-r from-amber-500 to-orange-600">
+                            <span class="absolute top-3 left-3 bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-medium">压力管理</span>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fa fa-balance-scale text-white text-6xl opacity-80"></i>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 2023-06-15</span>
+                                <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 7,234</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-gray-800">职场压力管理指南</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                了解职场压力的来源，掌握有效的压力缓解技巧，保持工作与生活的平衡，提升工作效率和生活质量。
+                            </p>
+                            <button class="text-purple-500 hover:text-purple-600 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 文章2 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card article-card" data-section="articles" data-category="sleep">
+                        <div class="relative h-48 bg-gradient-to-r from-blue-400 to-indigo-600">
+                            <span class="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">睡眠改善</span>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fa fa-moon-o text-white text-6xl opacity-80"></i>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 2023-07-22</span>
+                                <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 8,765</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-gray-800">打造健康睡眠环境</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                从环境、习惯和心理三个方面，详细介绍如何创建理想的睡眠条件，改善睡眠质量，提高白天的精力水平。
+                            </p>
+                            <button class="text-purple-500 hover:text-purple-600 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 文章3 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card article-card" data-section="articles" data-category="growth">
+                        <div class="relative h-48 bg-gradient-to-r from-purple-500 to-pink-600">
+                            <span class="absolute top-3 left-3 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">个人成长</span>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fa fa-lightbulb-o text-white text-6xl opacity-80"></i>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 2023-08-05</span>
+                                <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 8,210</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-gray-800">如何培养成长型思维模式</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                深入了解固定型思维与成长型思维的区别，学习如何转变思维模式，激发潜能，实现个人突破与成长。
+                            </p>
+                            <button class="text-purple-500 hover:text-purple-600 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 文章4 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card article-card" data-section="articles" data-category="stress">
+                        <div class="relative h-48 bg-gradient-to-r from-red-400 to-red-600">
+                            <span class="absolute top-3 left-3 bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-medium">压力管理</span>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fa fa-leaf text-white text-6xl opacity-80"></i>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 2023-09-18</span>
+                                <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 6,492</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-gray-800">正念冥想与压力缓解</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                正念冥想作为一种有效的压力管理工具，如何通过日常练习培养正念意识，减轻焦虑，提升心理韧性。
+                            </p>
+                            <button class="text-purple-500 hover:text-purple-600 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 文章5 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card article-card" data-section="articles" data-category="sleep">
+                        <div class="relative h-48 bg-gradient-to-r from-indigo-400 to-purple-600">
+                            <span class="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">睡眠改善</span>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fa fa-bed text-white text-6xl opacity-80"></i>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 2023-10-03</span>
+                                <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 9,105</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-gray-800">睡眠质量与心理健康的关系</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                探索睡眠质量对心理健康的影响，分析常见睡眠障碍的成因与解决方案，建立健康的睡眠习惯。
+                            </p>
+                            <button class="text-purple-500 hover:text-purple-600 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 文章6 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300 resource-card article-card" data-section="articles" data-category="growth">
+                        <div class="relative h-48 bg-gradient-to-r from-green-400 to-teal-600">
+                            <span class="absolute top-3 left-3 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">个人成长</span>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fa fa-rocket text-white text-6xl opacity-80"></i>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm text-gray-500"><i class="fa fa-calendar-o mr-1"></i> 2023-11-12</span>
+                                <span class="text-sm text-gray-500"><i class="fa fa-eye mr-1"></i> 7,863</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-gray-800">设定有效目标的SMART原则</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                通过SMART原则（具体、可衡量、可实现、相关性、时限性）学习如何设定真正能推动个人成长的有效目标。
+                            </p>
+                            <button class="text-purple-500 hover:text-purple-600 font-medium inline-flex items-center transition-transform hover:translate-x-1">
+                                阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <button class="px-6 py-3 bg-white text-purple-500 border border-purple-500 rounded-full shadow-md hover:bg-purple-50 transition-all duration-300 font-medium">
+                        查看更多文章 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </section>
+
+                <!-- 故事3 -->
+                <div class="story-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl" data-category="relationship">
+                    <div class="h-48 bg-gradient-to-r from-green-500 to-teal-600 flex items-center justify-center">
+                        <i class="fa fa-users text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-green-100 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded">人际关系</span>
+                            <span class="ml-auto text-gray-500 text-sm"><i class="fa fa-clock-o mr-1"></i> 12分钟阅读</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">倾听的力量</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一对夫妻通过学习有效沟通和倾听技巧，成功修复了濒临破裂的婚姻关系，重建了彼此之间的信任和理解。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="3">
+                        阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    </div>
+                </div>
+
+                <!-- 故事4 -->
+                <div class="story-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl" data-category="growth">
+                    <div class="h-48 bg-gradient-to-r from-amber-500 to-orange-600 flex items-center justify-center">
+                        <i class="fa fa-rocket text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5 rounded">个人成长</span>
+                            <span class="ml-auto text-gray-500 text-sm"><i class="fa fa-clock-o mr-1"></i> 9分钟阅读</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">突破自我设限</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位职场人士如何通过心理辅导，克服了自我怀疑和恐惧，勇敢挑战新的职业领域并取得成功的故事。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="4">
+                        阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    </div>
+                </div>
+
+                <!-- 故事5 -->
+                <div class="story-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl" data-category="anxiety">
+                    <div class="h-48 bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center">
+                        <i class="fa fa-heartbeat text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-blue-100 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded">焦虑管理</span>
+                            <span class="ml-auto text-gray-500 text-sm"><i class="fa fa-clock-o mr-1"></i> 7分钟阅读</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">呼吸之间</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位惊恐发作患者通过学习呼吸技巧和正念冥想，成功控制住症状，并逐步恢复正常生活的经历。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="5">
+                        阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    </div>
+                </div>
+
+                <!-- 故事6 -->
+                <div class="story-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl" data-category="growth">
+                    <div class="h-48 bg-gradient-to-r from-pink-500 to-red-600 flex items-center justify-center">
+                        <i class="fa fa-book text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5 rounded">个人成长</span>
+                            <span class="ml-auto text-gray-500 text-sm"><i class="fa fa-clock-o mr-1"></i> 11分钟阅读</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">从低谷到高峰</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位经历职业挫折的企业家，通过心理韧性的培养和积极心态的调整，最终东山再起的励志故事。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="6">
+                        阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    </div>
+                </div>
+
+                <!-- 故事7 -->
+                <div class="story-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl" data-category="selfesteem">
+                    <div class="h-48 bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center">
+                        <i class="fa fa-mirror text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-violet-100 text-violet-700 text-xs font-medium px-2.5 py-0.5 rounded">自尊与接纳</span>
+                            <span class="ml-auto text-gray-500 text-sm"><i class="fa fa-clock-o mr-1"></i> 10分钟阅读</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">与自己和解</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位年轻女性通过心理治疗，从长期的自我否定和完美主义中解脱出来，学会接纳真实自己的旅程。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="7">
+                        阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    </div>
+                </div>
+
+                <!-- 故事8 -->
+                <div class="story-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl" data-category="trauma">
+                    <div class="h-48 bg-gradient-to-r from-indigo-500 to-blue-600 flex items-center justify-center">
+                        <i class="fa fa-heartbeat text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-indigo-100 text-indigo-700 text-xs font-medium px-2.5 py-0.5 rounded">创伤恢复</span>
+                            <span class="ml-auto text-gray-500 text-sm"><i class="fa fa-clock-o mr-1"></i> 12分钟阅读</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">愈合的伤痕</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位车祸幸存者如何通过专业心理干预和社会支持，逐渐走出创伤阴影，重新拥抱生活的真实经历。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="8">
+                        阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    </div>
+                </div>
+
+                <!-- 故事9 -->
+                <div class="story-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl" data-category="anxiety">
+                    <div class="h-48 bg-gradient-to-r from-cyan-500 to-teal-600 flex items-center justify-center">
+                        <i class="fa fa-pagelines text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-blue-100 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded">焦虑管理</span>
+                            <span class="ml-auto text-gray-500 text-sm"><i class="fa fa-clock-o mr-1"></i> 9分钟阅读</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">平静的力量</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位职场新人通过正念练习和时间管理技巧，成功克服了工作焦虑，找到了工作与生活的平衡。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="9">
+                        阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    </div>
+                </div>
+
+                <!-- 故事10 -->
+                <div class="story-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl" data-category="depression">
+                    <div class="h-48 bg-gradient-to-r from-emerald-500 to-green-600 flex items-center justify-center">
+                        <i class="fa fa-leaf text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-purple-100 text-purple-700 text-xs font-medium px-2.5 py-0.5 rounded">情绪调节</span>
+                            <span class="ml-auto text-gray-500 text-sm"><i class="fa fa-clock-o mr-1"></i> 11分钟阅读</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">情绪的调色板</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位艺术家通过创作过程探索和表达自己的情绪，最终找到情绪管理和自我疗愈的独特方式。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="10">
+                        阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    </div>
+                </div>
+
+                <!-- 故事11 -->
+                <div class="story-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl" data-category="relationship">
+                    <div class="h-48 bg-gradient-to-r from-rose-500 to-red-600 flex items-center justify-center">
+                        <i class="fa fa-link text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-green-100 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded">人际关系</span>
+                            <span class="ml-auto text-gray-500 text-sm"><i class="fa fa-clock-o mr-1"></i> 13分钟阅读</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">重建信任</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一对朋友因误解而关系破裂，通过真诚沟通和共同努力，最终修复关系并建立更深层次信任的故事。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="11">
+                        阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    </div>
+                </div>
+
+                <!-- 故事12 -->
+                <div class="story-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl" data-category="growth">
+                    <div class="h-48 bg-gradient-to-r from-amber-500 to-yellow-600 flex items-center justify-center">
+                        <i class="fa fa-compass text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5 rounded">个人成长</span>
+                            <span class="ml-auto text-gray-500 text-sm"><i class="fa fa-clock-o mr-1"></i> 10分钟阅读</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">寻找内在的声音</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">
+                            一位年轻人在职业选择的迷茫中，通过自我探索和心理咨询，找到了真正符合内心渴望的人生方向。
+                        </p>
+                        <button class="read-story-btn text-primary hover:text-indigo-600 font-medium inline-flex items-center transition-transform hover:translate-x-1" data-story-id="12">
+                        阅读全文 <i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 推荐书籍板块 -->
+            <section class="mt-16">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold mb-3 text-primary">推荐心理书籍</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">精选优质心理类书籍，帮助您深入了解心理学知识，获得心灵成长和自我提升</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- 推荐书籍1 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300 group">
+                        <div class="h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
+                            <img src="https://img3.doubanio.com/view/subject/s/public/s27274418.jpg" alt="被讨厌的勇气" class="h-56 object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-center mb-2">
+                                <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded">个体心理学</span>
+                                <div class="ml-auto flex items-center">
+                                    <i class="fa fa-star text-yellow-400 text-xs"></i>
+                                    <span class="text-xs text-gray-600 ml-1">9.2</span>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold mb-1 text-gray-800">被讨厌的勇气</h3>
+                            <p class="text-sm text-gray-500 mb-2">[日]岸见一郎 / 古贺史健</p>
+                            <div class="flex items-center mb-3">
+                                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">入门级</span>
+                                <span class="text-xs text-gray-500 ml-2">哲学心理学</span>
+                            </div>
+                            <p class="text-sm text-gray-600 line-clamp-2 mb-3">
+                                阿德勒心理学的精髓，教你如何面对人际关系困扰，获得真正的自由与勇气。
+                            </p>
+                            <button class="text-primary text-sm font-medium hover:text-indigo-600 transition-colors">
+                                了解更多 <i class="fa fa-angle-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 推荐书籍2 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300 group">
+                        <div class="h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
+                            <img src="https://img9.doubanio.com/view/subject/s/public/s1070143.jpg" alt="少有人走的路" class="h-56 object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-center mb-2">
+                                <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded">心理成长</span>
+                                <div class="ml-auto flex items-center">
+                                    <i class="fa fa-star text-yellow-400 text-xs"></i>
+                                    <span class="text-xs text-gray-600 ml-1">8.4</span>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold mb-1 text-gray-800">少有人走的路</h3>
+                            <p class="text-sm text-gray-500 mb-2">[美]M·斯科特·派克</p>
+                            <div class="flex items-center mb-3">
+                                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">进阶级</span>
+                                <span class="text-xs text-gray-500 ml-2">心理成熟</span>
+                            </div>
+                            <p class="text-sm text-gray-600 line-clamp-2 mb-3">
+                                探索爱与成长的心理学经典，帮助您面对生活的挑战，迈向心智成熟。
+                            </p>
+                            <button class="text-primary text-sm font-medium hover:text-indigo-600 transition-colors">
+                                了解更多 <i class="fa fa-angle-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 推荐书籍3 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300 group">
+                        <div class="h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
+                            <img src="https://img3.doubanio.com/view/subject/s/public/s29286668.jpg" alt="蛤蟆先生去看心理医生" class="h-56 object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-center mb-2">
+                                <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded">心理咨询</span>
+                                <div class="ml-auto flex items-center">
+                                    <i class="fa fa-star text-yellow-400 text-xs"></i>
+                                    <span class="text-xs text-gray-600 ml-1">8.7</span>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold mb-1 text-gray-800">蛤蟆先生去看心理医生</h3>
+                            <p class="text-sm text-gray-500 mb-2">[英]罗伯特·戴博德</p>
+                            <div class="flex items-center mb-3">
+                                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">入门级</span>
+                                <span class="text-xs text-gray-500 ml-2">心理治疗</span>
+                            </div>
+                            <p class="text-sm text-gray-600 line-clamp-2 mb-3">
+                                用童话般的语言讲述心理治疗的过程，通俗易懂地呈现心理咨询的原理与技术。
+                            </p>
+                            <button class="text-primary text-sm font-medium hover:text-indigo-600 transition-colors">
+                                了解更多 <i class="fa fa-angle-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 推荐书籍4 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300 group">
+                        <div class="h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
+                            <img src="https://img1.doubanio.com/view/subject/s/public/s32766220.jpg" alt="非暴力沟通" class="h-56 object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-center mb-2">
+                                <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded">人际沟通</span>
+                                <div class="ml-auto flex items-center">
+                                    <i class="fa fa-star text-yellow-400 text-xs"></i>
+                                    <span class="text-xs text-gray-600 ml-1">8.4</span>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold mb-1 text-gray-800">非暴力沟通</h3>
+                            <p class="text-sm text-gray-500 mb-2">[美]马歇尔·卢森堡</p>
+                            <div class="flex items-center mb-3">
+                                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">入门级</span>
+                                <span class="text-xs text-gray-500 ml-2">沟通技巧</span>
+                            </div>
+                            <p class="text-sm text-gray-600 line-clamp-2 mb-3">
+                                教您如何用平和的方式表达自己的感受和需求，建立健康、和谐的人际关系。
+                            </p>
+                            <button class="text-primary text-sm font-medium hover:text-indigo-600 transition-colors">
+                                了解更多 <i class="fa fa-angle-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 推荐文章板块 -->
+            <section class="mt-16">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold mb-3 text-primary">精选心理文章</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">专业心理学家撰写的深度文章，提供科学的心理知识和实用的自我提升建议</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- 推荐文章1 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-1/3 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center p-6">
+                                <i class="fa fa-brain text-white text-6xl"></i>
+                            </div>
+                            <div class="md:w-2/3 p-6">
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">认知心理学</span>
+                                    <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">自我认知</span>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2 text-gray-800">认识你的认知偏差：如何避免思维陷阱</h3>
+                                <p class="text-gray-600 mb-4 line-clamp-3">
+                                    认知偏差是影响我们决策和情绪的重要因素。本文深入分析了常见的认知偏差类型，如确认偏误、后视偏差等，并提供了识别和纠正这些偏差的实用方法，帮助您做出更理性的判断。
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center text-gray-500 text-sm">
+                                        <span class="font-medium text-primary mr-2">李明哲</span>
+                                        <span class="text-xs"><i class="fa fa-calendar-o mr-1"></i> 2024-05-15</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500"><i class="fa fa-clock-o mr-1"></i> 15分钟阅读</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 推荐文章2 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-1/3 bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center p-6">
+                                <i class="fa fa-heart text-white text-6xl"></i>
+                            </div>
+                            <div class="md:w-2/3 p-6">
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">情绪管理</span>
+                                    <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">压力应对</span>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2 text-gray-800">情绪调节的科学方法：从认知重评到正念练习</h3>
+                                <p class="text-gray-600 mb-4 line-clamp-3">
+                                    本文基于最新的心理学研究，介绍了多种科学有效的情绪调节技术，包括认知重评、接纳与承诺疗法、正念冥想等。通过实践这些方法，您可以更好地管理负面情绪，提升情绪韧性。
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center text-gray-500 text-sm">
+                                        <span class="font-medium text-primary mr-2">张雨晴</span>
+                                        <span class="text-xs"><i class="fa fa-calendar-o mr-1"></i> 2024-06-02</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500"><i class="fa fa-clock-o mr-1"></i> 18分钟阅读</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 推荐文章3 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-1/3 bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center p-6">
+                                <i class="fa fa-users text-white text-6xl"></i>
+                            </div>
+                            <div class="md:w-2/3 p-6">
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">人际关系</span>
+                                    <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">沟通技巧</span>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2 text-gray-800">建立健康边界：在关系中保护自己的心理健康</h3>
+                                <p class="text-gray-600 mb-4 line-clamp-3">
+                                    健康的人际边界对心理健康至关重要。本文探讨了边界的类型、建立健康边界的重要性，以及如何在不伤害他人的情况下设定和维护个人边界，帮助您在关系中找到平衡。
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center text-gray-500 text-sm">
+                                        <span class="font-medium text-primary mr-2">王建国</span>
+                                        <span class="text-xs"><i class="fa fa-calendar-o mr-1"></i> 2024-05-28</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500"><i class="fa fa-clock-o mr-1"></i> 12分钟阅读</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 推荐文章4 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all-300">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-1/3 bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center p-6">
+                                <i class="fa fa-graduation-cap text-white text-6xl"></i>
+                            </div>
+                            <div class="md:w-2/3 p-6">
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">个人成长</span>
+                                    <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">心理韧性</span>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2 text-gray-800">心理韧性的培养：如何从挫折中反弹并成长</h3>
+                                <p class="text-gray-600 mb-4 line-clamp-3">
+                                    心理韧性不是天生的，而是可以培养的能力。本文结合积极心理学研究，介绍了培养心理韧性的关键要素和实用策略，帮助您在面对生活中的挑战和逆境时，能够更好地适应和成长。
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center text-gray-500 text-sm">
+                                        <span class="font-medium text-primary mr-2">陈志强</span>
+                                        <span class="text-xs"><i class="fa fa-calendar-o mr-1"></i> 2024-06-10</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500"><i class="fa fa-clock-o mr-1"></i> 20分钟阅读</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 故事阅读模态框 -->
+    <div id="story-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center hidden">
+        <div class="story-modal-content w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="bg-white rounded-2xl shadow-2xl">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <span id="modal-story-category" class="bg-blue-100 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded">焦虑管理</span>
+                            <h3 id="modal-story-title" class="text-2xl font-bold text-primary mt-2">走出焦虑的迷雾</h3>
+                        </div>
+                        <button id="close-story-modal" class="text-gray-500 hover:text-gray-700 focus:outline-none transition-transform hover:rotate-90">
+                            <i class="fa fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="story-content" class="prose max-w-none">
+                        <!-- 故事内容将通过JavaScript动态加载 -->
+                    </div>
+                    
+                    <!-- 故事选项区域 -->
+                    <div id="story-choices" class="mt-8 hidden">
+                        <h4 class="font-bold text-lg mb-4">你会如何选择？</h4>
+                        <div class="space-y-3"></div>
+                    </div>
+                    
+                    <!-- 故事导航 -->
+                    <div class="mt-8 flex justify-between">
+                        <button id="prev-paragraph" class="px-4 py-2 glass-effect text-primary rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fa fa-arrow-left mr-2"></i> 上一段
+                        </button>
+                        <button id="next-paragraph" class="px-4 py-2 glass-effect text-primary rounded-lg">
+                            下一段 <i class="fa fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <!-- 统一页脚组件 -->
+<footer class="bg-[#1e293b] text-white py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <!-- 左侧Logo和文字 -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                    <i class="fa fa-heart"></i>
+                </div>
+                <span class="text-white">心社区</span>
+            </div>
+            
+            <!-- 中间版权信息 -->
+            <div class="text-center">
+                <p class="text-white">© 2025 心社区心理健康支持中心. 保留所有权利.</p>
+            </div>
+            
+            <!-- 右侧图标 -->
+            <div class="flex space-x-4">
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-bell"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- 故事数据和交互脚本 -->
+    <script>
+        // 故事数据
+        const stories = {
+            1: {
+                title: "走出焦虑的迷雾",
+                category: "焦虑管理",
+                categoryColor: "blue",
+                paragraphs: [
+                    "当李明第一次走进心理咨询室时，他的手一直在微微颤抖，额头上布满了细密的汗珠。他在门口犹豫了整整十分钟，反复搓着那张已经被捏得皱巴巴的预约单，直到走廊上的时钟指向下午三点整——这是他预约的时间。作为一名即将参加高考的学生，他已经被严重的考试焦虑困扰了三个月。",
+                    "'我每次一想到考试，就会心跳加速，呼吸困难，甚至有几次在模拟考试中晕了过去。'李明声音颤抖着说道，他的手指无意识地绞着自己校服的衣角，'我担心这样下去，我根本无法正常参加高考。我的父母对我期望很高，我不想让他们失望。'说到这里，李明的眼睛湿润了，他低下头，盯着自己的脚尖，仿佛在和空气说话，'其实...最让我害怕的是让自己失望。从小我就是老师眼里的好学生，如果连高考都考不好...我觉得自己很失败。'",
+                    "心理咨询师王老师没有急于给出建议，而是耐心地倾听李明的讲述，了解他的成长经历和家庭环境。通过深入交流，王老师发现李明的焦虑源于对自己过高的期望和对失败的极度恐惧。李明的父亲是一名大学教授，母亲是医生，从小他们就教导李明要'追求卓越'，这种教育方式在李明心中埋下了'必须完美'的种子。",
+                    "在接下来的咨询中，王老师引导李明学习了认知行为疗法的基本技巧。首先，他们一起识别了李明头脑中的非理性信念，比如'如果考不好，我的人生就完了'这样的绝对化思维。'你能告诉我，如果你高考失利，最坏的情况会是什么吗？'王老师温和地问道。李明沉默了一会儿，小声说：'我会让父母失望，他们可能不再以我为荣。同学们会嘲笑我，说我不过如此。我自己也会觉得很没用。'",
+                    "然后，王老师教会了李明如何用理性的想法替代这些非理性信念，比如'考试成绩不能完全定义我的价值'。同时，他们还一起练习了深呼吸放松法和渐进式肌肉放松技术。'当你感到焦虑时，试着把注意力带回当下。'王老师示范着，'感受你的呼吸，感受双脚与地面的接触，感受周围的声音和气味。'李明跟着王老师的引导，慢慢闭上了眼睛，开始尝试这种全新的体验。"
+                ],
+                choices: [
+                    {
+                        text: "继续接受心理咨询，坚持练习学到的技巧",
+                        result: "李明坚持每周进行心理咨询，并在日常生活中不断练习学到的放松技巧和认知调整方法。起初，改变并不容易，他常常会在练习时思绪飘远，或者在感到焦虑时忘记使用学到的技巧。但随着时间推移，李明逐渐能够识别自己的焦虑触发点，并在它们变得强烈之前进行干预。三个月后，他的焦虑水平显著降低，能够以相对平静的心态面对考试。高考那天，当他坐在考场里感到紧张时，他想起了王老师教给他的呼吸技巧，深深吸了一口气，然后缓缓呼出。那一刻，他突然明白：他不必完美，只要尽力就好。"
+                    },
+                    {
+                        text: "尝试自我调节，但不太规律地练习",
+                        result: "李明尝试自己练习学到的技巧，但缺乏持续性。他的焦虑症状有所缓解，但在压力大的时候仍然会出现强烈的不适感。高考前一个月，李明再次出现了严重的焦虑发作，他不得不回到咨询室寻求帮助。这次的经历让他意识到，心理成长不是一蹴而就的过程，需要持续的努力和练习。在王老师的鼓励下，他重新制定了规律的练习计划，并在家人的支持下坚持执行。虽然高考对他来说仍然充满挑战，但他已经学会了如何与焦虑共处，而不是被它完全控制。"
+                    }
+                ]
+            },
+            2: {
+                title: "心灵的阳光",
+                category: "情绪调节",
+                categoryColor: "purple",
+                paragraphs: [
+                    "陈雨坐在公园的长椅上，看着远处玩耍的孩子们，脸上却没有一丝笑容。阳光透过树叶的缝隙洒在她的膝盖上，形成斑驳的光影，但她感受不到一丝温暖。过去的半年里，她一直被一种难以言喻的低落情绪笼罩着，对任何事情都提不起兴趣。她记得自己曾经热爱摄影，喜欢捕捉生活中的美好瞬间，但现在相机已经在抽屉里沉睡了很久。",
+                    "'我曾经是一个很开朗的人，但不知道从什么时候开始，我变得越来越沉默寡言。'陈雨在心理咨询室里说道，她的声音轻得几乎听不见，'我觉得自己像掉进了一个无底洞，无论怎么努力都爬不出来。每天早晨醒来，我都要花很长时间才能起床，仿佛有千斤重的石头压在身上。'她停顿了一下，用手指轻轻擦拭眼角的泪水，'最让我难过的是，我甚至对自己的孩子都没有了耐心。我知道这样不对，但我就是控制不住自己的情绪。'",
+                    "经过诊断，陈雨被确诊为中度抑郁症。在医生的建议下，她开始接受药物治疗和心理治疗相结合的综合干预方案。刚开始服药的那段时间，陈雨感到非常疲惫，总是想睡觉，但随着身体逐渐适应，她开始感受到一些细微的变化。'有一天早晨，我发现窗台上的绿萝长出了新叶子，我居然觉得有点开心。'她在一次咨询中对医生说。",
+                    "除了专业治疗外，陈雨还在心理咨询师的建议下尝试了多种自我调节的方法。她开始每天早晨进行30分钟的有氧运动，从最初只能慢慢走几分钟，到后来能够慢跑半小时。这不仅改善了她的睡眠质量，还让她的心情逐渐好转。'运动时，我能感受到自己的心跳，感受到血液在体内流动，这种活着的感觉真好。'陈雨说。",
+                    "同时，陈雨重新拾起了搁置已久的绘画爱好。起初，她只是机械地在纸上涂涂抹抹，画出来的东西连自己都觉得难看。但随着时间推移，她开始用画笔表达自己内心的感受——那些无法用言语形容的悲伤、绝望，以及偶尔闪现的希望。'有一次，我画了一幅名为《裂缝中的光》的画，画的是一堵破旧的墙，墙缝里长出了一株小小的向日葵。画完后，我突然意识到，即使在最黑暗的时刻，也总会有希望存在。'"
+                ],
+                choices: [
+                    {
+                        text: "坚持治疗并积极参与社交活动",
+                        result: "陈雨不仅坚持治疗，还在心理咨询师的鼓励下，主动参加了社区的绘画小组。刚开始的时候，她总是坐在角落里，很少说话，只是默默观察其他人。但随着时间推移，她逐渐打开了心扉，开始与小组成员交流自己的创作心得。她惊讶地发现，原来有那么多人也经历过类似的痛苦，他们互相理解、互相支持。一年后，陈雨的抑郁症状基本消失，她重新找回了生活的热情。她的丈夫说：'我很高兴看到那个充满活力的陈雨又回来了。'而陈雨自己则说：'抑郁症教会了我更加珍惜生活中的每一份美好，哪怕是最微小的美好。'"
+                    },
+                    {
+                        text: "专注于个人爱好，但减少社交",
+                        result: "陈雨在绘画中找到了乐趣，她的作品越来越有感染力，甚至在社区的小型展览中展出。但社交活动的减少让她有时仍然感到孤独。有一天，她在整理旧照片时，发现了一张自己和大学时最好的朋友的合影。她犹豫了很久，终于拨通了那个很久没有联系的电话号码。'你知道吗？我一直在等你的电话。'朋友的声音从电话那头传来，'我知道你最近过得不容易，但你从来都不是一个人。'这句话让陈雨泪如雨下。她开始意识到，真正的治愈不仅需要自我探索，还需要与他人建立连接。在朋友的陪伴下，陈雨的情绪状态继续改善，虽然恢复的道路依然漫长，但她已经不再感到孤单。"
+                    }
+                ]
+            },
+            3: {
+                title: "倾听的力量",
+                category: "人际关系",
+                categoryColor: "green",
+                paragraphs: [
+                    "张伟和李娜结婚五年了，最近他们的关系变得越来越紧张。'我们几乎每天都在争吵，为了一些鸡毛蒜皮的小事。'李娜在婚姻咨询中说道，她的眼睛里充满了委屈和疲惫，'昨天晚上，我做了他最爱吃的红烧肉，想和他好好聊聊孩子的教育问题，可他一回家就坐在沙发上看手机，一句话都不愿意说。我问他是不是工作不顺心，他却不耐烦地说我总是胡思乱想。他总是不理解我的感受，也不愿意听我说话。'",
+                    "'我觉得她太挑剔了，无论我做什么都不满意。'张伟则抱怨道，他的声音里带着一丝无奈，'最近公司项目压力很大，我每天加班到很晚，回到家只想安静一会儿。可她总是说我不关心家庭，不关心她和孩子。而且她说话总是很冲，让我很难接受。上次我主动提出周末带全家去公园玩，她却冷笑着说：'你平时都不在，现在装什么好爸爸？'这句话真的很伤人。'",
+                    "婚姻咨询师刘老师注意到，这对夫妻之间最大的问题是缺乏有效的沟通和倾听。他们都在表达自己的感受和需求，但却没有真正听到对方在说什么。在咨询过程中，刘老师教会了他们'非暴力沟通'的技巧，包括观察、感受、需求和请求四个步骤。'试着用'我'开头表达，而不是'你'，这样可以减少对方的防御心理。'刘老师建议道，'比如，不要说'你总是不关心我'，而是说'当你回家后一直看手机不说话时，我感到很孤独，因为我需要你的关注和陪伴'。'",
+                    "刘老师还设计了一系列练习，帮助他们学会真正地倾听对方。比如，当一方说话时，另一方需要先复述对方的话，确保自己真正理解了对方的意思，然后再表达自己的看法。'这个练习的目的不是为了证明谁对谁错，而是为了建立真正的理解。'刘老师解释道。第一次练习时，李娜说起了自己照顾孩子的辛苦，张伟试图复述，但他的复述里充满了辩解和评判。'我知道你觉得我不够关心孩子，但你知道我工作有多忙吗？'李娜听了，眼泪夺眶而出：'你根本就没在听我说话！'",
+                    "起初，这个过程对张伟和李娜来说都很困难，他们经常忍不住打断对方或者急于为自己辩解。但随着练习的深入，他们逐渐学会了控制自己的情绪，给予对方充分的关注和尊重。有一次，张伟主动说起了自己在工作中遇到的挑战，李娜没有像以前那样指责他只关心工作，而是认真地听完，然后轻声说：'听起来你最近压力真的很大。我能为你做些什么吗？'张伟愣住了，这是他们结婚以来，李娜第一次没有评判，而是真正地理解和接纳他的感受。那一刻，他突然意识到，原来他们之间的问题并不在于缺乏爱，而在于缺乏正确的沟通方式。"
+                ],
+                choices: [
+                    {
+                        text: "继续参加婚姻咨询并在日常生活中实践学到的沟通技巧",
+                        result: "张伟和李娜坚持参加了三个月的婚姻咨询，并在日常生活中不断实践学到的沟通技巧。他们开始每天抽出15分钟的'分享时间'，轮流讲述自己的一天，倾听对方的感受。起初，这个过程充满了尴尬和沉默，但随着时间推移，他们变得越来越自然，越来越愿意敞开心扉。有一天晚上，李娜轻轻握住张伟的手，说：'谢谢你愿意听我说话，我觉得我们好像又回到了刚结婚的时候。'张伟微笑着回应：'我也要谢谢你，是你让我明白了什么是真正的倾听。'他们的关系逐渐得到改善，重新找回了彼此之间的信任和理解。更重要的是，他们学会了如何在日常生活中保持良好的沟通，而不是等到问题积累到无法解决时才去寻求帮助。"
+                    },
+                    {
+                        text: "只在冲突发生时尝试使用沟通技巧",
+                        result: "张伟和李娜尝试在冲突发生时使用学到的沟通技巧，但效果有限。他们往往在情绪激动的时候才想起这些技巧，而这时已经很难控制自己的言行。有一次，他们又因为孩子的教育问题发生了争执，李娜忍不住提高了声音：'你总是这样，从来都不考虑我的感受！'张伟也不甘示弱：'你才是，总是把问题都怪在我身上！'事后，他们都感到后悔，想起了咨询师教过的'非暴力沟通'技巧，但已经于事无补。他们的关系有所缓和，但仍然会因为沟通不畅而产生矛盾。直到有一天，李娜在整理旧物时，发现了他们的结婚相册。看着照片中笑得幸福的两个人，她突然意识到，他们需要的不仅仅是在冲突时使用沟通技巧，而是在日常生活中建立一种互相理解、互相尊重的沟通习惯。"
+                    }
+                ]
+            },
+            4: {
+                title: "突破自我设限",
+                category: "个人成长",
+                categoryColor: "amber",
+                paragraphs: [
+                    "王强在一家科技公司工作了五年，一直担任软件工程师的职位。虽然他的工作表现不错，年年都能拿到优秀员工奖，但他总觉得自己的职业发展遇到了瓶颈。每天重复着相似的工作内容，他开始感到一种说不出的空虚和焦虑。'难道我这辈子就这样了吗？'他常常在夜深人静时这样问自己。",
+                    "'我想尝试管理岗位，但我担心自己没有领导能力。'王强在职业咨询中说道，他的手指紧张地绞在一起，'而且我性格比较内向，不善于与人沟通，可能不适合做管理。从小到大，我都是那个坐在角落里安静学习的孩子，从来没有当过班干部。我记得高中的时候，老师让我上台发言，我紧张得一句话都说不出来，全班同学都在笑我。从那以后，我就告诉自己，我不适合当领导者。'说到这里，王强的声音变得越来越小，眼神也黯淡了下来。",
+                    "职业咨询师张老师通过一系列评估发现，王强其实具备许多管理者的潜质，比如逻辑思维能力强、责任心强、注重细节等。他的主要障碍是自我设限的信念。'你刚才提到的高中经历，其实只是一次失败的尝试，并不能定义你的全部能力。'张老师温和地说道，'内向的人也可以成为优秀的管理者，许多伟大的领导者其实都是内向的人。重要的是找到适合自己性格特点的领导方式。'",
+                    "在咨询过程中，张老师帮助王强识别了这些自我限制的信念，并通过认知重构的方法，帮助他建立了更加积极、现实的自我认知。同时，张老师还为他制定了一个详细的能力提升计划。'我们不需要一步到位，而是可以从小事做起，逐步建立信心。'张老师建议道。王强开始有意识地在团队会议中多发言，虽然刚开始时他的声音很小，说话也不太流利，但随着练习次数的增加，他变得越来越自信。",
+                    "王强开始有意识地锻炼自己的沟通能力和团队协作能力。他主动参与团队项目的协调工作，积极表达自己的想法和建议，还参加了公司组织的领导力培训课程。有一次，团队遇到了一个技术难题，王强不仅提出了解决方案，还耐心地向团队成员解释了其中的原理和实施步骤。团队领导注意到了他的变化，开始交给他更多的责任，让他带领小组完成一些小型项目。王强惊喜地发现，他其实并不像自己想象的那样不擅长领导。'原来我也可以做到这些事情。'他在一次咨询中兴奋地对张老师说。"
+                ],
+                choices: [
+                    {
+                        text: "主动申请公司内部的管理岗位空缺",
+                        result: "在充分准备后，王强申请了公司内部的项目经理职位。面试前的晚上，他躺在床上辗转反侧，高中时那次失败的经历不断在他脑海中浮现。但他很快调整了自己的心态，想起了这段时间以来的成长和进步。面试当天，王强穿着整齐的西装，自信地走进了面试室。虽然过程中遇到了一些挑战，比如被问到如何处理团队冲突这样的尖锐问题，但他凭借扎实的专业知识和新发展的领导能力，以及真诚的态度，最终成功获得了这个职位。上任后，王强充分发挥了自己内向性格的优势——他善于倾听团队成员的意见，注重细节，能够制定清晰的工作计划。几个月后，当他带领团队成功完成一个重要项目时，他终于明白：真正的突破不是改变自己的性格，而是学会接纳自己，并在这个基础上不断成长。"
+                    },
+                    {
+                        text: "继续提升自己，但等待更合适的机会",
+                        result: "王强没有急于申请管理岗位，而是继续提升自己的能力。他参加了更多的培训课程，阅读了大量关于领导力的书籍，还主动向公司里的优秀管理者请教经验。他开始在团队中担任更多的协调工作，逐渐建立起自己的影响力。半年后，当公司有更适合他的技术团队负责人职位空缺时，他成功应聘并很快适应了新角色。这个职位既需要技术专长，又需要一定的管理能力，非常适合王强的特点。上任后，王强发现，自己内向的性格反而成为了一种优势——他更善于深入思考问题，更能够理解团队中其他内向成员的想法。他带领的团队氛围融洽，效率很高，得到了公司领导的高度评价。王强终于明白，职业发展不是一条固定的直线，而是一条可以根据自己特点和优势调整的曲线。"
+                    }
+                ]
+            },
+            5: {
+                title: "呼吸之间",
+                category: "焦虑管理",
+                categoryColor: "blue",
+                paragraphs: [
+                    "林小燕第一次经历惊恐发作是在地铁上。那天是周五下班高峰期，地铁车厢里挤满了人，几乎连转身的空间都没有。林小燕站在车厢中间，突然感到胸口一阵发闷，心跳开始不受控制地加速。她的手开始发抖，呼吸变得越来越困难，仿佛有人用手紧紧掐住了她的喉咙。'我是不是心脏病发作了？'这个念头在她脑海中闪过，恐惧瞬间吞噬了她。她拼尽全力挤到车门口，在下一站冲了出去，跌跌撞撞地找到一个电话亭，颤抖着拨打了120。",
+                    "经过一系列检查，医生告诉她这是惊恐发作，不是心脏病。'这是一种焦虑障碍，虽然发作时非常痛苦，但不会对身体造成真正的伤害。'医生解释道。但林小燕仍然感到非常害怕，她担心这种情况会再次发生，甚至不敢独自出门。从那以后，她开始避免乘坐公共交通工具，尽量减少外出，生活范围变得越来越小。'我觉得自己像被关在一个无形的笼子里，不知道什么时候会被那种可怕的感觉再次袭击。'她在第一次心理咨询时这样说道。",
+                    "在心理咨询师的帮助下，林小燕开始学习如何应对惊恐发作。首先，她了解到惊恐发作虽然非常痛苦，但不会对身体造成真正的伤害。'惊恐发作就像是一场虚假的警报，你的身体以为自己处于危险中，但实际上并没有。'咨询师解释道。这种认知上的改变本身就减轻了她的一部分恐惧。'当我再次感到惊恐发作即将来临的时候，我会告诉自己：这只是焦虑在作祟，它会过去的。'林小燕说。",
+                    "然后，心理咨询师教会了她腹式呼吸法。'试着把空气吸到你的腹部，而不是胸部。'咨询师示范着，'感受你的腹部慢慢鼓起，然后再慢慢呼出。'这种呼吸方法可以帮助她在感到焦虑时快速平静下来。每天，林小燕都会花10-15分钟练习腹式呼吸，逐渐掌握了这项技巧。刚开始的时候，她总是忍不住分心，或者忘记如何正确呼吸，但随着练习次数的增加，她变得越来越熟练。'现在，我可以在几秒钟内调整自己的呼吸，让自己平静下来。'她说。",
+                    "此外，心理咨询师还引导林小燕学习了正念冥想。'试着观察你的情绪和身体感受，就像一个旁观者一样，不要评判它们，也不要试图压抑它们。'咨询师建议道。通过正念练习，她学会了观察自己的情绪和身体感受，而不是被它们控制。'当焦虑来袭时，我不再像以前那样拼命抵抗，而是试着接纳它，与它和平共处。'林小燕说，'这种感觉很奇怪，但确实有效。就像是当你不再拼命挣扎时，你反而能够浮在水面上。'"
+                ],
+                choices: [
+                    {
+                        text: "坚持练习呼吸技巧和正念冥想，并逐渐扩大活动范围",
+                        result: "林小燕坚持练习学到的技巧，并在咨询师的指导下逐渐扩大自己的活动范围。她制定了一个循序渐进的计划，从短距离步行开始，逐渐过渡到乘坐公交车、地铁等交通工具。第一次独自乘坐地铁时，她感到前所未有的紧张，手心直冒汗，心跳也比平时快很多。但她及时运用了学到的呼吸技巧，让自己慢慢平静下来。虽然那次旅程只有两站地，但对林小燕来说，这是一个巨大的胜利。三个月后，她不仅能够独自乘坐公共交通工具，惊恐发作的频率也显著降低。更重要的是，她重新找回了对生活的控制感。'现在，我知道即使惊恐发作再次来临，我也有能力应对它。这种感觉真的很棒。'她在一次咨询结束时开心地说道。"
+                    },
+                    {
+                        text: "主要依靠药物治疗，辅助练习呼吸技巧",
+                        result: "林小燕在医生的指导下服用抗焦虑药物，同时练习呼吸技巧。药物确实帮助她快速缓解了症状，惊恐发作的频率和强度都有所降低。但她很快发现，单纯依靠药物并不能解决根本问题。有一次，当她尝试减少药物剂量时，惊恐发作再次出现，这让她意识到，长期来看还需要结合心理治疗才能真正克服惊恐障碍。于是，她重新回到咨询室，更加认真地学习和练习应对技巧。在药物治疗和心理治疗的双重作用下，林小燕的情况逐渐好转。她开始明白，药物可以帮助控制症状，但真正的治愈来自于内心的成长和对自我的认知。'这是一段漫长而艰难的旅程，但我相信我能够走出来。'她在日记中这样写道。"
+                    }
+                ]
+            },
+            6: {
+                title: "从低谷到高峰",
+                category: "个人成长",
+                categoryColor: "amber",
+                paragraphs: [
+                    "赵磊的创业公司在运营了两年后遇到了严重的资金问题。由于市场竞争激烈，公司的产品销量远低于预期，投资人也开始失去信心。'最后一次融资会议结束后，我的合伙人拍了拍我的肩膀，什么都没说就走了。我看着他离去的背影，突然意识到，这次可能真的要失败了。'赵磊回忆道。那天晚上，他独自留在办公室，看着窗外灯火辉煌的城市，第一次感到如此的孤独和无助。",
+                    "'那段时间我每天都失眠，担心公司随时会倒闭。'赵磊回忆道，他的眼睛里闪烁着复杂的情绪，'我感到前所未有的压力和挫败感，甚至开始怀疑自己的能力。我想起了创业初期的雄心壮志，想起了对团队成员的承诺，想起了家人期待的目光。这些都像沉重的石头一样压在我的心上，让我喘不过气来。'有一次，他在镜子里看到自己，发现才35岁的自己，头发已经白了不少，眼睛里充满了疲惫和迷茫。",
+                    "在朋友的建议下，赵磊开始接受心理咨询。'我以为心理咨询只是聊聊天，没什么用。但第一次咨询结束后，我突然觉得心里好像轻松了一些。'他说。心理咨询师帮助他梳理了自己的情绪，引导他重新审视这次创业经历。'失败并不意味着你是一个失败者。'咨询师这样对他说，'它只是意味着你尝试了，并且从中学习到了一些东西。'通过咨询，赵磊逐渐认识到，失败是创业过程中的正常现象，重要的是从失败中学习。他开始重新审视自己的创业动机，思考自己真正想要的是什么。",
+                    "赵磊开始调整自己的心态，他不再沉浸在失败的情绪中，而是积极分析问题的根源，并寻找解决方案。他重新评估了公司的商业模式，与团队成员进行了深入的沟通，还尝试了一些新的营销策略。'我开始倾听团队的意见，而不是像以前那样固执己见。'赵磊说，'我发现，当我放下自己的骄傲，真正倾听他人的声音时，很多问题都变得容易解决了。'他还主动联系了一些行业专家，向他们请教经验，寻求建议。这些努力虽然没有立即带来明显的改变，但赵磊感到自己正在成长，正在变得更加成熟和坚强。",
+                    "同时，赵磊也开始注重自己的身心健康。他每天抽出时间进行体育锻炼，保持充足的睡眠，还学习了一些压力管理的技巧。'以前我总是觉得工作最重要，为了工作可以牺牲一切。但现在我明白了，没有健康的身体和心态，什么都做不好。'他说。每天早上，赵磊都会去公园跑步，感受清晨的阳光和新鲜的空气。这个习惯不仅让他的身体变得更加健康，也让他的心情变得更加平静。在一次晨跑后，他突然想到了一个新的产品思路，这个思路后来成为了公司转型的关键。这些改变不仅改善了他的心理状态，也让他能够以更加清晰的头脑思考问题。"
+                ],
+                choices: [
+                    {
+                        text: "重新调整业务方向，寻找新的投资机会",
+                        result: "通过市场调研和分析，赵磊重新定位了公司的产品，找到了更有潜力的市场。他将公司的核心业务从原来的大众消费品转向了企业服务领域，这个决定虽然冒险，但基于充分的市场调研和团队的专业能力。同时，他积极寻找新的投资机会，带着新的商业计划参加了各种创业路演。起初，很多投资人对他的项目不感兴趣，有些人甚至直接指出他之前的失败。但赵磊没有气馁，他认真听取每一位投资人的反馈，不断完善自己的商业计划。最终，他获得了一家风投机构的支持。拿到投资的那天，赵磊请团队成员一起吃饭，他举起酒杯，眼含热泪地说：'谢谢你们一直以来的信任和支持。这次，我们一定会成功。'一年后，公司的业务开始好转，新的产品线获得了市场的认可，团队规模也从原来的10人扩大到了30人。赵磊在一次行业论坛上分享自己的创业经历时说：'失败是最好的老师，它教会了我如何面对困境，如何调整自己，如何与团队合作。我很庆幸自己经历了那次低谷，因为它让我成为了一个更好的创业者。'"
+                    },
+                    {
+                        text: "缩小公司规模，专注于核心业务",
+                        result: "赵磊决定缩小公司规模，减少不必要的开支，专注于发展最有潜力的核心业务。这个决定并不容易，因为它意味着要裁员，要放弃一些曾经看好的项目。'那天晚上，我一个人在办公室里，看着员工的名单，眼泪止不住地流。'赵磊回忆道，'但我知道，这是为了让公司能够生存下去，为了让剩下的员工有更好的未来。'裁员之后，公司只剩下了5名核心成员，但他们都对公司的未来充满信心。赵磊重新规划了公司的发展方向，将所有资源都集中在一款最有市场潜力的产品上。他们夜以继日地工作，不断优化产品，提升用户体验。虽然过程艰难，但这种策略帮助公司度过了危机，为未来的发展奠定了基础。半年后，这款产品开始获得稳定的收入，公司的财务状况逐渐好转。赵磊在公司的周会上对团队成员说：'我们曾经经历了低谷，但正是那段经历让我们更加清楚自己想要什么，更加珍惜现在所拥有的一切。我相信，只要我们坚持下去，就一定能够创造出更好的成绩。'"
+                    }
+                ]
+            },
+            7: {
+                title: "与自己和解",
+                category: "自尊与接纳",
+                categoryColor: "violet",
+                paragraphs: [
+                    "林小雨站在试衣镜前，看着镜子中的自己，眉头紧锁。这件漂亮的连衣裙穿在她身上显得很合身，但她却盯着自己腰上的一点点赘肉，感到无比沮丧。'我怎么这么胖？'她小声嘀咕着，手指无意识地捏着腰间的皮肤。这已经不是第一次了，每当她看到自己的身体，总会找到各种各样的不满意之处。",
+                    "作为一家时尚杂志的编辑，林小雨每天都要面对各种完美身材的模特和时尚照片。'我知道那些照片都是经过修图的，但我还是忍不住拿自己和她们比较。'她在心理咨询中说道，声音里带着一丝哽咽，'我从小就是个胖子，同学们给我起外号，嘲笑我。虽然现在我已经瘦了很多，但那些伤害好像刻在了我的心里，永远都无法抹去。'她停顿了一下，深吸了一口气，'最让我感到痛苦的是，我明明知道这种自我否定是不健康的，但我就是无法控制自己。'",
+                    "心理咨询师陈医生注意到，林小雨的问题源于长期的自我否定和完美主义倾向。在接下来的咨询中，陈医生引导林小雨探索她的自我认知模式，帮助她识别那些不合理的自我批判。'当你说'我很胖'的时候，你是在描述一个客观事实，还是在评价自己的价值？'陈医生问道。林小雨沉默了一会儿，轻声说：'我想，我是在把体重和自我价值联系在一起了。'",
+                    "陈医生教会了林小雨一种叫做'自我同情'的技巧，帮助她学会像对待好朋友一样对待自己。'当你感到自责时，试着对自己说一些温暖、支持的话。'陈医生建议道，'比如，当你因为吃了一块蛋糕而自责时，试着说：'每个人都有享受美食的权利，这并不代表我意志力薄弱。'同时，他们还一起制定了一个'身体感恩'练习，每天记录下身体为自己做的三件事。",
+                    "起初，林小雨觉得这些练习很奇怪，甚至有些做作。但随着时间推移，她开始逐渐接受这种新的思维方式。'有一天，我在晨跑时，突然感到自己的双腿充满力量，能够带着我前进。那一刻，我第一次觉得，我的身体其实很强大，很了不起。'她在一次咨询中兴奋地说道。慢慢地，林小雨开始关注自己身体的功能和优点，而不是仅仅关注外表。她发现，当她不再苛刻地批评自己时，整个人都变得轻松了许多。"
+                ],
+                choices: [
+                    {
+                        text: "继续接受心理咨询，并尝试参加身体积极运动团体",
+                        result: "林小雨在心理咨询的基础上，加入了一个身体积极运动团体。这个团体鼓励成员关注运动带来的感受，而不是追求特定的体型目标。在团体活动中，她遇到了许多和她有类似经历的人，他们互相支持，互相鼓励。有一次，团体组织了一场'身体正面'摄影活动，参与者只穿着简单的衣物，展示真实的身体。林小雨犹豫了很久，最终决定参加。当她看到照片中的自己时，她惊讶地发现，原来真实的自己也可以如此美丽。这次经历让她对自己有了全新的认识。一年后，林小雨在社交媒体上分享了自己的成长经历，鼓励更多的人接纳自己。她写道：'真正的美丽不是完美无缺，而是学会与自己和解，爱真实的自己。'"
+                    },
+                    {
+                        text: "专注于个人成长，但保持一定的隐私空间",
+                        result: "林小雨选择在相对私密的环境中继续自己的成长旅程。她开始阅读有关身体积极和自我接纳的书籍，参加线上课程，记录自己的感悟。她还培养了一些新的爱好，如绘画和园艺，这些活动让她能够在不关注外表的情况下表达自己。随着时间推移，她发现自己的自尊心逐渐增强，对自己的评价也变得更加客观和积极。有一天，她的同事注意到了她的变化，'你最近看起来很不一样，整个人都散发着自信的光芒。'同事说道。林小雨微笑着回答：'因为我终于学会了爱自己。'虽然她选择了相对低调的方式，但这种内在的转变已经深刻地影响了她的生活质量和人际关系。"
+                    }
+                ]
+            },
+            8: {
+                title: "愈合的伤痕",
+                category: "创伤恢复",
+                categoryColor: "indigo",
+                paragraphs: [
+                    "李明哲坐在心理咨询室里，双手紧紧地握在一起，指节因为用力而泛白。这是他第三次来接受创伤后应激障碍（PTSD）的治疗，但他仍然无法平静地讲述一年前发生的那场车祸。'我记得那天下着大雨，路面很滑。'他的声音开始颤抖，眼睛盯着地面，不敢与咨询师对视，'我正常行驶在回家的路上，突然一辆卡车失去控制，向我的车冲了过来...'他的呼吸变得急促，额头上冒出了细密的汗珠。",
+                    "那场车祸导致李明哲右腿骨折，在医院住了三个月。身体的伤势逐渐恢复，但心理的创伤却挥之不去。他开始害怕开车，甚至害怕坐车。每当他看到汽车，脑海中就会浮现出车祸发生时的情景，耳边仿佛还能听到金属碰撞的声音。'我晚上经常做噩梦，梦到自己又回到了车祸现场，那种恐惧和无助的感觉是如此真实。'他说道，'我尝试过各种方法让自己忘记，但那些记忆就像影子一样，无论我走到哪里都跟着我。'",
+                    "心理咨询师周医生决定采用认知行为疗法（CBT）结合眼动脱敏与再加工（EMDR）技术来帮助李明哲处理创伤。在第一次EMDR治疗中，周医生引导李明哲回忆车祸的细节，同时让他的眼睛跟随治疗师手指的移动而左右转动。'刚开始的时候，那种感觉太痛苦了，我几乎想要放弃。'李明哲后来回忆道，'但周医生一直在旁边鼓励我，告诉我这是治疗过程中的正常反应。'随着治疗次数的增加，李明哲发现自己能够逐渐平静地谈论那场车祸了。",
+                    "除了专业治疗外，李明哲还在家人和朋友的支持下，尝试了一些自我疗愈的方法。他开始学习冥想和深呼吸，帮助自己在感到焦虑时快速平静下来。他还加入了一个创伤幸存者支持小组，在那里他遇到了许多有类似经历的人。'当我听到他们分享自己的故事时，我突然觉得自己并不孤单。'他说，'我们互相鼓励，互相支持，这种感觉真的很好。'",
+                    "六个月后，李明哲的症状有了显著改善。他不再频繁做噩梦，对汽车的恐惧也减轻了很多。有一天，他决定尝试自己开车，虽然过程中他的手心直冒汗，心跳也比平时快很多，但他成功地完成了一段短途驾驶。'那一刻，我感到无比的骄傲和轻松。'他在治疗结束时对周医生说，'我知道，我永远不会忘记那场车祸，但它已经不再能控制我的生活了。我终于可以继续前进了。'"
+                ],
+                choices: [
+                    {
+                        text: "完成全部疗程并尝试帮助其他创伤幸存者",
+                        result: "李明哲坚持完成了整个治疗疗程，并在周医生的鼓励下，成为了支持小组的志愿者。他开始分享自己的治疗经历和应对技巧，帮助其他创伤幸存者。'当我看到那些刚经历创伤的人，就像看到了过去的自己。'他说，'我希望我的经历能够给他们带来希望，让他们知道康复是可能的。'随着时间推移，李明哲不仅帮助了许多人，也在这个过程中进一步治愈了自己。他开始重新享受生活，甚至尝试了一些以前从未想过的活动，如徒步旅行和摄影。一年后，他在支持小组的年会上说：'创伤可能会改变我们，但它不能定义我们。我们都有康复的能力，只要我们愿意寻求帮助并坚持下去。'"
+                    },
+                    {
+                        text: "专注于自己的生活重建，但保持警惕预防复发",
+                        result: "李明哲完成了治疗后，将更多的精力放在了生活重建上。他换了一份工作，搬到了一个新的社区，开始了新的生活。他继续定期练习冥想和深呼吸，保持健康的生活方式，并与心理医生保持定期联系，预防症状复发。'我知道，创伤的影响可能会在某些时候再次出现，尤其是在压力大或遇到类似情境的时候。'他说，'所以我必须保持警惕，及时调整自己的状态。'随着时间推移，李明哲逐渐建立了一种新的平衡。他不再让过去的创伤定义自己，而是学会了与它和平共处。他开始重新发现生活中的美好，享受每一个平凡但珍贵的时刻。'现在，我更加珍惜生命，更加感恩每一天。'他说，'这可能是那场可怕经历带给我的唯一积极的改变。'"
+                    }
+                ]
+            },
+            9: {
+                title: "平静的力量",
+                category: "焦虑管理",
+                categoryColor: "cyan",
+                paragraphs: [
+                    "王小明坐在办公桌前，面前的电脑屏幕上显示着多个未完成的任务和即将到来的截止日期。他的手指在键盘上机械地敲打着，但思绪却飘到了九霄云外。'我感觉自己就像一个被上了发条的机器，永远停不下来。'他在心里默默地想，'每天早上一睁开眼睛，就感到一股巨大的压力扑面而来，让我喘不过气来。'作为一名刚入职半年的职场新人，王小明一直努力想要证明自己，但这种过度的努力却让他陷入了焦虑的漩涡。",
+                    "王小明的焦虑症状在最近一个月变得越来越严重。他开始失眠，晚上躺在床上辗转反侧，脑海中不断浮现着工作中的各种问题。白天，他感到注意力无法集中，工作效率下降，还经常出现头痛、胃痛等身体不适。'我担心这样下去会被公司开除。'他在心理咨询中说道，声音里充满了担忧，'我的父母供我上大学很不容易，我不想让他们失望。而且，我真的很喜欢这份工作，不想因为自己的问题而失去它。'",
+                    "心理咨询师李医生通过评估发现，王小明的焦虑主要源于过度追求完美和不合理的时间管理。在接下来的咨询中，李医生首先帮助王小明识别了他的不合理信念，如'我必须把所有事情都做到完美'、'如果我犯了错误，就会被开除'等。然后，他们一起学习了如何用更加现实和合理的信念来替代这些不合理信念。",
+                    "同时，李医生还教会了王小明一些实用的时间管理技巧，如四象限法则、番茄工作法等。'我们不需要同时处理所有事情，而是要学会区分优先级，先完成最重要的任务。'李医生解释道。此外，他们还一起练习了正念冥想，帮助王小明在感到焦虑时能够快速平静下来。'试着把注意力带回到当下，感受你的呼吸，感受身体与椅子的接触。'李医生示范着，'当你感到思绪飘走时，不要自责，只是温和地把注意力带回来。'",
+                    "起初，这些改变对王小明来说并不容易。他习惯了同时处理多项任务，习惯了不断检查工作邮件，习惯了对自己苛刻要求。但随着练习次数的增加，他开始逐渐适应这种新的工作和生活方式。'我发现，当我不再同时处理多项任务，而是专注于一件事情时，我的工作效率反而提高了。'他在一次咨询中兴奋地说道，'而且，每天的正念练习让我感到前所未有的平静，我不再像以前那样容易感到焦虑和压力了。'"
+                ],
+                choices: [
+                    {
+                        text: "继续练习正念和时间管理技巧，并尝试将这些技巧分享给同事",
+                        result: "王小明坚持练习正念和时间管理技巧，并在一次团队会议上分享了自己的经验。起初，他有些担心同事们会嘲笑他，但令他惊讶的是，很多同事都对他的分享表示了兴趣。有几位同事甚至开始尝试他推荐的番茄工作法和正念练习。随着时间推移，王小明的工作状态有了显著改善，他不仅能够高效地完成工作任务，还能够在工作之余享受生活。他开始定期参加瑜伽课，周末会和朋友一起爬山、骑行，这些活动进一步减轻了他的压力和焦虑。三个月后，王小明因为工作表现优秀而获得了部门经理的表扬。'我现在明白了，真正的成功不是拼命工作，而是找到工作与生活的平衡。'他在日记中写道。"
+                    },
+                    {
+                        text: "专注于个人成长，但在工作环境中保持低调",
+                        result: "王小明选择在相对私密的环境中继续练习正念和时间管理技巧。他每天早上提前半小时到办公室，进行15分钟的正念冥想，然后制定当天的工作计划。下班后，他会去健身房锻炼，或者参加一些兴趣小组，丰富自己的业余生活。随着时间推移，他的工作效率和质量都有了显著提高，同事和上级都注意到了他的变化。有一次，部门经理在会议上特别表扬了他的工作态度和成果。'我觉得你最近状态很好，工作效率很高，能和大家分享一下你的秘诀吗？'经理问道。王小明犹豫了一下，简单地说：'我只是学会了如何更好地管理时间和调整心态。'虽然他选择了保持低调，但他内心知道，这些改变对他来说意义重大。他不再像以前那样被焦虑和压力所困扰，而是能够以更加从容和自信的态度面对工作和生活。"
+                    }
+                ]
+            },
+            10: {
+                title: "情绪的调色板",
+                category: "情绪调节",
+                categoryColor: "emerald",
+                paragraphs: [
+                    "陈艺坐在画室里，面前的画布上是一片混乱的色彩。她的画笔在画布上用力地涂抹着，颜料飞溅得到处都是。'为什么我总是画不好？'她大声地喊道，声音里充满了 frustration。作为一名年轻的艺术家，陈艺最近陷入了创作瓶颈，同时也被强烈的情绪波动所困扰。她时而感到极度兴奋，创作欲旺盛，时而又感到深深的绝望，对一切都失去了兴趣。",
+                    "'我觉得自己像一个情绪的奴隶，被各种情绪所控制。'陈艺在心理咨询中说道，她的眼睛红红的，显然刚刚哭过，'当我感到愤怒或沮丧时，我会疯狂地作画，把所有的情绪都发泄在画布上。但这样做的结果是，我的作品充满了负面情绪，连我自己都不愿意看。我想要创作一些能够带给人们希望和美的作品，但我就是做不到。'她停顿了一下，深吸了一口气，'最让我感到害怕的是，我不知道这些情绪从何而来，也不知道如何控制它们。'",
+                    "心理咨询师刘医生发现，陈艺的情绪问题与她不善于识别和表达自己的情绪有关。在接下来的咨询中，刘医生首先帮助陈艺学习了情绪识别的技巧，教她如何识别自己的情绪，以及这些情绪背后的需求和想法。'试着给你的情绪命名，比如，这是愤怒，这是悲伤，这是恐惧。'刘医生建议道，'当你能够准确地识别自己的情绪时，你就已经迈出了控制它们的第一步。'",
+                    "同时，刘医生还鼓励陈艺将情绪表达与艺术创作结合起来，但采用更加有意识和建设性的方式。'情绪本身没有好坏之分，它们都是你内心世界的一部分。'刘医生解释道，'重要的是如何表达和转化这些情绪。'他们一起尝试了各种艺术治疗的方法，如画情绪日记、用不同的色彩表达不同的情绪等。陈艺发现，当她能够有意识地观察和表达自己的情绪时，这些情绪不再像以前那样令她感到失控和恐惧。",
+                    "随着治疗的深入，陈艺开始尝试一种新的创作方式：她会先花时间安静地观察自己的情绪，然后有意识地选择如何在作品中表达这些情绪。'现在，我不再被情绪所控制，而是学会了与它们合作。'她在一次咨询中兴奋地说道，'我发现，当我能够接纳自己的所有情绪，包括那些负面情绪时，我的创作反而变得更加丰富和有深度了。'她最近创作了一系列名为《情绪的调色板》的作品，用丰富的色彩和意象表达了人类复杂的情感世界。"
+                ],
+                choices: [
+                    {
+                        text: "将艺术治疗与传统心理治疗结合，探索更深层次的情感表达",
+                        result: "陈艺在刘医生的建议下，开始尝试更深入的艺术治疗方法，如沙盘疗法和舞动治疗。这些新的治疗方式帮助她探索了一些她自己都没有意识到的深层情感和记忆。通过这些探索，她发现自己的情绪波动与童年时期的一些经历有关。随着这些深层问题的解决，陈艺的情绪状态逐渐变得更加稳定，她的创作也进入了一个新的阶段。她最近举办了个人画展，展出了她在治疗过程中创作的作品。展览获得了很大的成功，许多观众表示从她的作品中感受到了共鸣和启发。'艺术不仅是我的职业，也是我的治愈方式。'陈艺在展览开幕式上说，'我希望通过我的作品，能够帮助更多的人理解和接纳自己的情绪。'"
+                    },
+                    {
+                        text: "专注于艺术创作，同时保持定期的心理咨询",
+                        result: "陈艺选择将更多的精力放在艺术创作上，同时保持定期的心理咨询。她开始尝试各种新的艺术形式和技巧，不断探索如何更好地表达自己的情感世界。她的作品风格逐渐变得更加成熟和独特，开始受到艺术界的关注。有一天，一家画廊主动联系她，提出要举办她的个人画展。在准备画展的过程中，陈艺感到了前所未有的压力，但这次她不再像以前那样被情绪所控制，而是能够有意识地管理和调节自己的情绪。画展取得了很大的成功，她的作品被许多收藏家收藏。'我现在明白了，情绪是艺术家最宝贵的财富。'陈艺在画展后的采访中说，'关键是要学会如何与它们和谐共处，而不是被它们所控制。'"
+                    }
+                ]
+            },
+            11: {
+                title: "重建信任",
+                category: "人际关系",
+                categoryColor: "rose",
+                paragraphs: [
+                    "张敏站在咖啡馆的窗边，看着窗外的雨景，心情就像这天气一样沉重。她已经在这里等了二十分钟，她的好朋友李婷还没有出现。'她会不会又爽约了？'这个念头在张敏的脑海中闪过，让她感到一阵失落。三个月前，李婷因为一个误会而伤害了张敏，从那以后，她们的关系就变得紧张起来。虽然李婷后来道歉了，但张敏心中的伤口却没有完全愈合。",
+                    "'那天是我的生日，我邀请了几个好朋友一起庆祝，包括李婷。'张敏在心理咨询中回忆道，'我一直期待着她的到来，因为她是我最好的朋友。但她不仅迟到了两个小时，而且还忘记了我的生日礼物。更让我伤心的是，她在聚会上一直在和别人聊天，几乎没有和我说几句话。后来我才知道，她其实是去参加了另一个朋友的聚会，然后才来我的生日会。'说到这里，张敏的眼睛湿润了，'我感到自己被背叛了，被忽视了。我以为我们是最好的朋友，但显然，我在她心中并没有那么重要。'",
+                    "心理咨询师王医生注意到，张敏和李婷之间的问题不仅仅是一个简单的误会，而是涉及到信任和期望的深层次问题。在接下来的咨询中，王医生首先帮助张敏理清自己的感受和需求。'你希望从这段友谊中得到什么？'王医生问道，'你对好朋友的期望是什么？'通过这些问题，张敏开始重新审视自己对友谊的理解和期望。她意识到，她希望得到的是被重视、被理解和被支持的感觉。",
+                    "同时，王医生也鼓励张敏与李婷进行一次坦诚的沟通。'试着用'我'开头表达你的感受，而不是指责对方。'王医生建议道，'比如，不要说'你总是忽视我'，而是说'当你忘记我的生日时，我感到很受伤，因为我很重视我们的友谊'。'在王医生的鼓励下，张敏决定邀请李婷出来谈谈。起初，她很紧张，不知道该如何开口，但当她真正开始表达自己的感受时，她发现这个过程并没有她想象的那么困难。",
+                    "让张敏感到意外的是，李婷听完她的话后，诚恳地道歉，并解释了当天的情况。'那天我确实做错了，我不应该那样对待你。'李婷说，'我很后悔，因为你是我最重要的朋友之一。'李婷还分享了她最近面临的一些困难，这些困难导致她那段时间情绪低落，对什么事情都提不起兴趣。'我理解你的感受，但我希望你能给我一个机会，让我证明我真的很重视我们的友谊。'李婷说道。"
+                ],
+                choices: [
+                    {
+                        text: "给李婷一个机会，尝试重建友谊",
+                        result: "张敏决定给李婷一个机会，她们开始尝试重建友谊。起初，张敏还有些犹豫和警惕，但随着时间推移，她发现李婷真的在努力改变。李婷开始更加关注张敏的感受，记得重要的日子，主动分享自己的生活。张敏也学会了更加坦诚地表达自己的需求和感受，而不是默默期待对方能够猜透她的心思。三个月后，她们的友谊不仅恢复了，而且变得比以前更加深厚。'这次的经历让我明白了，真正的友谊需要双方的努力和坦诚的沟通。'张敏在一次咨询结束时对王医生说，'我也学会了，人都会犯错，重要的是要有勇气承认错误，并努力弥补。'她们现在经常一起参加活动，分享生活中的喜怒哀乐，彼此之间的信任比以前更加牢固。"
+                    },
+                    {
+                        text: "保持距离，但不排除未来修复关系的可能性",
+                        result: "张敏决定暂时保持距离，给彼此一些时间和空间。她告诉李婷，她需要时间来处理自己的感受，但她并没有完全关闭修复关系的大门。在这段时间里，张敏开始关注自己的其他友谊，参加一些新的社交活动，丰富自己的生活。她也在心理咨询中继续探索自己对友谊的理解和期望，逐渐变得更加独立和自信。几个月后，当她再次见到李婷时，她的心情已经平静了许多。她们开始偶尔联系，分享一些生活中的小事，但关系再也没有回到以前的亲密程度。'我并不后悔这个决定。'张敏后来对朋友说，'有时候，保持适当的距离也是对彼此的尊重。我已经学会了如何保护自己的感受，同时也理解了每个人都有自己的局限和困难。'"
+                    }
+                ]
+            },
+            12: {
+                title: "寻找内在的声音",
+                category: "个人成长",
+                categoryColor: "amber",
+                paragraphs: [
+                    "刘阳坐在公司的会议室里，听着部门经理在台上宣布新的项目计划。他的同事们都在认真地做笔记，脸上带着兴奋的表情，但刘阳却感到一阵迷茫。'这真的是我想要的吗？'这个问题已经在他的脑海中盘旋了很久。作为一名软件工程师，刘阳有着令人羡慕的工作和收入，但他总觉得自己的生活缺少了一些什么。每天重复着相似的工作内容，他开始感到一种说不出的空虚和焦虑。",
+                    "'我从小就是一个'乖孩子'，听父母的话，好好学习，考上好大学，找一份稳定的工作。'刘阳在职业咨询中说道，他的声音里带着一丝无奈，'现在我做到了父母期望的一切，但我却不知道自己真正想要什么。有时候我会问自己，这到底是我的人生，还是父母期望的人生？'他停顿了一下，深吸了一口气，'最让我感到困惑的是，我甚至不知道自己喜欢什么，擅长什么。这么多年来，我一直在按照别人的期望生活，从来没有认真想过自己的感受和需求。'",
+                    "职业咨询师陈老师注意到，刘阳的问题源于自我认知的缺失。在接下来的咨询中，陈老师引导刘阳进行了一系列的自我探索活动，如兴趣测评、价值观澄清、能力评估等。'试着回忆一下，在你的生活中，什么时候你感到最快乐、最充实？'陈老师问道。刘阳开始回忆，他想起了高中时参加机器人竞赛的日子，想起了大学时帮助同学解决技术问题的时光，还想起了周末做志愿者教老人使用智能手机的经历。",
+                    "通过这些探索，刘阳逐渐发现，他其实对教育和帮助他人很感兴趣。'当我帮助别人解决问题，看到他们脸上的笑容时，我感到无比的满足。'他说，'而且，我发现我很喜欢分享知识，喜欢看到别人因为我的帮助而成长。'在陈老师的鼓励下，刘阳开始尝试一些新的事物，如参加教育类的志愿者活动，学习教学技巧等。他发现，当他做这些事情时，他感到前所未有的充实和快乐。",
+                    "随着自我认知的深入，刘阳开始考虑职业转型的可能性。他开始利用业余时间学习教育技术相关的知识，参加相关的培训课程，并尝试在公司内部承担一些培训新员工的工作。'起初，我很害怕改变，担心自己无法适应新的领域。'刘阳在一次咨询中说道，'但陈老师告诉我，改变虽然充满挑战，但也是成长的机会。现在，我开始对未来充满期待，因为我知道，我正在朝着真正符合自己内心渴望的方向前进。'"
+                ],
+                choices: [
+                    {
+                        text: "勇敢追求教育技术领域的职业转型",
+                        result: "在充分准备后，刘阳决定辞去现有的工作，加入一家教育科技公司，担任技术培训师的职位。这个决定遭到了父母的强烈反对，他们认为刘阳放弃了稳定的工作和优厚的收入，是一个非常不明智的选择。但刘阳这次没有轻易妥协，他耐心地向父母解释自己的想法和感受，告诉他们这是他经过深思熟虑后做出的决定。随着时间推移，父母看到刘阳在新工作中表现得如此开心和充实，也逐渐接受了他的选择。在新的工作岗位上，刘阳充分发挥了自己的技术优势和教学热情，很快就成为了团队中的核心成员。一年后，他被提升为培训主管，负责公司的培训体系建设。'我现在终于明白，真正的成功不是别人眼中的成就，而是能够做自己喜欢并且有意义的事情。'刘阳在一次职业分享会上说道。"
+                    },
+                    {
+                        text: "在现有工作基础上，逐步向教育领域过渡",
+                        result: "刘阳决定采取更加稳妥的方式，在保持现有工作的同时，逐步向教育领域过渡。他开始在公司内部承担更多的培训工作，同时利用业余时间在在线教育平台上开设编程课程。起初，他的课程报名人数很少，但他并没有气馁，而是不断改进自己的教学方法和课程内容。随着教学经验的积累，他的课程越来越受欢迎，报名人数开始稳步增长。同时，他在公司内部的培训工作也得到了领导和同事的认可，被任命为部门的培训负责人。两年后，刘阳已经在教育领域积累了丰富的经验和资源，他开始考虑是否要全职投入教育事业。但无论最终的决定是什么，他都感到前所未有的清晰和自信，因为他知道，他已经找到了真正符合自己内心渴望的方向。'这个过程虽然漫长，但每一步都让我更加了解自己。'刘阳说，'我很庆幸自己没有急于求成，而是选择了一条更加适合自己的成长道路。'"
+                    }
+                ]
+            }
+        };
+
+        // 当前故事状态
+        let currentStoryId = null;
+        let currentParagraphIndex = 0;
+        let bgMusicPlaying = false;
+        let bgMusic = null;
+
+        // DOM元素
+        const storyModal = document.getElementById('story-modal');
+        const storyModalContent = document.querySelector('.story-modal-content');
+        const closeStoryModal = document.getElementById('close-story-modal');
+        const modalStoryTitle = document.getElementById('modal-story-title');
+        const modalStoryCategory = document.getElementById('modal-story-category');
+        const storyContent = document.getElementById('story-content');
+        const storyChoices = document.getElementById('story-choices');
+        const choicesContainer = storyChoices.querySelector('.space-y-3');
+        const prevParagraphBtn = document.getElementById('prev-paragraph');
+        const nextParagraphBtn = document.getElementById('next-paragraph');
+        const readStoryBtns = document.querySelectorAll('.read-story-btn');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const bgMusicToggle = document.getElementById('bg-music-toggle');
+        const musicIndicator = document.getElementById('music-indicator');
+
+        // 初始化背景音乐
+        function initBgMusic() {
+            bgMusic = new Audio('https://assets.mixkit.co/music/preview/mixkit-relaxing-waves-tropea-2387.mp3');
+            bgMusic.loop = true;
+            bgMusic.volume = 0.3;
+        }
+
+        // 切换背景音乐
+        function toggleBgMusic() {
+            if (!bgMusic) {
+                initBgMusic();
+            }
+            
+            if (bgMusicPlaying) {
+                bgMusic.pause();
+                bgMusicToggle.innerHTML = '<i class="fa fa-music text-xl"></i>';
+                musicIndicator.classList.add('hidden');
+            } else {
+                bgMusic.play().catch(e => console.log('无法自动播放音乐:', e));
+                bgMusicToggle.innerHTML = '<i class="fa fa-pause text-xl"></i>';
+                musicIndicator.classList.remove('hidden');
+            }
+            bgMusicPlaying = !bgMusicPlaying;
+        }
+
+        // 打开故事模态框
+        function openStoryModal(storyId) {
+            currentStoryId = storyId;
+            currentParagraphIndex = 0;
+            
+            const story = stories[storyId];
+            modalStoryTitle.textContent = story.title;
+            modalStoryCategory.textContent = story.category;
+            modalStoryCategory.className = `bg-${story.categoryColor}-100 text-${story.categoryColor}-700 text-xs font-medium px-2.5 py-0.5 rounded`;
+            
+            // 显示第一个段落
+            showParagraph(0);
+            
+            // 显示模态框
+            storyModal.classList.remove('hidden');
+            setTimeout(() => {
+                storyModalContent.classList.add('show');
+            }, 10);
+            
+            // 禁用背景滚动
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭故事模态框
+        function closeStoryModalFunc() {
+            storyModalContent.classList.remove('show');
+            setTimeout(() => {
+                storyModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                // 清除内容
+                storyContent.innerHTML = '';
+                choicesContainer.innerHTML = '';
+                storyChoices.classList.add('hidden');
+            }, 300);
+        }
+
+        // 显示段落
+        function showParagraph(index) {
+            const story = stories[currentStoryId];
+            
+            // 检查索引是否有效
+            if (index < 0) return;
+            if (index >= story.paragraphs.length) {
+                // 显示选择
+                showChoices();
+                return;
+            }
+            
+            currentParagraphIndex = index;
+            
+            // 更新按钮状态
+            prevParagraphBtn.disabled = index === 0;
+            nextParagraphBtn.disabled = false;
+            nextParagraphBtn.textContent = index === story.paragraphs.length - 1 ? '查看结局' : '下一段';
+            nextParagraphBtn.innerHTML = index === story.paragraphs.length - 1 ? '查看结局 <i class="fa fa-arrow-right ml-2"></i>' : '下一段 <i class="fa fa-arrow-right ml-2"></i>';
+            
+            // 隐藏选择区域
+            storyChoices.classList.add('hidden');
+            
+            // 显示段落
+            storyContent.innerHTML = '';
+            const paragraph = document.createElement('p');
+            paragraph.className = 'story-paragraph text-lg leading-relaxed text-gray-700';
+            paragraph.textContent = story.paragraphs[index];
+            storyContent.appendChild(paragraph);
+            
+            // 动画效果
+            setTimeout(() => {
+                paragraph.classList.add('show');
+            }, 100);
+            
+            // 滚动到顶部
+            storyContent.scrollTop = 0;
+        }
+
+        // 显示选择
+        function showChoices() {
+            const story = stories[currentStoryId];
+            
+            // 更新按钮状态
+            prevParagraphBtn.disabled = false;
+            nextParagraphBtn.disabled = true;
+            
+            // 隐藏段落，显示选择
+            storyContent.innerHTML = '';
+            storyChoices.classList.remove('hidden');
+            choicesContainer.innerHTML = '';
+            
+            story.choices.forEach((choice, index) => {
+                const choiceBtn = document.createElement('button');
+                choiceBtn.className = 'choice-btn w-full text-left px-6 py-4 bg-gray-50 hover:bg-gray-100 border-l-4 border-primary rounded-r-lg shadow-sm transition-all-300';
+                choiceBtn.textContent = choice.text;
+                choiceBtn.addEventListener('click', () => {
+                    // 显示选择结果
+                    showChoiceResult(choice.result);
+                });
+                choicesContainer.appendChild(choiceBtn);
+                
+                // 延迟添加动画
+                setTimeout(() => {
+                    choiceBtn.style.transform = 'translateX(0)';
+                }, 100 + index * 200);
+            });
+        }
+
+        // 显示选择结果
+        function showChoiceResult(result) {
+            storyChoices.classList.add('hidden');
+            
+            const resultPara = document.createElement('p');
+            resultPara.className = 'story-paragraph text-lg leading-relaxed text-gray-700';
+            resultPara.textContent = result;
+            storyContent.appendChild(resultPara);
+            
+            // 动画效果
+            setTimeout(() => {
+                resultPara.classList.add('show');
+            }, 100);
+            
+            // 更新按钮状态
+            nextParagraphBtn.disabled = true;
+        }
+
+        // 切换资源板块
+        function switchSection(section) {
+            const sections = document.querySelectorAll('section[data-section]');
+            const sectionBtns = document.querySelectorAll('.section-btn');
+            
+            // 更新按钮样式
+            sectionBtns.forEach(btn => {
+                btn.className = 'section-btn px-8 py-3 glass-effect text-primary rounded-full shadow-lg transition-all duration-300';
+            });
+            
+            const activeBtn = document.querySelector(`.section-btn[data-section="${section}"]`);
+            activeBtn.className = 'section-btn px-8 py-3 bg-primary text-white rounded-full shadow-lg transition-all duration-300';
+            
+            // 显示/隐藏板块
+            sections.forEach(s => {
+                if (section === 'all' || s.dataset.section === section) {
+                    s.style.display = 'block';
+                    // 添加动画
+                    setTimeout(() => {
+                        s.style.opacity = '1';
+                        s.style.transform = 'translateY(0)';
+                    }, 100);
+                } else {
+                    s.style.opacity = '0';
+                    s.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        s.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+        
+        // 切换故事分类
+        function filterStories(category) {
+            const storyCards = document.querySelectorAll('.story-card');
+            const storyCategoryBtns = document.querySelectorAll('.story-category-btn');
+            
+            // 更新按钮样式
+            storyCategoryBtns.forEach(btn => {
+                btn.className = 'story-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors';
+            });
+            
+            const activeBtn = document.querySelector(`.story-category-btn[data-category="${category}"]`);
+            activeBtn.className = 'story-category-btn px-4 py-2 bg-primary text-white rounded-full text-sm font-medium';
+            
+            // 过滤故事卡片
+            storyCards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                    // 添加动画
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+        
+        // 切换视频分类
+        function filterVideos(category) {
+            const videoCards = document.querySelectorAll('.video-card');
+            const videoCategoryBtns = document.querySelectorAll('.video-category-btn');
+            
+            // 更新按钮样式
+            videoCategoryBtns.forEach(btn => {
+                btn.className = 'video-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors';
+            });
+            
+            const activeBtn = document.querySelector(`.video-category-btn[data-category="${category}"]`);
+            activeBtn.className = 'video-category-btn px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-medium';
+            
+            // 过滤视频卡片
+            videoCards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                    // 添加动画
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+        
+        // 切换书籍分类
+        function filterBooks(category) {
+            const bookCards = document.querySelectorAll('.book-card');
+            const bookCategoryBtns = document.querySelectorAll('.book-category-btn');
+            
+            // 更新按钮样式
+            bookCategoryBtns.forEach(btn => {
+                btn.className = 'book-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors';
+            });
+            
+            const activeBtn = document.querySelector(`.book-category-btn[data-category="${category}"]`);
+            activeBtn.className = 'book-category-btn px-4 py-2 bg-green-500 text-white rounded-full text-sm font-medium';
+            
+            // 过滤书籍卡片
+            bookCards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                    // 添加动画
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+        
+        // 切换文章分类
+        function filterArticles(category) {
+            const articleCards = document.querySelectorAll('.article-card');
+            const articleCategoryBtns = document.querySelectorAll('.article-category-btn');
+            
+            // 更新按钮样式
+            articleCategoryBtns.forEach(btn => {
+                btn.className = 'article-category-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors';
+            });
+            
+            const activeBtn = document.querySelector(`.article-category-btn[data-category="${category}"]`);
+            activeBtn.className = 'article-category-btn px-4 py-2 bg-purple-500 text-white rounded-full text-sm font-medium';
+            
+            // 过滤文章卡片
+            articleCards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                    // 添加动画
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+
+        // 事件监听器
+        readStoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const storyId = btn.dataset.storyId;
+                openStoryModal(storyId);
+            });
+        });
+
+        closeStoryModal.addEventListener('click', closeStoryModalFunc);
+
+        prevParagraphBtn.addEventListener('click', () => {
+            showParagraph(currentParagraphIndex - 1);
+        });
+
+        nextParagraphBtn.addEventListener('click', () => {
+            showParagraph(currentParagraphIndex + 1);
+        });
+        
+        // 板块切换事件
+        document.querySelectorAll('.section-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const section = btn.dataset.section;
+                switchSection(section);
+            });
+        });
+        
+        // 故事分类切换事件
+        document.querySelectorAll('.story-category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.dataset.category;
+                filterStories(category);
+            });
+        });
+        
+        // 视频分类切换事件
+        document.querySelectorAll('.video-category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.dataset.category;
+                filterVideos(category);
+            });
+        });
+        
+        // 书籍分类切换事件
+        document.querySelectorAll('.book-category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.dataset.category;
+                filterBooks(category);
+            });
+        });
+        
+        // 文章分类切换事件
+        document.querySelectorAll('.article-category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.dataset.category;
+                filterArticles(category);
+            });
+        });
+
+        bgMusicToggle.addEventListener('click', toggleBgMusic);
+
+        // 点击模态框背景关闭
+        storyModal.addEventListener('click', (e) => {
+            if (e.target === storyModal) {
+                closeStoryModalFunc();
+            }
+        });
+
+        // 初始化导航栏
+            window.addEventListener('DOMContentLoaded', () => {
+                // 这里可以添加导航栏初始化代码
+                console.log('心理资源页面加载完成');
+                
+                // 初始化显示所有板块
+                switchSection('all');
+            });
+    </script>
+    
+    <!-- AI助手容器 -->
+    <div id="ai-assistant-container" class="fixed bottom-6 right-6 z-50">
+        <!-- AI助手启动按钮 -->
+        <button id="ai-assistant-btn" class="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-indigo-600 text-white shadow-lg flex items-center justify-center hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 animate-pulse">
+            <i class="fa fa-comments text-xl"></i>
+        </button>
+    </div>
+    
+    <!-- 引入公共脚本 -->
+    <script src="common.js"></script>
+</body>
+</html>

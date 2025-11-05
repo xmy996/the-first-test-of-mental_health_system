@@ -1,0 +1,2930 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心社区 - 心理健康支持平台</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 全局样式文件 -->
+    <link rel="stylesheet" href="common.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        error: '#ef4444',
+                        info: '#3b82f6',
+                        dark: '#1e293b',
+                        light: '#f8fafc',
+                        // 年龄阶段特定颜色
+                        children: '#22c55e',    // 儿童 - 绿色
+                        teenager: '#3b82f6',   // 青少年 - 蓝色
+                        adult: '#8b5cf6',      // 成人 - 紫色
+                        elderly: '#f59e0b'     // 老年人 - 橙色
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                        children: ['Comic Sans MS', 'Bubblegum Sans', 'cursive'],
+                        teenager: ['Segoe UI', 'Roboto', 'sans-serif'],
+                        adult: ['Inter', 'system-ui', 'sans-serif'],
+                        elderly: ['Georgia', 'Times New Roman', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* 游戏特定样式 */
+        .game-card {
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+        .game-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .game-container {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .game-container.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .emotion-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .emotion-card:hover {
+            transform: scale(1.05);
+        }
+        .emotion-card.selected {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+        .memory-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+        .memory-card-front,
+        .memory-card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .memory-card-back {
+            transform: rotateY(180deg);
+        }
+        .breathe-circle {
+            animation: breathe 4s infinite ease-in-out;
+        }
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(0.8);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.3;
+            }
+        }
+        .thought-bubble {
+            animation: float 3s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        .game-button {
+            transition: all 0.2s ease;
+        }
+        .game-button:hover {
+            transform: translateY(-2px);
+        }
+        .game-button:active {
+            transform: translateY(0);
+        }
+        .star-rating .fa {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .star-rating .fa:hover,
+        .star-rating .fa.active {
+            transform: scale(1.2);
+        }
+    </style>
+<style>
+
+    /* 全局样式重置 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 全局颜色变量 */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background-color: var(--bg-primary);
+    }
+    
+    /* 统一按钮样式 */
+    button {
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        outline: none;
+    }
+    
+    /* 主按钮样式 - 注册按钮 */
+    .btn-primary {
+        background-color: var(--secondary-color);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #7c3aed;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+    }
+    
+    /* 次要按钮样式 - 登录按钮 */
+    .btn-secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        transform: translateY(-1px);
+    }
+    
+    /* 导航栏样式 */
+    nav {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .btn-primary,
+        .btn-secondary {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* 卡片样式 */
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+    }
+    
+    /* 输入框样式 */
+    input,
+    textarea,
+    select {
+        font-family: inherit;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+</style>
+</head>
+<body class="bg-light font-sans text-dark overflow-x-hidden">
+    <!-- 动态背景 -->
+    <div class="dynamic-bg bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div class="shape bg-primary/20 w-[30vw] h-[30vw] top-[-5vw] left-[-5vw]"></div>
+        <div class="shape bg-secondary/20 w-[40vw] h-[40vw] bottom-[-10vw] right-[-10vw]"></div>
+        <div class="shape bg-accent/20 w-[25vw] h-[25vw] top-[40vh] right-[15vw]"></div>
+    </div>
+    
+    <!-- 导航栏 -->
+    <!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300 py-3">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <!-- Logo -->
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                <i class="fa fa-heart-o text-xl"></i>
+            </div>
+            <span class="text-xl font-bold text-primary tracking-wide">心社区</span>
+        </div>
+        
+        <!-- 桌面端导航 -->
+        <div class="hidden md:flex nav-links items-center space-x-1">
+            <a href="index.html" class="text-primary border-b-2 border-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center">
+                <i class="fa fa-home mr-2"></i>首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-list-alt mr-2"></i>心理测评
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-user-md mr-2"></i>咨询服务
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-users mr-2"></i>团体活动
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-music mr-2"></i>放松体验
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            
+            <!-- 更多服务下拉菜单 -->
+            <div class="relative" id="desktop-more-menu">
+                <button id="desktop-more-menu-button" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center gap-1 relative group">
+                    更多服务
+                    <i class="fa fa-angle-down transition-transform duration-300 group-hover:rotate-180"></i>
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </button>
+                <div id="desktop-more-dropdown" class="hidden absolute top-full left-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="healing_treehole.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-tree mr-2"></i>治愈树洞
+                    </a>
+                    <a href="sandbox_simulation_immersive.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-cubes mr-2"></i>沙盘模拟
+                    </a>
+                    <a href="mental_stories.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-book mr-2"></i>心理资源
+                    </a>
+                    <a href="mental_games.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-gamepad mr-2"></i>心理游戏
+                    </a>
+                                    <a href="psychology_experiments.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-flask mr-2"></i>心理实验
+                    </a>
+                    </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单按钮 -->
+        <div class="md:hidden">
+            <button id="menu-toggle" class="text-gray-700 focus:outline-none transition-transform duration-300 hover:rotate-90 p-2 rounded-md hover:bg-gray-100">
+                <i class="fa fa-bars text-xl"></i>
+                <span class="sr-only">打开菜单</span>
+            </button>
+        </div>
+        
+        <!-- 用户菜单 -->
+        <div id="user-menu" class="hidden md:flex items-center space-x-4">
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none group p-1 rounded-full hover:bg-white/30 transition-all duration-300 focus:ring-2 focus:ring-primary/50">
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="user-name" class="text-gray-700 group-hover:text-primary transition-colors"></span>
+                    <i class="fa fa-angle-down text-gray-500 group-hover:text-primary transition-transform duration-300 group-hover:rotate-180"></i>
+                </button>
+                <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="user_profile.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-user-circle w-4 mr-3 text-center"></i>
+                        <span>个人中心</span>
+                    </a>
+                    <a href="assessment_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-list-alt w-4 mr-3 text-center"></i>
+                        <span>测评记录</span>
+                    </a>
+                    <a href="booking_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-check-o w-4 mr-3 text-center"></i>
+                        <span>预约记录</span>
+                    </a>
+                    <a href="activity_registration.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-plus-o w-4 mr-3 text-center"></i>
+                        <span>活动报名</span>
+                    </a>
+                    <hr class="my-1 border-gray-200">
+                    <a href="#" id="logout-button" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-danger transition-all duration-200 flex items-center">
+                        <i class="fa fa-sign-out mr-3 w-4 text-center"></i>
+                        <span>退出登录</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 登录/注册按钮 -->
+        <div id="auth-buttons" class="hidden md:flex items-center space-x-3">
+            <button class="px-4 py-2 text-primary border-2 border-primary rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-medium shadow-sm hover:shadow transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='login.html'">
+                <i class="fa fa-sign-in mr-1"></i>登录
+            </button>
+            <button class="px-4 py-2 bg-gradient-to-r from-primary to-indigo-600 text-indigo-900 rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='register.html'">
+                <i class="fa fa-user-plus mr-2"></i>注册
+            </button>
+            <a href="admin_login.html" class="text-gray-600 hover:text-gray-800 transition-all duration-300 text-xs hover:underline px-2">管理员入口</a>
+        </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="md:hidden hidden glass-effect shadow-lg absolute w-full">
+        <div class="container mx-auto px-4 py-3 flex flex-col space-y-1">
+            <a href="index.html" class="bg-primary/5 text-primary py-2 px-3 rounded-lg font-medium flex items-center">
+                <i class="fa fa-home w-5 mr-3 text-center"></i>
+                首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-list-alt w-5 mr-3 text-center"></i>
+                心理测评
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-user-md w-5 mr-3 text-center"></i>
+                咨询服务
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-users w-5 mr-3 text-center"></i>
+                团体活动
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-music w-5 mr-3 text-center"></i>
+                放松体验
+            </a>
+            <a href="healing_treehole.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-tree w-5 mr-3 text-center"></i>
+                治愈树洞
+            </a>
+            <a href="sandbox_simulation_immersive.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-th-large w-5 mr-3 text-center"></i>
+                沙盘模拟
+            </a>
+            <a href="mental_stories.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-book w-5 mr-3 text-center"></i>
+                心理资源
+            </a>
+            <a href="mental_games.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-gamepad w-5 mr-3 text-center"></i>
+                心理游戏
+            </a>
+            
+            <!-- 移动端登录/注册按钮 -->
+            <div class="flex space-x-3 py-3 mt-2">
+                <button class="px-4 py-2.5 text-primary border border-primary rounded-lg hover:bg-primary/5 transition-all duration-300 flex-1 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='login.html'">
+                    <i class="fa fa-sign-in mr-2"></i>登录
+                </button>
+                <button class="px-4 py-2.5 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 flex-1 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='register.html'">
+                    <i class="fa fa-user-plus mr-2"></i>注册
+                </button>
+            </div>
+            
+            <!-- 移动端用户菜单（登录后显示） -->
+            <div id="mobile-user-menu" class="hidden py-2 animate-fade-in">
+                <div class="flex items-center space-x-3 mb-3 pb-3 border-b border-gray-200 bg-white/30 rounded-lg p-2">
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="mobile-user-name" class="text-gray-700 font-medium"></span>
+                </div>
+                <a href="user_profile.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-user-circle mr-2 w-5 text-center"></i>个人中心
+                </a>
+                <a href="assessment_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-list-alt mr-2 w-5 text-center"></i>测评记录
+                </a>
+                <a href="booking_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-check-o mr-2 w-5 text-center"></i>预约记录
+                </a>
+                <a href="activity_registration.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-plus-o mr-2 w-5 text-center"></i>活动报名
+                </a>
+                <a href="#" id="mobile-logout-button" class="block px-4 py-2 text-gray-700 hover:bg-white/50 hover:text-danger transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-sign-out mr-2 w-5 text-center"></i>退出登录
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 导航栏必要的脚本引用 -->
+<script src="components/navbar.js" defer></script>
+<script src="components/fix_duplicate_user_menu.js" defer></script>
+
+    <!-- 主内容区 -->
+    <main class="pt-24 pb-16">
+        <div class="container mx-auto px-4">
+            <!-- 页面标题 -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4 text-primary animate-fade-in slide-up">心理游戏</h1>
+                <p class="text-xl text-gray-700 max-w-3xl mx-auto animate-fade-in slide-up" style="animation-delay: 0.2s;">
+                    为不同年龄段定制的心理游戏，培养情绪识别能力，学习压力管理技巧
+                </p>
+            </div>
+
+            <!-- 年龄阶段选择器 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-10 animate-fade-in slide-up" style="animation-delay: 0.3s;">
+                <h2 class="text-2xl font-bold mb-4 text-primary">选择年龄阶段</h2>
+                <div class="flex flex-wrap justify-center gap-4" id="age-selector">
+                    <button class="age-btn active px-6 py-3 rounded-full font-medium transition-all-300 text-white bg-children hover:shadow-lg flex items-center gap-2" data-age="children">
+                        <i class="fa fa-child text-xl"></i>
+                        <span>儿童 (6-12岁)</span>
+                    </button>
+                    <button class="age-btn px-6 py-3 rounded-full font-medium transition-all-300 text-white bg-teenager hover:shadow-lg flex items-center gap-2" data-age="teenager">
+                        <i class="fa fa-leaf text-xl"></i>
+                        <span>青少年 (13-18岁)</span>
+                    </button>
+                    <button class="age-btn px-6 py-3 rounded-full font-medium transition-all-300 text-white bg-adult hover:shadow-lg flex items-center gap-2" data-age="adult">
+                        <i class="fa fa-user text-xl"></i>
+                        <span>成人 (19-59岁)</span>
+                    </button>
+                    <button class="age-btn px-6 py-3 rounded-full font-medium transition-all-300 text-white bg-elderly hover:shadow-lg flex items-center gap-2" data-age="elderly">
+                        <i class="fa fa-heartbeat text-xl"></i>
+                        <span>老年人 (60岁以上)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 游戏分类标签 -->
+            <div class="mb-8 overflow-x-auto" id="game-categories">
+                <div class="flex gap-2 min-w-max px-2">
+                    <button class="category-btn active px-4 py-2 rounded-full bg-primary text-white text-sm font-medium transition-all-300 hover:shadow-md" data-category="all">
+                        全部游戏
+                    </button>
+                    <button class="category-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 text-sm font-medium transition-all-300 hover:shadow-md hover:bg-gray-300" data-category="emotion">
+                        情绪管理
+                    </button>
+                    <button class="category-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 text-sm font-medium transition-all-300 hover:shadow-md hover:bg-gray-300" data-category="cognitive">
+                        认知训练
+                    </button>
+                    <button class="category-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 text-sm font-medium transition-all-300 hover:shadow-md hover:bg-gray-300" data-category="relaxation">
+                        放松减压
+                    </button>
+                    <button class="category-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 text-sm font-medium transition-all-300 hover:shadow-md hover:bg-gray-300" data-category="mindset">
+                        心态培养
+                    </button>
+                </div>
+            </div>
+
+            <!-- 游戏列表 -->
+            <div id="games-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                <!-- 儿童版游戏 -->
+                <!-- 表情猜猜乐 - 情绪管理 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="children" data-category="emotion">
+                    <div class="h-48 bg-gradient-to-r from-children to-emerald-500 flex items-center justify-center">
+                        <i class="fa fa-smile-o text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-children font-children">表情猜猜乐</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            和可爱的小动物一起学习识别不同的表情，认识自己和他人的情绪！
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.5</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-children to-emerald-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="emotion-children">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 动物朋友配对 - 认知训练 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="children" data-category="cognitive">
+                    <div class="h-48 bg-gradient-to-r from-blue-400 to-cyan-500 flex items-center justify-center">
+                        <i class="fa fa-th text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-blue-500 font-children">动物朋友配对</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            帮助小动物找到它们的好朋友，锻炼记忆力和专注力！
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.0</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-blue-400 to-cyan-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="memory-children">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 故事接龙 - 创造力 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="children" data-category="creativity">
+                    <div class="h-48 bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center">
+                        <i class="fa fa-book text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-yellow-500 font-children">故事接龙</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">中等</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            和故事精灵一起创造奇妙的故事，激发想象力和创造力！
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.9</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="story-children">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 友好小使者 - 社交技能 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="children" data-category="social">
+                    <div class="h-48 bg-gradient-to-r from-red-400 to-pink-500 flex items-center justify-center">
+                        <i class="fa fa-users text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-red-500 font-children">友好小使者</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            学习如何与朋友友好相处，培养良好的社交习惯和同理心！
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.6</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-red-400 to-pink-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="social-children">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 情绪温度计 - 情绪管理 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="children" data-category="emotion">
+                    <div class="h-48 bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center">
+                        <i class="fa fa-thermometer-half text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-purple-500 font-children">情绪温度计</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            学习认识和表达自己的情绪强度，找到合适的情绪管理方法！
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.3</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-purple-400 to-indigo-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="mood-children">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数字认知挑战 - 认知训练 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="children" data-category="cognitive">
+                    <div class="h-48 bg-gradient-to-r from-teal-400 to-cyan-500 flex items-center justify-center">
+                        <i class="fa fa-calculator text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-teal-500 font-children">数字认知挑战</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">中等</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            通过有趣的游戏学习数字概念，锻炼数学思维和逻辑推理能力！
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.1</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-teal-400 to-cyan-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="numbers-children">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 青少年版游戏 -->
+                <!-- 情绪解码 - 情绪管理 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="teenager" data-category="emotion">
+                    <div class="h-48 bg-gradient-to-r from-teenager to-blue-600 flex items-center justify-center">
+                        <i class="fa fa-smile-o text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-teenager font-teenager">情绪解码</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">中等</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            通过场景和微表情识别复杂情绪，提升人际沟通敏感度和同理心。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.5</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-teenager to-blue-600 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="emotion-teenager">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 脑力挑战配对 - 认知训练 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="teenager" data-category="cognitive">
+                    <div class="h-48 bg-gradient-to-r from-violet-500 to-fuchsia-500 flex items-center justify-center">
+                        <i class="fa fa-th text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-violet-500 font-teenager">脑力挑战配对</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">中等</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            高级记忆配对游戏，锻炼快速记忆和信息处理能力，提升学习效率。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.0</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="memory-teenager">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 同理心地图 - 社交技能 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="teenager" data-category="social">
+                    <div class="h-48 bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center">
+                        <i class="fa fa-users text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-green-500 font-teenager">同理心地图</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">中等</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            学习从他人角度思考问题，理解不同观点，提升人际沟通质量。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.4</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="empathy-teenager">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 压力管理工具箱 - 情绪管理 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="teenager" data-category="emotion">
+                    <div class="h-48 bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
+                        <i class="fa fa-toolbox text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-orange-500 font-teenager">压力管理工具箱</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">中等</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            学习识别压力源和应对策略，掌握有效的压力管理技巧。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.8</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="stress-teenager">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批判性思维训练 - 问题解决 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="teenager" data-category="problem-solving">
+                    <div class="h-48 bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
+                        <i class="fa fa-brain text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-purple-500 font-teenager">批判性思维训练</h3>
+                            <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">困难</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            学习分析和评估信息，培养独立思考能力和理性决策能力。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.2</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="critical-teenager">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 创意表达工坊 - 创造力 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="teenager" data-category="creativity">
+                    <div class="h-48 bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center">
+                        <i class="fa fa-paint-brush text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-pink-500 font-teenager">创意表达工坊</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            通过多种形式表达内心想法和感受，培养自我表达能力和创造力。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.6</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="creative-teenager">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 成人版游戏 -->
+                <!-- 正念呼吸练习 - 放松减压 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="adult" data-category="relaxation">
+                    <div class="h-48 bg-gradient-to-r from-adult to-indigo-600 flex items-center justify-center">
+                        <i class="fa fa-heartbeat text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-adult font-adult">正念呼吸练习</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            科学的深呼吸技巧，帮助缓解工作压力和焦虑，恢复内心平静。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">5.0</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-adult to-indigo-600 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="breathe">
+                                开始练习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 思维重构训练 - 心态培养 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="adult" data-category="mindset">
+                    <div class="h-48 bg-gradient-to-r from-amber-500 to-orange-600 flex items-center justify-center">
+                        <i class="fa fa-lightbulb-o text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-amber-500 font-adult">思维重构训练</h3>
+                            <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">困难</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            学习识别并重构消极思维模式，培养乐观心态，提升心理韧性。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <i class="fa fa-star-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">3.5</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="positive">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 情绪觉察日记 - 情绪管理 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="adult" data-category="emotion">
+                    <div class="h-48 bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                        <i class="fa fa-book text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-blue-500 font-adult">情绪觉察日记</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            通过结构化日记练习，提升对情绪的觉察和理解，增强情绪管理能力。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.7</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="journal-adult">
+                                开始练习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 有效沟通模拟器 - 社交技能 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="adult" data-category="social">
+                    <div class="h-48 bg-gradient-to-r from-purple-500 to-violet-500 flex items-center justify-center">
+                        <i class="fa fa-comments text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-purple-500 font-adult">有效沟通模拟器</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">中等</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            练习积极倾听和表达技巧，提升职场和人际关系中的沟通质量。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.9</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="communication-adult">
+                                开始练习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 专注力训练 - 认知训练 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="adult" data-category="cognitive">
+                    <div class="h-48 bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
+                        <i class="fa fa-bullseye text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-emerald-500 font-adult">专注力训练</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">中等</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            通过结构化练习提升注意力持续时间和抗干扰能力，提高工作效率。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.3</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="focus-adult">
+                                开始练习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 压力点识别 - 问题解决 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="adult" data-category="problem-solving">
+                    <div class="h-48 bg-gradient-to-r from-red-500 to-rose-500 flex items-center justify-center">
+                        <i class="fa fa-search text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-red-500 font-adult">压力点识别</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">中等</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            学习识别生活和工作中的压力源，制定个性化的压力管理方案。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.6</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="stress-point-adult">
+                                开始练习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 老年版游戏 -->
+                <!-- 记忆花园 - 认知训练 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="elderly" data-category="cognitive">
+                    <div class="h-48 bg-gradient-to-r from-elderly to-amber-600 flex items-center justify-center">
+                        <i class="fa fa-puzzle-piece text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-elderly font-elderly">记忆花园</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            通过轻松的记忆练习，保持大脑活跃，预防认知衰退，享受美好回忆。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.7</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-elderly to-amber-600 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="memory-elderly">
+                                开始游戏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 静心冥想 - 放松减压 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="elderly" data-category="relaxation">
+                    <div class="h-48 bg-gradient-to-r from-teal-500 to-cyan-500 flex items-center justify-center">
+                        <i class="fa fa-leaf text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-teal-500 font-elderly">静心冥想</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            舒缓的冥想练习，帮助放松身心，改善睡眠质量，提升生活幸福感。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.9</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="meditation-elderly">
+                                开始练习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 往事回忆工坊 - 认知训练 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="elderly" data-category="cognitive">
+                    <div class="h-48 bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
+                        <i class="fa fa-clock-o text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-blue-500 font-elderly">往事回忆工坊</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            通过引导式回忆练习，激活长期记忆，分享人生故事，增强自我认同感。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.8</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="memories-elderly">
+                                开始回忆
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 社交连接桥 - 社交技能 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="elderly" data-category="social">
+                    <div class="h-48 bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center">
+                        <i class="fa fa-heart text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-pink-500 font-elderly">社交连接桥</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            学习有效的沟通技巧，增强社交信心，建立和维护健康的人际关系。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.2</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="social-elderly">
+                                开始练习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 情绪表达练习 - 情绪管理 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="elderly" data-category="emotion">
+                    <div class="h-48 bg-gradient-to-r from-purple-500 to-violet-500 flex items-center justify-center">
+                        <i class="fa fa-smile-o text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-purple-500 font-elderly">情绪表达练习</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">简单</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            学习识别和健康表达情绪，减少情绪压抑，提升心理舒适度和生活质量。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-half-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.6</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="emotion-elderly">
+                                开始练习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 日常生活问题解决 - 问题解决 -->
+                <div class="game-card bg-white rounded-xl shadow-lg overflow-hidden" data-age="elderly" data-category="problem-solving">
+                    <div class="h-48 bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center">
+                        <i class="fa fa-lightbulb-o text-white text-6xl opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-orange-500 font-elderly">日常生活问题解决</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">中等</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            锻炼解决日常问题的能力，保持独立生活的信心和能力，提高生活满意度。
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star text-yellow-400"></i>
+                                <i class="fa fa-star-o text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-500">4.1</span>
+                            </div>
+                            <button class="play-game-btn px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full hover:shadow-lg transition-all-300 transform hover:scale-105" data-game="problem-solving-elderly">
+                                开始练习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 游戏容器 -->
+            <div id="game-container" class="game-container hidden bg-white rounded-2xl shadow-xl p-8 mb-16">
+                <!-- 游戏标题栏 -->
+                <div class="flex justify-between items-center mb-8">
+                    <h2 id="game-title" class="text-2xl font-bold text-primary"></h2>
+                    <button id="close-game" class="text-gray-500 hover:text-gray-700 focus:outline-none transition-transform hover:rotate-90">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- 游戏内容区域 -->
+                <div id="game-content">
+                    <!-- 游戏内容将通过JavaScript动态加载 -->
+                </div>
+            </div>
+
+            <!-- 游戏益处说明 -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 mb-16">
+                <h2 class="text-2xl font-bold mb-6 text-primary">游戏对心理健康的益处</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="flex space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                            <i class="fa fa-brain text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2">认知能力提升</h3>
+                            <p class="text-gray-600">通过游戏锻炼记忆力、注意力和问题解决能力，保持大脑活跃和健康。</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                            <i class="fa fa-heart-o text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2">情绪管理</h3>
+                            <p class="text-gray-600">学习识别和表达情绪，掌握有效的情绪调节策略，提升情绪智力。</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                            <i class="fa fa-balance-scale text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2">压力缓解</h3>
+                            <p class="text-gray-600">游戏中的放松练习和正念技巧有助于减轻压力和焦虑，促进身心放松。</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                            <i class="fa fa-users text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2">社交技能发展</h3>
+                            <p class="text-gray-600">通过角色扮演和互动游戏，提升人际沟通能力和社交适应能力。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <!-- 统一页脚组件 -->
+<footer class="bg-[#1e293b] text-white py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <!-- 左侧Logo和文字 -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                    <i class="fa fa-heart"></i>
+                </div>
+                <span class="text-white">心社区</span>
+            </div>
+            
+            <!-- 中间版权信息 -->
+            <div class="text-center">
+                <p class="text-white">© 2025 心社区心理健康支持中心. 保留所有权利.</p>
+            </div>
+            
+            <!-- 右侧图标 -->
+            <div class="flex space-x-4">
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-bell"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- 游戏数据和交互脚本 -->
+    <script>
+        // 游戏数据 - 按年龄段分组
+        const games = {
+            // 儿童游戏
+            'emotion-children': {
+                title: "表情猜猜乐",
+                description: "和可爱的小动物一起学习识别不同的表情，认识自己和他人的情绪！",
+                ageGroup: "children",
+                difficulty: "简单",
+                goals: "学习识别基本情绪，理解情绪表达",
+                materials: "游戏界面、表情图片、提示文本",
+                steps: "1. 观察屏幕上的情绪提示\n2. 从选项中找出匹配的表情图片\n3. 获得即时反馈，学习正确的情绪识别",
+                benefits: "提升情绪识别能力，增强情感表达能力，促进自我认知发展",
+                notes: "游戏过程中给予积极鼓励，避免批评错误选择",
+                levels: [
+                    {
+                        question: "看！小猫咪看起来很开心，这是什么表情？",
+                        image: "😊",
+                        options: ["快乐", "悲伤", "生气", "害怕"],
+                        correctAnswer: "快乐"
+                    },
+                    {
+                        question: "小兔子好像很难过，这是什么表情？",
+                        image: "😢",
+                        options: ["生气", "悲伤", "惊讶", "开心"],
+                        correctAnswer: "悲伤"
+                    },
+                    {
+                        question: "小熊生气了，这是什么表情？",
+                        image: "😠",
+                        options: ["开心", "害怕", "生气", "惊讶"],
+                        correctAnswer: "生气"
+                    },
+                    {
+                        question: "小鸟看到了什么？表情很惊讶！",
+                        image: "😮",
+                        options: ["惊讶", "开心", "悲伤", "生气"],
+                        correctAnswer: "惊讶"
+                    }
+                ]
+            },
+            'memory-children': {
+                title: "动物朋友配对",
+                description: "帮助小动物找到它们的好朋友，锻炼记忆力和专注力！",
+                ageGroup: "children",
+                difficulty: "简单",
+                goals: "提高视觉记忆能力，增强专注力和观察能力",
+                materials: "游戏界面、动物卡片图片",
+                steps: "1. 观察并记住卡片位置\n2. 一次翻开两张卡片\n3. 找到所有配对的动物朋友",
+                benefits: "锻炼短时记忆能力，提升专注力，培养耐心和解决问题的能力",
+                notes: "游戏难度逐步提升，给予足够的思考时间",
+                cards: ["🐶", "🐱", "🐰", "🐼", "🐨", "🐵", "🐶", "🐱", "🐰", "🐼", "🐨", "🐵"],
+                gridSize: { rows: 3, cols: 4 }
+            },
+            'story-children': {
+                title: "故事接龙",
+                description: "和故事精灵一起创造奇妙的故事，激发想象力和创造力！",
+                ageGroup: "children",
+                difficulty: "中等",
+                goals: "培养创造力和想象力，提升语言表达能力",
+                materials: "游戏界面、故事卡片、提示词",
+                steps: "1. 阅读故事开头\n2. 选择或输入接下来的故事发展\n3. 继续丰富故事情节\n4. 完成完整的故事创作",
+                benefits: "发展创造性思维，提升语言组织能力，培养故事叙述能力",
+                notes: "鼓励自由表达，不限制想象力，给予积极反馈",
+                storyStarters: [
+                    "一天早晨，小兔子在森林里发现了一个神秘的盒子...",
+                    "下雨天，小猫咪坐在窗台上，突然看到一只受伤的小鸟...",
+                    "生日那天，小狗收到了一个会说话的气球..."
+                ],
+                storyOptions: [
+                    ["盒子里飞出了许多彩色的蝴蝶", "盒子里传来奇怪的声音", "盒子里是一颗会发光的种子"],
+                    ["小猫咪把小鸟带回家照顾", "小鸟突然变成了小精灵", "雨停了，小鸟自己飞走了"],
+                    ["气球带着小狗飞到了云朵上", "气球带小狗认识了新朋友", "气球告诉小狗一个秘密"],
+                    ["他们一起度过了美好的一天", "故事有了一个惊喜的结局", "这成为了最难忘的经历"]
+                ]
+            },
+            'social-children': {
+                title: "友好小使者",
+                description: "学习与朋友友好相处的社交技能，成为受欢迎的小朋友！",
+                ageGroup: "children",
+                difficulty: "简单",
+                goals: "培养良好的社交习惯，增强同理心和合作意识",
+                materials: "游戏界面、社交场景卡片、选择按钮",
+                steps: "1. 观察社交场景\n2. 选择合适的社交行为\n3. 学习积极的社交互动方式",
+                benefits: "提升社交技能，增强情绪理解能力，培养友好相处的习惯",
+                notes: "强调积极互动的重要性，不强调竞争",
+                scenarios: [
+                    {
+                        situation: "小明在玩玩具，小红也想玩，你会怎么做？",
+                        options: ["和小红一起玩，分享玩具", "抱着玩具跑开", "告诉小红这是我的玩具"],
+                        correct: "和小红一起玩，分享玩具",
+                        lesson: "分享能让我们交到更多朋友，一起玩更开心！"
+                    },
+                    {
+                        situation: "当你不小心撞到了同学，应该怎么做？",
+                        options: ["说声对不起", "假装没看见", "怪同学走路不看路"],
+                        correct: "说声对不起",
+                        lesson: "真诚道歉可以化解矛盾，是尊重他人的表现。"
+                    }
+                ]
+            },
+            'mood-children': {
+                title: "情绪温度计",
+                description: "学习认识和表达不同强度的情绪，找到合适的情绪管理方法！",
+                ageGroup: "children",
+                difficulty: "简单",
+                goals: "学习识别情绪强度，找到合适的情绪管理方法",
+                materials: "游戏界面、情绪温度计图表、情境卡片",
+                steps: "1. 阅读情境描述\n2. 指出角色的情绪强度\n3. 学习合适的情绪调节方法",
+                benefits: "提升情绪觉察能力，学习情绪调节策略，增强自我控制能力",
+                notes: "创造安全的情绪表达环境，接纳各种情绪",
+                scenarios: [
+                    {
+                        situation: "今天是你的生日，收到了很多礼物",
+                        emotions: ["有点开心", "非常开心", "超级开心"],
+                        thermometerValue: 8,
+                        copingTip: "分享你的快乐，会让快乐加倍！"
+                    },
+                    {
+                        situation: "你最喜欢的玩具坏了",
+                        emotions: ["有点难过", "非常难过", "超级难过"],
+                        thermometerValue: 7,
+                        copingTip: "深呼吸，告诉爸爸妈妈你的感受，他们会帮助你。"
+                    }
+                ]
+            },
+            'numbers-children': {
+                title: "数字认知挑战",
+                description: "通过有趣的游戏学习数字概念和基础计算，爱上数学！",
+                ageGroup: "children",
+                difficulty: "中等",
+                goals: "加强数字认知能力，提升数学思维和逻辑推理能力",
+                materials: "游戏界面、数字卡片、计算任务",
+                steps: "1. 完成数字识别任务\n2. 解决简单的数学问题\n3. 参与数字游戏挑战",
+                benefits: "提升数学学习兴趣，增强逻辑思维能力，为数学学习打下基础",
+                notes: "游戏难度逐步提升，保持趣味性，避免学习压力",
+                levels: [
+                    {
+                        type: "counting",
+                        question: "数一数有几只小动物？🐶🐱🐰🐼",
+                        options: ["2", "3", "4", "5"],
+                        correctAnswer: "4"
+                    },
+                    {
+                        type: "addition",
+                        question: "2 + 3 = ?",
+                        options: ["4", "5", "6", "7"],
+                        correctAnswer: "5"
+                    }
+                ]
+            },
+            
+            // 青少年游戏
+            'emotion-teenager': {
+                title: "情绪解码",
+                description: "通过场景和微表情识别复杂情绪，提升人际沟通敏感度和同理心。",
+                ageGroup: "teenager",
+                difficulty: "中等",
+                goals: "识别复杂情绪和微表情，提升情绪智能和社交敏感度",
+                materials: "游戏界面、情绪场景视频/图片、选择选项",
+                steps: "1. 观察场景中的人物表情和动作\n2. 分析情境中的情绪线索\n3. 选择正确的情绪识别和应对方式",
+                benefits: "提升情绪识别能力，增强社交感知能力，改善人际关系",
+                notes: "讨论不同文化背景下的情绪表达差异，尊重多样化的情绪反应",
+                levels: [
+                    {
+                        question: "在考试成绩公布后，同学露出这样的表情，他可能在想什么？",
+                        image: "😐",
+                        options: ["成绩不理想但不想表现出来", "对成绩无所谓", "正在思考其他事情", "对成绩非常满意"],
+                        correctAnswer: "成绩不理想但不想表现出来"
+                    },
+                    {
+                        question: "朋友在社交场合突然表现出这样的表情，他可能感到？",
+                        image: "😬",
+                        options: ["尴尬", "兴奋", "愤怒", "无聊"],
+                        correctAnswer: "尴尬"
+                    }
+                ]
+            },
+            'memory-teenager': {
+                title: "脑力挑战配对",
+                description: "高级记忆配对游戏，锻炼快速记忆和信息处理能力，提升学习效率。",
+                ageGroup: "teenager",
+                difficulty: "中等",
+                goals: "提升记忆速度和容量，增强信息处理能力",
+                materials: "游戏界面、记忆卡片、计时器",
+                steps: "1. 在限定时间内记忆卡片位置\n2. 快速找出匹配的卡片\n3. 记录并改善记忆效率",
+                benefits: "提升学习效率，增强注意力，锻炼工作记忆能力",
+                notes: "强调方法学习而非仅追求速度，注意适当休息",
+                cards: ["🧠", "💡", "🔍", "🎯", "⚡", "💪", "📝", "📚", "🎯", "⚡", "💪", "📝", "🧠", "🎓", "💡", "🎮"],
+                gridSize: { rows: 4, cols: 4 }
+            },
+            'empathy-teenager': {
+                title: "同理心地图",
+                description: "学习从他人角度思考问题，增强人际理解和沟通能力。",
+                ageGroup: "teenager",
+                difficulty: "中等",
+                goals: "培养同理心，理解不同观点，提升人际沟通质量",
+                materials: "游戏界面、情境案例、多角度分析工具",
+                steps: "1. 阅读或观看情境描述\n2. 从不同角色的角度分析问题\n3. 提出建设性的解决方案\n4. 反思自己的观点和偏见",
+                benefits: "增强人际理解能力，减少冲突，改善沟通质量",
+                notes: "鼓励开放和尊重的讨论氛围，避免评判不同观点",
+                scenarios: [
+                    {
+                        situation: "小组作业中，两位同学对如何完成任务有不同意见，发生了争执",
+                        perspectives: [
+                            {
+                                role: "提出创意的同学",
+                                feelings: "不被理解，沮丧",
+                                needs: "希望自己的想法被重视"
+                            },
+                            {
+                                role: "反对的同学",
+                                feelings: "担心任务无法按时完成",
+                                needs: "希望有更实际的计划"
+                            }
+                        ],
+                        solutionPrompt: "如何找到兼顾创意和实用性的解决方案？"
+                    }
+                ]
+            },
+            'stress-teenager': {
+                title: "压力管理工具箱",
+                description: "学习识别压力源和有效的应对策略，轻松应对学习和生活压力。",
+                ageGroup: "teenager",
+                difficulty: "中等",
+                goals: "识别个人压力源，掌握有效的压力管理技巧",
+                materials: "游戏界面、压力评估工具、应对策略库",
+                steps: "1. 完成压力源识别测试\n2. 学习各种压力应对技巧\n3. 定制个人压力管理计划\n4. 练习和应用学到的技巧",
+                benefits: "减轻学习和生活压力，提升心理韧性，改善身心健康",
+                notes: "强调健康的应对方式，注意观察压力信号",
+                stressTypes: [
+                    {
+                        type: "学习压力",
+                        examples: ["考试焦虑", "作业过多", "学习困难"],
+                        copingStrategies: ["制定学习计划", "分解任务", "寻求帮助", "积极自我对话"]
+                    },
+                    {
+                        type: "社交压力",
+                        examples: ["社交焦虑", "同伴压力", "人际关系冲突"],
+                        copingStrategies: ["深呼吸放松", "积极的自我肯定", "寻找支持系统", "明确个人边界"]
+                    }
+                ]
+            },
+            'critical-teenager': {
+                title: "批判性思维训练",
+                description: "学习分析和评估信息，培养独立思考能力和理性决策能力。",
+                ageGroup: "teenager",
+                difficulty: "困难",
+                goals: "发展批判性思维，培养独立思考，提升理性决策能力",
+                materials: "游戏界面、案例分析、辩论场景",
+                steps: "1. 分析给定信息或观点\n2. 识别假设和逻辑关系\n3. 评估证据的可靠性\n4. 形成有理有据的结论\n5. 表达和辩护自己的观点",
+                benefits: "提升思维质量，增强判断力，培养理性分析能力",
+                notes: "鼓励质疑精神，但保持开放态度，避免偏见",
+                exercises: [
+                    {
+                        type: "新闻分析",
+                        prompt: "分析这则新闻报道中的信息是否全面？有哪些可能被忽略的角度？",
+                        article: "某学校禁止学生使用智能手机后，学生成绩普遍提升15%。校方认为智能手机是影响学习的主要因素。",
+                        questions: [
+                            "报道中是否提供了完整的数据支持？",
+                            "是否考虑了其他可能影响成绩的因素？",
+                            "这个结论是否存在因果关系的错误？"
+                        ]
+                    }
+                ]
+            },
+            'creative-teenager': {
+                title: "创意表达工坊",
+                description: "通过多种形式表达内心想法和感受，培养自我表达能力和创造力。",
+                ageGroup: "teenager",
+                difficulty: "简单",
+                goals: "培养自我表达能力和创造力，探索多种表达方式",
+                materials: "游戏界面、创意工具、表达模板",
+                steps: "1. 选择表达主题或感受\n2. 探索不同的表达形式（写作、绘画、音乐等）\n3. 创作个人表达作品\n4. 反思和分享创作过程",
+                benefits: "提升自我认知，增强情感表达能力，培养创新思维",
+                notes: "强调过程重于结果，鼓励大胆尝试和创新",
+                activities: [
+                    {
+                        type: "自由写作",
+                        prompt: "写下当你感到开心时的感受，就像创作一首诗或短文",
+                        tips: ["使用比喻和形象的描述", "关注身体感受", "不要担心语法和拼写"]
+                    },
+                    {
+                        type: "情绪绘画",
+                        prompt: "用颜色和线条表达你最近经历的一种情绪",
+                        tips: ["选择能代表情绪的颜色", "使用不同的线条粗细和形状", "不需要画出具体的物体"]
+                    }
+                ]
+            },
+            
+            // 成人游戏
+            'breathe': {
+                title: "正念呼吸练习",
+                description: "科学的深呼吸技巧，帮助缓解工作压力和焦虑，恢复内心平静。",
+                ageGroup: "adult",
+                difficulty: "简单",
+                goals: "掌握科学呼吸技巧，缓解压力和焦虑，提升身心放松能力",
+                materials: "游戏界面、呼吸引导动画、计时器",
+                steps: "1. 选择适合的练习时长和类型\n2. 跟随引导进行深呼吸练习\n3. 关注呼吸和身体感受\n4. 完成练习后进行简短反思",
+                benefits: "减轻焦虑和压力，改善情绪状态，提升专注力，促进身心健康",
+                notes: "练习过程中保持舒适姿势，若感到不适可随时停止",
+                exercises: [
+                    {
+                        name: "4-7-8呼吸法",
+                        steps: [
+                            "吸气4秒",
+                            "屏住呼吸7秒",
+                            "呼气8秒",
+                            "重复以上步骤4次"
+                        ],
+                        duration: 60
+                    },
+                    {
+                        name: "箱式呼吸",
+                        steps: [
+                            "吸气4秒",
+                            "屏住呼吸4秒",
+                            "呼气4秒",
+                            "屏住呼吸4秒",
+                            "重复以上步骤5次"
+                        ],
+                        duration: 80
+                    }
+                ]
+            },
+            'positive': {
+                title: "思维重构训练",
+                description: "学习识别并重构消极思维模式，培养乐观心态，提升心理韧性。",
+                ageGroup: "adult",
+                difficulty: "困难",
+                goals: "识别消极思维模式，学习思维重构技巧，培养积极心态",
+                materials: "游戏界面、思维案例分析、重构工具",
+                steps: "1. 识别常见的消极思维模式\n2. 练习挑战和质疑消极想法\n3. 学习用更平衡的思维替代消极思维\n4. 应用到日常生活情境中",
+                benefits: "减轻消极情绪，增强心理韧性，改善生活满意度",
+                notes: "强调练习的持续性，不是立即改变所有思维模式",
+                scenarios: [
+                    {
+                        negative: "我永远做不好这件事。",
+                        positives: [
+                            "这对我来说是一个挑战，但我可以从中学习。",
+                            "我已经掌握了一些相关技能，这会有帮助。",
+                            "我可以寻求帮助，没有人生来就会所有事情。"
+                        ],
+                        pattern: "全或无思维",
+                        reframingQuestion: "有什么证据支持或反驳这个想法？"
+                    },
+                    {
+                        negative: "没有人理解我。",
+                        positives: [
+                            "我可以尝试更清晰地表达自己的想法。",
+                            "真正的理解需要时间和耐心。",
+                            "我学会了自我理解和接纳。"
+                        ],
+                        pattern: "过度概括",
+                        reframingQuestion: "这种情况总是发生吗？有没有例外？"
+                    }
+                ]
+            },
+            'journal-adult': {
+                title: "情绪觉察日记",
+                description: "通过结构化日记练习，提升对情绪的觉察和理解，增强情绪管理能力。",
+                ageGroup: "adult",
+                difficulty: "简单",
+                goals: "增强情绪觉察能力，理解情绪触发因素，发展情绪调节策略",
+                materials: "游戏界面、日记模板、引导问题",
+                steps: "1. 记录日常情绪体验\n2. 探索情绪背后的想法和触发因素\n3. 分析情绪模式和应对方式\n4. 发展更有效的情绪管理策略",
+                benefits: "提升情绪智能，减轻情绪困扰，增强自我了解",
+                notes: "保持诚实和接纳的态度，避免评判自己的情绪",
+                templates: [
+                    {
+                        name: "日常情绪记录",
+                        sections: [
+                            "今天的主要情绪是...",
+                            "触发这些情绪的事件是...",
+                            "当时的想法和信念是...",
+                            "身体上的感受是...",
+                            "我采取的行动是...",
+                            "下次可能的不同应对方式是..."
+                        ]
+                    },
+                    {
+                        name: "感恩日记",
+                        sections: [
+                            "今天让我感到感激的三件事...",
+                            "这些事情为什么让我感激...",
+                            "明天我期待什么..."
+                        ]
+                    }
+                ]
+            },
+            'communication-adult': {
+                title: "有效沟通模拟器",
+                description: "练习积极倾听和表达技巧，提升职场和人际关系中的沟通质量。",
+                ageGroup: "adult",
+                difficulty: "中等",
+                goals: "提升沟通技能，学习有效表达和积极倾听，改善人际关系",
+                materials: "游戏界面、沟通场景模拟、反馈系统",
+                steps: "1. 参与不同的沟通场景模拟\n2. 练习积极倾听和非暴力沟通技巧\n3. 学习表达感受和需求的方法\n4. 获得反馈并改进沟通方式",
+                benefits: "改善人际关系，减少沟通障碍，提升职场效率和满意度",
+                notes: "关注沟通过程而非结果，重视双向互动",
+                scenarios: [
+                    {
+                        situation: "职场场景：向同事反馈工作中的问题",
+                        challenge: "如何在不引起对方防御的情况下提出建设性反馈？",
+                        communicationTips: [
+                            "使用'我'语句表达感受",
+                            "具体描述行为而非评判性格",
+                            "提出具体的改进建议",
+                            "肯定对方的优点"
+                        ],
+                        practice: "请用上述技巧组织一段反馈对话"
+                    },
+                    {
+                        situation: "家庭场景：与伴侣讨论家务分工问题",
+                        challenge: "如何表达需求而不引起争吵？",
+                        communicationTips: [
+                            "选择合适的沟通时机",
+                            "使用温和的语气",
+                            "明确表达感受和需求",
+                            "共同寻找解决方案"
+                        ],
+                        practice: "请用上述技巧模拟一段对话"
+                    }
+                ]
+            },
+            'focus-adult': {
+                title: "专注力训练",
+                description: "通过结构化练习提升注意力持续时间和抗干扰能力，提高工作效率。",
+                ageGroup: "adult",
+                difficulty: "中等",
+                goals: "增强专注力和注意力控制，提高工作效率和学习质量",
+                materials: "游戏界面、专注任务、干扰控制练习",
+                steps: "1. 评估当前的注意力水平\n2. 进行不同类型的专注力练习\n3. 学习管理干扰的策略\n4. 应用到日常工作和学习中",
+                benefits: "提高工作和学习效率，减少分心，增强认知控制能力",
+                notes: "逐步增加练习难度，保持合理的休息间隔",
+                exercises: [
+                    {
+                        type: "持续专注训练",
+                        task: "在限定时间内专注于单一任务，练习番茄工作法",
+                        steps: [
+                            "选择一项需要专注的任务",
+                            "设置25分钟的专注时间",
+                            "在这段时间内只专注于这项任务",
+                            "完成后休息5分钟"
+                        ]
+                    },
+                    {
+                        type: "抗干扰训练",
+                        task: "在有轻微干扰的环境中保持专注",
+                        tips: [
+                            "创造视觉和听觉的专注空间",
+                            "使用专注力辅助工具（如白噪音）",
+                            "练习快速重新聚焦的技巧"
+                        ]
+                    }
+                ]
+            },
+            'stress-point-adult': {
+                title: "压力点识别",
+                description: "学习识别生活和工作中的压力源，制定个性化的压力管理方案。",
+                ageGroup: "adult",
+                difficulty: "中等",
+                goals: "识别个人压力源，理解压力反应模式，制定有效的压力管理计划",
+                materials: "游戏界面、压力评估工具、干预策略库",
+                steps: "1. 完成全面的压力评估\n2. 识别主要压力源和个人反应模式\n3. 学习和选择适合的应对策略\n4. 制定和实施个人压力管理计划",
+                benefits: "减轻压力影响，提升心理韧性，改善身心健康和生活质量",
+                notes: "关注长期压力管理而非短期缓解，重视自我关怀",
+                assessment: [
+                    {
+                        domain: "工作压力",
+                        questions: [
+                            "工作负担是否过重？",
+                            "是否经常感到时间不够用？",
+                            "工作中的人际关系是否和谐？",
+                            "是否感到职业发展受阻？"
+                        ],
+                        interventions: [
+                            "时间管理技巧",
+                            "任务优先级排序",
+                            "职场边界设定",
+                            "沟通技巧提升"
+                        ]
+                    },
+                    {
+                        domain: "生活压力",
+                        questions: [
+                            "生活节奏是否过快？",
+                            "个人时间是否充足？",
+                            "家庭关系是否和谐？",
+                            "财务状况是否造成压力？"
+                        ],
+                        interventions: [
+                            "生活方式调整",
+                            "自我关怀实践",
+                            "家庭沟通改善",
+                            "财务规划帮助"
+                        ]
+                    }
+                ]
+            },
+            
+            // 老年人游戏
+            'memory-elderly': {
+                title: "记忆花园",
+                description: "通过轻松的记忆练习，保持大脑活跃，预防认知衰退，享受美好回忆。",
+                ageGroup: "elderly",
+                difficulty: "简单",
+                goals: "保持和改善记忆功能，预防认知衰退，增强大脑活力",
+                materials: "游戏界面、图像记忆任务、渐进式难度调整",
+                steps: "1. 从简单的记忆任务开始\n2. 逐渐增加任务复杂度\n3. 进行定期练习和复习\n4. 保持练习的一致性",
+                benefits: "维护认知功能，增强自信，提供认知刺激，促进大脑健康",
+                notes: "游戏节奏适中，避免时间压力，强调参与和享受过程",
+                cards: ["🌺", "🌸", "🌹", "🌻", "🌼", "🌷", "🌺", "🌸", "🌹", "🌻", "🌼", "🌷"],
+                gridSize: { rows: 3, cols: 4 },
+                cardSize: "large" // 为老年人设计的更大卡片
+            },
+            'meditation-elderly': {
+                title: "静心冥想",
+                description: "舒缓的冥想练习，帮助放松身心，改善睡眠质量，提升生活幸福感。",
+                ageGroup: "elderly",
+                difficulty: "简单",
+                goals: "促进放松，改善睡眠质量，减轻焦虑，提升生活幸福感",
+                materials: "游戏界面、引导语音、放松音乐、计时器",
+                steps: "1. 选择舒适的姿势\n2. 跟随引导进行温和的冥想练习\n3. 关注呼吸或身体感受\n4. 完成练习后进行简短休息",
+                benefits: "减轻压力和焦虑，改善睡眠质量，提升情绪状态，增强身体舒适度",
+                notes: "根据个人情况调整练习时长，避免强制要求",
+                sessions: [
+                    {
+                        name: "早晨唤醒",
+                        duration: 5,
+                        guidance: "慢慢睁开眼睛，感受阳光的温暖，深呼吸，感谢新的一天。"
+                    },
+                    {
+                        name: "睡前放松",
+                        duration: 10,
+                        guidance: "放松身体的每一个部位，从脚趾开始，慢慢向上，让一天的疲惫都消散。"
+                    }
+                ]
+            },
+            'memories-elderly': {
+                title: "往事回忆工坊",
+                description: "通过引导式回忆练习，激活长期记忆，分享人生故事，增强自我认同感。",
+                ageGroup: "elderly",
+                difficulty: "简单",
+                goals: "激活长期记忆，增强自我认同感，分享人生故事，促进心理健康",
+                materials: "游戏界面、回忆引导问题、图片提示、故事记录工具",
+                steps: "1. 根据提示回忆特定时期的经历\n2. 分享或记录个人故事和感受\n3. 反思生活经验和智慧\n4. 与他人分享或保存个人故事",
+                benefits: "维持认知功能，增强自我价值感，促进社会连接，保存个人历史",
+                notes: "创造温馨支持的环境，尊重个人隐私，避免触及痛苦记忆",
+                memoryPrompts: [
+                    {
+                        category: "童年回忆",
+                        prompts: [
+                            "描述你记忆中最快乐的童年时光",
+                            "你小时候最喜欢的游戏或活动是什么？",
+                            "童年时期有哪些特别的节日庆祝活动？"
+                        ]
+                    },
+                    {
+                        category: "生活里程碑",
+                        prompts: [
+                            "回忆你职业生涯中的重要成就",
+                            "分享一个对你影响深远的人生决定",
+                            "描述你最难忘的一次旅行经历"
+                        ]
+                    },
+                    {
+                        category: "家庭故事",
+                        prompts: [
+                            "分享一个关于家人的温馨故事",
+                            "你从父母那里学到的最重要的人生智慧是什么？",
+                            "有哪些家族传统或故事是你珍视的？"
+                        ]
+                    }
+                ]
+            },
+            'social-elderly': {
+                title: "社交连接桥",
+                description: "学习有效的沟通技巧，增强社交信心，建立和维护健康的人际关系。",
+                ageGroup: "elderly",
+                difficulty: "简单",
+                goals: "提升社交能力，增强社交信心，建立和维护健康的人际关系",
+                materials: "游戏界面、社交场景模拟、沟通技巧指导",
+                steps: "1. 学习适合老年人的社交技巧\n2. 练习日常社交情境中的沟通\n3. 学习表达需求和感受的方法\n4. 发展和维护有意义的人际关系",
+                benefits: "减少孤独感，增强社会支持，提升生活满意度，促进心理健康",
+                notes: "强调真实自我表达，尊重个人边界，避免强迫社交",
+                scenarios: [
+                    {
+                        situation: "与年轻一代交流",
+                        challenges: ["技术话题交流", "代沟问题", "保持对话流畅"],
+                        tips: [
+                            "表达兴趣和好奇，而非批评",
+                            "分享自己的经验，但不强迫对方接受",
+                            "学习基本的科技词汇",
+                            "寻找共同兴趣点"
+                        ]
+                    },
+                    {
+                        situation: "在社区中结识新朋友",
+                        challenges: ["主动交流", "寻找共同话题", "建立深度联系"],
+                        tips: [
+                            "参加兴趣小组或社区活动",
+                            "从简单的问候开始",
+                            "倾听他人，表现真诚兴趣",
+                            "分享自己的生活经验"
+                        ]
+                    }
+                ]
+            },
+            'emotion-elderly': {
+                title: "情绪表达练习",
+                description: "学习识别和健康表达情绪，减少情绪压抑，提升心理舒适度和生活质量。",
+                ageGroup: "elderly",
+                difficulty: "简单",
+                goals: "增强情绪识别能力，学习健康表达情绪，减轻情绪压抑，提升心理舒适度",
+                materials: "游戏界面、情绪识别练习、表达技巧指导",
+                steps: "1. 识别日常生活中的情绪体验\n2. 学习健康表达情绪的方法\n3. 练习情绪管理技巧\n4. 应用到日常情境中",
+                benefits: "提升情绪健康，减少情绪困扰，改善人际关系，提高生活质量",
+                notes: "创造安全接纳的环境，尊重个人情绪体验，避免评判",
+                exercises: [
+                    {
+                        type: "情绪识别",
+                        activity: "识别身体中的情绪信号",
+                        guide: "不同情绪会在身体不同部位产生感觉。例如，焦虑可能表现为心跳加快或胃部不适，愤怒可能表现为肌肉紧张。试着觉察这些身体信号，它们是情绪的重要线索。"
+                    },
+                    {
+                        type: "情绪表达",
+                        activity: "学习用'我'语句表达感受",
+                        examples: [
+                            "当...发生时，我感到...",
+                            "我希望能...",
+                            "我需要..."
+                        ],
+                        practiceScenario: "当家人没有按时回家，你感到担心时，如何表达？"
+                    }
+                ]
+            },
+            'problem-solving-elderly': {
+                title: "日常生活问题解决",
+                description: "锻炼解决日常问题的能力，保持独立生活的信心和能力，提高生活满意度。",
+                ageGroup: "elderly",
+                difficulty: "中等",
+                goals: "增强解决日常问题的能力，提升独立生活技能，保持生活自主性",
+                materials: "游戏界面、日常问题场景、问题解决工具",
+                steps: "1. 分析日常遇到的问题\n2. 思考多种可能的解决方案\n3. 评估不同方案的优缺点\n4. 选择并实施最佳解决方案\n5. 评估解决效果",
+                benefits: "增强生活信心，提升生活质量，保持独立生活能力，减轻依赖感",
+                notes: "强调实际可用的解决方案，考虑个人能力和资源，避免挫败感",
+                scenarios: [
+                    {
+                        situation: "如何记住按时服药？",
+                        possibleSolutions: [
+                            "使用药盒按日期和时间整理药物",
+                            "设置手机或闹钟提醒",
+                            "将服药与日常固定活动（如吃饭）关联",
+                            "请家人或朋友提醒"
+                        ],
+                        evaluationFactors: ["便利性", "可靠性", "独立性", "长期坚持性"]
+                    },
+                    {
+                        situation: "如何应对居家安全问题？",
+                        possibleSolutions: [
+                            "安装扶手和防滑设施",
+                            "整理电线和杂物，避免绊倒",
+                            "使用智能家居设备（如自动关灯器）",
+                            "参加居家安全课程"
+                        ],
+                        evaluationFactors: ["实用性", "成本效益", "实施难度", "安全效果"]
+                    }
+                ]
+            }
+        };
+        
+        // 当前选中的年龄阶段和游戏分类
+        let selectedAge = 'children';
+        let selectedCategory = 'all';
+        
+        // 初始化页面
+        function initPage() {
+            // 设置年龄选择器事件监听
+            const ageButtons = document.querySelectorAll('.age-btn');
+            ageButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有按钮的active状态
+                    ageButtons.forEach(btn => btn.classList.remove('active', 'scale-105'));
+                    // 为当前按钮添加active状态
+                    this.classList.add('active', 'scale-105');
+                    // 更新选中的年龄
+                    selectedAge = this.dataset.age;
+                    // 筛选显示游戏
+                    filterGames();
+                });
+            });
+            
+            // 设置游戏分类标签事件监听
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有按钮的active状态
+                    categoryButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.classList.add('bg-gray-200', 'text-gray-700');
+                        btn.classList.remove('bg-primary', 'text-white');
+                    });
+                    // 为当前按钮添加active状态
+                    this.classList.add('active');
+                    this.classList.remove('bg-gray-200', 'text-gray-700');
+                    this.classList.add('bg-primary', 'text-white');
+                    // 更新选中的分类
+                    selectedCategory = this.dataset.category;
+                    // 筛选显示游戏
+                    filterGames();
+                });
+            });
+            
+            // 初始筛选（默认显示儿童所有游戏）
+            filterGames();
+        }
+        
+        // 根据选中的年龄和分类筛选游戏
+        function filterGames() {
+            const gameCards = document.querySelectorAll('.game-card');
+            
+            gameCards.forEach(card => {
+                const cardAge = card.dataset.age;
+                const cardCategory = card.dataset.category;
+                
+                // 检查是否符合筛选条件
+                const ageMatch = cardAge === selectedAge;
+                const categoryMatch = selectedCategory === 'all' || cardCategory === selectedCategory;
+                
+                if (ageMatch && categoryMatch) {
+                    card.style.display = 'block';
+                    // 添加动画效果
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'scale(1)';
+                    }, 50);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initPage();
+        });
+
+        // 当前游戏状态
+        let currentGame = null;
+        let currentLevel = 0;
+        let score = 0;
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let totalPairs = 0;
+        let memoryGameStarted = false;
+        let memoryGameTimer = null;
+        let memoryGameTime = 0;
+        let breatheExerciseTimer = null;
+        let breatheExerciseTime = 0;
+
+        // DOM元素
+        const gamesList = document.getElementById('games-list');
+        const gameContainer = document.getElementById('game-container');
+        const gameTitle = document.getElementById('game-title');
+        const gameContent = document.getElementById('game-content');
+        const closeGameBtn = document.getElementById('close-game');
+        const playGameBtns = document.querySelectorAll('.play-game-btn');
+
+        // 打开游戏
+        function openGame(gameName) {
+            currentGame = games[gameName];
+            currentLevel = 0;
+            score = 0;
+            
+            // 设置游戏标题
+            gameTitle.textContent = currentGame.title;
+            
+            // 隐藏游戏列表，显示游戏容器
+            gamesList.style.display = 'none';
+            gameContainer.classList.remove('hidden');
+            
+            // 根据年龄阶段调整游戏容器样式
+            const ageGroup = currentGame.ageGroup;
+            gameContainer.className = gameContainer.className.replace(/bg-[^\s]+/, '');
+            gameContainer.classList.add(`bg-${ageGroup}-bg/95`);
+            
+            setTimeout(() => {
+                gameContainer.classList.add('active');
+            }, 10);
+            
+            // 根据游戏类型初始化（忽略年龄标识部分）
+            if (gameName.includes('emotion')) {
+                initEmotionGame();
+            } else if (gameName.includes('memory')) {
+                initMemoryGame();
+            } else if (gameName.includes('breathe')) {
+                initBreatheGame();
+            } else if (gameName.includes('positive')) {
+                initPositiveGame();
+            } else if (gameName.includes('meditation')) {
+                initMeditationGame();
+            }
+            
+            // 记录用户游戏操作（可用于分析和个性化推荐）
+            console.log(`用户打开了游戏: ${gameName} (${ageGroup})`);
+        }
+
+        // 关闭游戏
+        function closeGame() {
+            // 清除计时器
+            if (memoryGameTimer) {
+                clearInterval(memoryGameTimer);
+                memoryGameTimer = null;
+            }
+            if (breatheExerciseTimer) {
+                clearInterval(breatheExerciseTimer);
+                breatheExerciseTimer = null;
+            }
+            
+            // 隐藏游戏容器
+            gameContainer.classList.remove('active');
+            setTimeout(() => {
+                gameContainer.classList.add('hidden');
+                gamesList.style.display = 'grid';
+                gameContent.innerHTML = '';
+            }, 400);
+        }
+        
+        // 初始化老年人冥想游戏
+        function initMeditationGame() {
+            const fontFamily = currentGame.ageGroup;
+            
+            gameContent.innerHTML = `
+                <div class="p-6 max-w-2xl mx-auto">
+                    <h3 class="text-xl font-${fontFamily} font-bold mb-6 text-center">选择冥想会话</h3>
+                    <div class="space-y-4">
+            `;
+            
+            // 渲染会话选项
+            currentGame.sessions.forEach((session, index) => {
+                gameContent.innerHTML += `
+                    <button class="w-full p-4 bg-${currentGame.ageGroup}-primary/20 border-2 border-${currentGame.ageGroup}-primary rounded-xl text-${currentGame.ageGroup}-text text-left transition-all hover:bg-${currentGame.ageGroup}-primary/30" 
+                            onclick="window.startMeditation(${index})">
+                        <div class="flex justify-between items-center">
+                            <span class="font-${fontFamily} font-bold">${session.name}</span>
+                            <span class="bg-${currentGame.ageGroup}-primary/30 px-3 py-1 rounded-full text-sm">${session.duration}分钟</span>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-600">${session.guidance.substring(0, 50)}...</p>
+                    </button>
+                `;
+            });
+            
+            gameContent.innerHTML += `
+                    </div>
+                    <div id="meditation-container" class="mt-8 hidden">
+                        <div class="bg-white/80 p-6 rounded-xl text-center">
+                            <h4 id="session-title" class="text-xl font-bold mb-4"></h4>
+                            <div class="my-8">
+                                <div id="meditation-animation" class="w-32 h-32 mx-auto bg-${currentGame.ageGroup}-primary/30 rounded-full flex items-center justify-center">
+                                    <span id="meditation-breath" class="text-4xl">🌸</span>
+                                </div>
+                            </div>
+                            <p id="meditation-guide" class="text-lg mb-6"></p>
+                            <div class="flex justify-center">
+                                <button id="stop-meditation" class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                    结束练习
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 开始冥想会话
+        window.startMeditation = function(sessionIndex) {
+            const session = currentGame.sessions[sessionIndex];
+            
+            // 显示冥想界面
+            document.querySelector('.space-y-4').classList.add('hidden');
+            document.getElementById('meditation-container').classList.remove('hidden');
+            
+            // 设置会话信息
+            document.getElementById('session-title').textContent = session.name;
+            document.getElementById('meditation-guide').textContent = session.guidance;
+            
+            // 添加呼吸动画
+            const breathElement = document.getElementById('meditation-breath');
+            let isExpanding = true;
+            
+            const breathInterval = setInterval(() => {
+                if (isExpanding) {
+                    breathElement.style.transform = 'scale(1.5)';
+                    breathElement.style.opacity = '1';
+                } else {
+                    breathElement.style.transform = 'scale(1)';
+                    breathElement.style.opacity = '0.6';
+                }
+                isExpanding = !isExpanding;
+            }, 3000);
+            
+            // 设置结束按钮事件
+            document.getElementById('stop-meditation').addEventListener('click', function() {
+                clearInterval(breathInterval);
+                document.querySelector('.space-y-4').classList.remove('hidden');
+                document.getElementById('meditation-container').classList.add('hidden');
+            });
+        };
+
+        // 初始化情绪识别游戏
+        function initEmotionGame() {
+            // 获取年龄组特定字体
+            const fontFamily = currentGame.ageGroup;
+            
+            gameContent.innerHTML = `
+                <div class="text-center mb-8">
+                    <p class="text-gray-700 mb-4 font-${fontFamily}">${currentGame.description}</p>
+                    <div class="flex justify-center items-center mb-6">
+                        <div class="text-8xl" id="emotion-image"></div>
+                    </div>
+                    <p class="text-lg font-medium mb-8 font-${fontFamily}" id="emotion-question"></p>
+                    <div id="emotion-options" class="grid grid-cols-2 gap-4 max-w-md mx-auto"></div>
+                </div>
+                <div class="flex justify-between items-center mt-10">
+                    <div class="text-lg font-${fontFamily}">
+                        <span class="font-semibold">分数: </span>
+                        <span id="emotion-score">0</span>/<span>${currentGame.levels.length}</span>
+                    </div>
+                    <div class="text-lg font-${fontFamily}">
+                        <span class="font-semibold">进度: </span>
+                        <span id="emotion-progress">0</span>/<span>${currentGame.levels.length}</span>
+                    </div>
+                </div>
+            `;
+            
+            loadEmotionLevel(0);
+        }
+
+        // 加载情绪游戏关卡
+        function loadEmotionLevel(levelIndex) {
+            const level = currentGame.levels[levelIndex];
+            
+            document.getElementById('emotion-image').textContent = level.image;
+            document.getElementById('emotion-question').textContent = level.question;
+            document.getElementById('emotion-progress').textContent = levelIndex + 1;
+            
+            const optionsContainer = document.getElementById('emotion-options');
+            optionsContainer.innerHTML = '';
+            
+            level.options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'emotion-card px-6 py-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all-300';
+                button.textContent = option;
+                button.addEventListener('click', () => {
+                    checkEmotionAnswer(option, level.correctAnswer);
+                });
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // 检查情绪游戏答案
+        function checkEmotionAnswer(selected, correct) {
+            const optionButtons = document.querySelectorAll('.emotion-card');
+            
+            optionButtons.forEach(button => {
+                button.disabled = true;
+                if (button.textContent === correct) {
+                    button.classList.add('bg-green-100', 'border-green-500');
+                    if (selected === correct) {
+                        score++;
+                        document.getElementById('emotion-score').textContent = score;
+                    }
+                } else if (button.textContent === selected) {
+                    button.classList.add('bg-red-100', 'border-red-500');
+                }
+            });
+            
+            // 延迟进入下一关或结束游戏
+            setTimeout(() => {
+                currentLevel++;
+                if (currentLevel < currentGame.levels.length) {
+                    loadEmotionLevel(currentLevel);
+                } else {
+                    showEmotionGameResult();
+                }
+            }, 1500);
+        }
+
+        // 显示情绪游戏结果
+        function showEmotionGameResult() {
+            let message = '';
+            let color = '';
+            
+            if (score === currentGame.levels.length) {
+                message = '太棒了！你是情绪识别大师！';
+                color = 'green';
+            } else if (score >= currentGame.levels.length * 0.7) {
+                message = '做得很好！你有不错的情绪识别能力！';
+                color = 'blue';
+            } else if (score >= currentGame.levels.length * 0.5) {
+                message = '还不错！继续练习可以提高情绪识别能力！';
+                color = 'yellow';
+            } else {
+                message = '别担心！多观察日常生活中的情绪表达，你会进步的！';
+                color = 'red';
+            }
+            
+            gameContent.innerHTML = `
+                <div class="text-center">
+                    <div class="text-8xl mb-6">🎉</div>
+                    <h3 class="text-2xl font-bold mb-4 text-${color}-600">${message}</h3>
+                    <p class="text-lg mb-8">你的得分: <span class="font-bold">${score}</span>/${currentGame.levels.length}</p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <button class="game-button px-6 py-3 bg-primary text-white rounded-full hover:shadow-lg transition-all-300" onclick="initEmotionGame()">
+                            再玩一次
+                        </button>
+                        <button class="game-button px-6 py-3 border border-primary text-primary rounded-full hover:bg-primary hover:text-white transition-all-300" onclick="closeGame()">
+                            返回游戏列表
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 初始化记忆配对游戏 - 添加年龄差异化设计
+        function initMemoryGame() {
+            memoryGameStarted = false;
+            matchedPairs = 0;
+            flippedCards = [];
+            memoryGameTime = 0;
+            
+            // 计算总对数
+            totalPairs = currentGame.cards.length / 2;
+            
+            // 根据年龄组设置样式
+            const ageGroup = currentGame.ageGroup;
+            let cardSize = 'w-full';
+            let fontSize = 'text-4xl';
+            let gapSize = 'gap-4';
+            
+            // 年龄差异化调整
+            if (ageGroup === 'children') {
+                cardSize = 'w-full aspect-square'; // 儿童版更大的卡片
+                fontSize = 'text-5xl'; // 更大的字体
+                gapSize = 'gap-2'; // 更小的间距
+            } else if (ageGroup === 'elderly') {
+                cardSize = 'w-full aspect-square'; // 老年人版更大的卡片
+                fontSize = 'text-5xl'; // 更大的字体
+                gapSize = 'gap-4';
+            }
+            
+            gameContent.innerHTML = `
+                <div class="text-center mb-8">
+                    <p class="text-gray-700 mb-4 font-${ageGroup}">${currentGame.description}</p>
+                    <div class="flex justify-center items-center mb-4 space-x-6">
+                        <div class="text-lg font-${ageGroup}">
+                            <span class="font-semibold">已匹配: </span>
+                            <span id="memory-matched">0</span>/<span>${totalPairs}</span>
+                        </div>
+                        <div class="text-lg font-${ageGroup}">
+                            <span class="font-semibold">时间: </span>
+                            <span id="memory-time">00:00</span>
+                        </div>
+                    </div>
+                    <button id="start-memory-game" class="game-button px-6 py-3 bg-${ageGroup} text-white rounded-full hover:shadow-lg transition-all-300 mb-8">
+                        开始游戏
+                    </button>
+                    <div id="memory-grid" class="grid grid-cols-${currentGame.gridSize.cols} ${gapSize} max-w-lg mx-auto"></div>
+                </div>
+            `;
+            
+            // 初始化卡片
+            renderMemoryCards(cardSize, fontSize, ageGroup);
+            
+            // 开始游戏按钮事件
+            document.getElementById('start-memory-game').addEventListener('click', startMemoryGame);
+        }
+
+        // 渲染记忆卡片 - 支持年龄差异化样式
+        function renderMemoryCards(cardSize, fontSize, ageGroup) {
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            
+            // 随机打乱卡片
+            const shuffledCards = [...currentGame.cards].sort(() => Math.random() - 0.5);
+            
+            // 根据年龄组设置颜色
+            let gradientFrom = 'from-primary';
+            let gradientTo = 'to-indigo-600';
+            let borderColor = 'border-gray-200';
+            
+            if (ageGroup === 'children') {
+                gradientFrom = 'from-children';
+                gradientTo = 'to-emerald-500';
+                borderColor = 'border-emerald-200';
+            } else if (ageGroup === 'teenager') {
+                gradientFrom = 'from-teenager';
+                gradientTo = 'to-blue-500';
+                borderColor = 'border-blue-200';
+            } else if (ageGroup === 'adult') {
+                gradientFrom = 'from-adult';
+                gradientTo = 'to-purple-500';
+                borderColor = 'border-purple-200';
+            } else if (ageGroup === 'elderly') {
+                gradientFrom = 'from-elderly';
+                gradientTo = 'to-amber-500';
+                borderColor = 'border-amber-200';
+            }
+            
+            shuffledCards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = `memory-card ${cardSize} transform transition-all duration-300 hover:scale-105`;
+                cardElement.dataset.index = index;
+                cardElement.innerHTML = `
+                    <div class="memory-card-front bg-gradient-to-r ${gradientFrom} ${gradientTo} rounded-lg flex items-center justify-center text-white ${fontSize} shadow-md cursor-pointer">
+                        <i class="fa fa-question"></i>
+                    </div>
+                    <div class="memory-card-back bg-white rounded-lg flex items-center justify-center ${fontSize} shadow-md ${borderColor} border cursor-pointer">
+                        ${card}
+                    </div>
+                `;
+                
+                cardElement.addEventListener('click', () => {
+                    if (!memoryGameStarted || flippedCards.length >= 2 || cardElement.classList.contains('flipped') || cardElement.classList.contains('matched')) {
+                        return;
+                    }
+                    
+                    flipMemoryCard(cardElement, card);
+                });
+                
+                grid.appendChild(cardElement);
+            });
+        }
+
+        // 开始记忆游戏
+        function startMemoryGame() {
+            memoryGameStarted = true;
+            document.getElementById('start-memory-game').style.display = 'none';
+            
+            // 启动计时器
+            if (memoryGameTimer) {
+                clearInterval(memoryGameTimer);
+            }
+            memoryGameTimer = setInterval(() => {
+                memoryGameTime++;
+                const minutes = Math.floor(memoryGameTime / 60).toString().padStart(2, '0');
+                const seconds = (memoryGameTime % 60).toString().padStart(2, '0');
+                document.getElementById('memory-time').textContent = `${minutes}:${seconds}`;
+            }, 1000);
+        }
+
+        // 翻转记忆卡片
+        function flipMemoryCard(cardElement, cardValue) {
+            cardElement.classList.add('flipped');
+            flippedCards.push({ element: cardElement, value: cardValue });
+            
+            if (flippedCards.length === 2) {
+                setTimeout(() => {
+                    checkMemoryMatch();
+                }, 1000);
+            }
+        }
+
+        // 检查记忆卡片匹配
+        function checkMemoryMatch() {
+            const [card1, card2] = flippedCards;
+            
+            if (card1.value === card2.value) {
+                // 匹配成功
+                card1.element.classList.add('matched');
+                card2.element.classList.add('matched');
+                matchedPairs++;
+                document.getElementById('memory-matched').textContent = matchedPairs;
+                
+                // 检查游戏是否结束
+                if (matchedPairs === totalPairs) {
+                    setTimeout(() => {
+                        showMemoryGameResult();
+                    }, 500);
+                }
+            } else {
+                // 匹配失败
+                card1.element.classList.remove('flipped');
+                card2.element.classList.remove('flipped');
+            }
+            
+            // 重置翻牌数组
+            flippedCards = [];
+        }
+
+        // 显示记忆游戏结果
+        function showMemoryGameResult() {
+            // 停止计时器
+            clearInterval(memoryGameTimer);
+            memoryGameTimer = null;
+            
+            let message = '';
+            
+            if (memoryGameTime < 30) {
+                message = '太棒了！你的记忆力惊人！';
+            } else if (memoryGameTime < 60) {
+                message = '做得很好！你的记忆力不错！';
+            } else if (memoryGameTime < 90) {
+                message = '还不错！继续练习可以提高记忆力！';
+            } else {
+                message = '别担心！多玩几次可以锻炼你的记忆力！';
+            }
+            
+            gameContent.innerHTML = `
+                <div class="text-center">
+                    <div class="text-8xl mb-6">🎉</div>
+                    <h3 class="text-2xl font-bold mb-4 text-primary">${message}</h3>
+                    <p class="text-lg mb-2">用时: <span class="font-bold">${Math.floor(memoryGameTime / 60)}分${memoryGameTime % 60}秒</span></p>
+                    <p class="text-lg mb-8">匹配对数: <span class="font-bold">${matchedPairs}</span>/<span>${totalPairs}</span></p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <button class="game-button px-6 py-3 bg-primary text-white rounded-full hover:shadow-lg transition-all-300" onclick="initMemoryGame()">
+                            再玩一次
+                        </button>
+                        <button class="game-button px-6 py-3 border border-primary text-primary rounded-full hover:bg-primary hover:text-white transition-all-300" onclick="closeGame()">
+                            返回游戏列表
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 初始化呼吸放松游戏
+        function initBreatheGame() {
+            gameContent.innerHTML = `
+                <div class="text-center mb-8">
+                    <p class="text-gray-700 mb-4">${currentGame.description}</p>
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">选择练习方法</h3>
+                        <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+                            ${currentGame.exercises.map((exercise, index) => `
+                                <button class="game-button px-6 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all-300" onclick="startBreatheExercise(${index})">
+                                    ${exercise.name}
+                                </button>
+                            `).join('')}
+                        </div>
+                        
+                        <div id="breathe-exercise" class="hidden">
+                            <div class="flex justify-center items-center mb-6">
+                                <div id="breathe-circle-container" class="relative w-64 h-64">
+                                    <div class="absolute inset-0 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <div class="breathe-circle w-full h-full rounded-full bg-primary/30 flex items-center justify-center">
+                                            <span id="breathe-instruction" class="text-2xl font-bold text-primary"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-lg mb-6" id="breathe-step"></p>
+                            <div class="flex justify-center items-center mb-8">
+                                <div class="text-lg">
+                                    <span class="font-semibold">剩余时间: </span>
+                                    <span id="breathe-time"></span>
+                                </div>
+                            </div>
+                            <button id="stop-breathe-exercise" class="game-button px-6 py-3 border border-primary text-primary rounded-full hover:bg-primary hover:text-white transition-all-300">
+                                停止练习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 停止练习按钮事件
+            document.getElementById('stop-breathe-exercise').addEventListener('click', stopBreatheExercise);
+        }
+
+        // 开始呼吸练习
+        function startBreatheExercise(exerciseIndex) {
+            const exercise = currentGame.exercises[exerciseIndex];
+            let currentStep = 0;
+            let stepProgress = 0;
+            
+            // 显示练习界面
+            document.getElementById('breathe-exercise').classList.remove('hidden');
+            
+            // 初始化计时器
+            breatheExerciseTime = exercise.duration;
+            updateBreatheTime();
+            
+            // 显示第一步
+            updateBreatheStep(exercise.steps[currentStep]);
+            
+            // 启动计时器
+            if (breatheExerciseTimer) {
+                clearInterval(breatheExerciseTimer);
+            }
+            breatheExerciseTimer = setInterval(() => {
+                breatheExerciseTime--;
+                updateBreatheTime();
+                
+                // 更新进度
+                stepProgress++;
+                
+                // 根据不同步骤更新指令
+                if (currentStep === 0 && stepProgress <= 4) {
+                    updateBreatheInstruction('吸气');
+                } else if (currentStep === 1 && stepProgress <= 7) {
+                    updateBreatheInstruction('屏息');
+                } else if (currentStep === 2 && stepProgress <= 8) {
+                    updateBreatheInstruction('呼气');
+                } else if (currentStep === 3 && stepProgress <= 4 && exercise.steps.length > 3) {
+                    updateBreatheInstruction('屏息');
+                } else {
+                    // 进入下一步或循环
+                    currentStep = (currentStep + 1) % exercise.steps.length;
+                    stepProgress = 0;
+                    updateBreatheStep(exercise.steps[currentStep]);
+                }
+                
+                // 检查练习是否结束
+                if (breatheExerciseTime <= 0) {
+                    stopBreatheExercise();
+                    showBreatheExerciseResult();
+                }
+            }, 1000);
+        }
+
+        // 更新呼吸指令
+        function updateBreatheInstruction(instruction) {
+            document.getElementById('breathe-instruction').textContent = instruction;
+        }
+
+        // 更新呼吸步骤
+        function updateBreatheStep(step) {
+            document.getElementById('breathe-step').textContent = step;
+        }
+
+        // 更新呼吸练习时间
+        function updateBreatheTime() {
+            const minutes = Math.floor(breatheExerciseTime / 60).toString().padStart(2, '0');
+            const seconds = (breatheExerciseTime % 60).toString().padStart(2, '0');
+            document.getElementById('breathe-time').textContent = `${minutes}:${seconds}`;
+        }
+
+        // 停止呼吸练习
+        function stopBreatheExercise() {
+            clearInterval(breatheExerciseTimer);
+            breatheExerciseTimer = null;
+            document.getElementById('breathe-exercise').classList.add('hidden');
+        }
+
+        // 显示呼吸练习结果
+        function showBreatheExerciseResult() {
+            gameContent.innerHTML = `
+                <div class="text-center">
+                    <div class="text-8xl mb-6">😌</div>
+                    <h3 class="text-2xl font-bold mb-4 text-primary">练习完成！</h3>
+                    <p class="text-lg mb-4">深呼吸是一种简单有效的放松技巧，定期练习可以帮助你：</p>
+                    <ul class="text-left max-w-md mx-auto mb-8 space-y-2">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>降低压力和焦虑水平</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>改善睡眠质量</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>提升专注力和清晰思考能力</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>增强情绪稳定性</span>
+                        </li>
+                    </ul>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <button class="game-button px-6 py-3 bg-primary text-white rounded-full hover:shadow-lg transition-all-300" onclick="initBreatheGame()">
+                            再次练习
+                        </button>
+                        <button class="game-button px-6 py-3 border border-primary text-primary rounded-full hover:bg-primary hover:text-white transition-all-300" onclick="closeGame()">
+                            返回游戏列表
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 初始化积极思维游戏
+        function initPositiveGame() {
+            gameContent.innerHTML = `
+                <div class="text-center mb-8">
+                    <p class="text-gray-700 mb-8">${currentGame.description}</p>
+                    <div class="mb-10">
+                        <h3 class="text-xl font-semibold mb-4">识别消极思维</h3>
+                        <div id="negative-thought" class="bg-red-50 border border-red-200 rounded-xl p-6 mb-6 text-left max-w-2xl mx-auto thought-bubble">
+                            <p class="text-red-700 text-lg"></p>
+                        </div>
+                        
+                        <h3 class="text-xl font-semibold mb-4">选择积极替代思维</h3>
+                        <div id="positive-options" class="space-y-4 max-w-2xl mx-auto"></div>
+                    </div>
+                    <div class="flex justify-between items-center mt-10">
+                        <div class="text-lg">
+                            <span class="font-semibold">进度: </span>
+                            <span id="positive-progress">0</span>/<span>${currentGame.scenarios.length}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            loadPositiveScenario(0);
+        }
+
+        // 加载积极思维场景
+        function loadPositiveScenario(index) {
+            const scenario = currentGame.scenarios[index];
+            
+            document.getElementById('negative-thought').querySelector('p').textContent = scenario.negative;
+            document.getElementById('positive-progress').textContent = index + 1;
+            
+            const optionsContainer = document.getElementById('positive-options');
+            optionsContainer.innerHTML = '';
+            
+            scenario.positives.forEach(positive => {
+                const option = document.createElement('div');
+                option.className = 'emotion-card bg-green-50 border border-green-200 rounded-xl p-6 text-left transition-all-300';
+                option.innerHTML = `
+                    <p class="text-green-700">${positive}</p>
+                `;
+                option.addEventListener('click', () => {
+                    // 高亮选择的选项
+                    document.querySelectorAll('.emotion-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+                    
+                    // 延迟进入下一个场景
+                    setTimeout(() => {
+                        currentLevel++;
+                        if (currentLevel < currentGame.scenarios.length) {
+                            loadPositiveScenario(currentLevel);
+                        } else {
+                            showPositiveGameResult();
+                        }
+                    }, 1500);
+                });
+                optionsContainer.appendChild(option);
+            });
+        }
+
+        // 显示积极思维游戏结果
+        function showPositiveGameResult() {
+            gameContent.innerHTML = `
+                <div class="text-center">
+                    <div class="text-8xl mb-6">🌟</div>
+                    <h3 class="text-2xl font-bold mb-4 text-primary">太棒了！你完成了所有练习！</h3>
+                    <p class="text-lg mb-8">通过这种思维转换练习，你已经学会了如何将消极思维转变为积极视角。记住，我们的想法会影响我们的情绪和行为。</p>
+                    
+                    <div class="bg-primary/5 rounded-xl p-6 mb-8 max-w-2xl mx-auto">
+                        <h4 class="text-xl font-semibold mb-4 text-primary">日常练习建议：</h4>
+                        <ul class="text-left space-y-3">
+                            <li class="flex items-start">
+                                <i class="fa fa-lightbulb-o text-yellow-500 mt-1 mr-3"></i>
+                                <span>每天记录3-5件让你感到感激的事情</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-lightbulb-o text-yellow-500 mt-1 mr-3"></i>
+                                <span>当消极想法出现时，尝试找到至少一个积极的替代想法</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-lightbulb-o text-yellow-500 mt-1 mr-3"></i>
+                                <span>关注解决方案而不是问题本身</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-lightbulb-o text-yellow-500 mt-1 mr-3"></i>
+                                <span>对自己和他人保持善意和宽容</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <button class="game-button px-6 py-3 bg-primary text-white rounded-full hover:shadow-lg transition-all-300" onclick="initPositiveGame()">
+                            再次练习
+                        </button>
+                        <button class="game-button px-6 py-3 border border-primary text-primary rounded-full hover:bg-primary hover:text-white transition-all-300" onclick="closeGame()">
+                            返回游戏列表
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 事件监听器 - 添加游戏卡片交互效果
+        playGameBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const game = btn.dataset.game;
+                // 添加点击动画
+                btn.classList.add('scale-95');
+                setTimeout(() => {
+                    btn.classList.remove('scale-95');
+                    openGame(game);
+                }, 100);
+            });
+        });
+
+        // 为游戏卡片添加悬停效果
+        const gameCards = document.querySelectorAll('.game-card');
+        gameCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('shadow-lg', 'scale-[1.02]');
+                card.style.transition = 'all 0.3s ease';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('shadow-lg', 'scale-[1.02]');
+            });
+        });
+
+        closeGameBtn.addEventListener('click', closeGame);
+        
+        // 添加ESC键关闭游戏功能
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && gameContainer.classList.contains('active')) {
+                closeGame();
+            }
+        });
+
+        // 初始化导航栏
+        window.addEventListener('DOMContentLoaded', () => {
+            // 这里可以添加导航栏初始化代码
+            console.log('心理游戏页面加载完成');
+        });
+    </script>
+    
+    <!-- 引入公共脚本 -->
+    <script src="common.js"></script>
+</body>
+</html>

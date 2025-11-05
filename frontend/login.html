@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心社区 - 心理健康支持平台</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 基础 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        error: '#ef4444',
+                        info: '#3b82f6',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- 全局样式文件 -->
+    <link rel="stylesheet" href="common.css">
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+        }
+    </style>
+    
+    <!-- 页面特定样式 -->
+    <style>
+        .login-shape-1 {
+            top: -10%;
+            left: -5%;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+        .login-shape-2 {
+            bottom: -15%;
+            right: -5%;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #ec4899, #f472b6);
+        }
+    </style>
+<style>
+
+    /* 全局样式重置 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 全局颜色变量 */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background-color: var(--bg-primary);
+    }
+    
+    /* 统一按钮样式 */
+    button {
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        outline: none;
+    }
+    
+    /* 主按钮样式 - 注册按钮 */
+    .btn-primary {
+        background-color: var(--secondary-color);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #7c3aed;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+    }
+    
+    /* 次要按钮样式 - 登录按钮 */
+    .btn-secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        transform: translateY(-1px);
+    }
+    
+    /* 导航栏样式 */
+    nav {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .btn-primary,
+        .btn-secondary {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* 卡片样式 */
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+    }
+    
+    /* 输入框样式 */
+    input,
+    textarea,
+    select {
+        font-family: inherit;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+</style>
+</head>
+<body class="bg-light font-sans text-dark min-h-screen flex flex-col bg-gradient-animated">
+    <!-- 动态背景形状 -->
+    <div class="fixed inset-0 overflow-hidden -z-10">
+        <div class="shape bg-primary/30 w-[400px] h-[400px] top-[-100px] left-[-100px] animate-pulse-slow"></div>
+        <div class="shape bg-secondary/30 w-[300px] h-[300px] bottom-[-50px] right-[-50px] animate-pulse-slow" style="animation-delay: 2s;"></div>
+        <div class="shape bg-accent/30 w-[250px] h-[250px] top-[50%] right-[20%] animate-pulse-slow" style="animation-delay: 4s;"></div>
+    </div>
+    <!-- 导航栏 -->
+    <!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300 py-3">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <!-- Logo -->
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                <i class="fa fa-heart-o text-xl"></i>
+            </div>
+            <span class="text-xl font-bold text-primary tracking-wide">心社区</span>
+        </div>
+        
+        <!-- 桌面端导航 -->
+        <div class="hidden md:flex nav-links items-center space-x-1">
+            <a href="index.html" class="text-primary border-b-2 border-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center">
+                <i class="fa fa-home mr-2"></i>首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-list-alt mr-2"></i>心理测评
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-user-md mr-2"></i>咨询服务
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-users mr-2"></i>团体活动
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-music mr-2"></i>放松体验
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            
+            <!-- 更多服务下拉菜单 -->
+            <div class="relative" id="desktop-more-menu">
+                <button id="desktop-more-menu-button" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center gap-1 relative group">
+                    更多服务
+                    <i class="fa fa-angle-down transition-transform duration-300 group-hover:rotate-180"></i>
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </button>
+                <div id="desktop-more-dropdown" class="hidden absolute top-full left-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="healing_treehole.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-tree mr-2"></i>治愈树洞
+                    </a>
+                    <a href="sandbox_simulation_immersive.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-cubes mr-2"></i>沙盘模拟
+                    </a>
+                    <a href="mental_stories.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-book mr-2"></i>心理资源
+                    </a>
+                    <a href="mental_games.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-gamepad mr-2"></i>心理游戏
+                    </a>
+                                    <a href="psychology_experiments.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-flask mr-2"></i>心理实验
+                    </a>
+                    </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单按钮 -->
+        <div class="md:hidden">
+            <button id="menu-toggle" class="text-gray-700 focus:outline-none transition-transform duration-300 hover:rotate-90 p-2 rounded-md hover:bg-gray-100">
+                <i class="fa fa-bars text-xl"></i>
+                <span class="sr-only">打开菜单</span>
+            </button>
+        </div>
+        
+        <!-- 用户菜单 -->
+        <div id="user-menu" class="hidden md:flex items-center space-x-4">
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none group p-1 rounded-full hover:bg-white/30 transition-all duration-300 focus:ring-2 focus:ring-primary/50">
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="user-name" class="text-gray-700 group-hover:text-primary transition-colors"></span>
+                    <i class="fa fa-angle-down text-gray-500 group-hover:text-primary transition-transform duration-300 group-hover:rotate-180"></i>
+                </button>
+                <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="user_profile.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-user-circle w-4 mr-3 text-center"></i>
+                        <span>个人中心</span>
+                    </a>
+                    <a href="assessment_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-list-alt w-4 mr-3 text-center"></i>
+                        <span>测评记录</span>
+                    </a>
+                    <a href="booking_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-check-o w-4 mr-3 text-center"></i>
+                        <span>预约记录</span>
+                    </a>
+                    <a href="activity_registration.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-plus-o w-4 mr-3 text-center"></i>
+                        <span>活动报名</span>
+                    </a>
+                    <hr class="my-1 border-gray-200">
+                    <a href="#" id="logout-button" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-danger transition-all duration-200 flex items-center">
+                        <i class="fa fa-sign-out mr-3 w-4 text-center"></i>
+                        <span>退出登录</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 登录/注册按钮 -->
+        <div id="auth-buttons" class="hidden md:flex items-center space-x-3">
+            <button class="px-4 py-2 text-primary border-2 border-primary rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-medium shadow-sm hover:shadow transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='login.html'">
+                <i class="fa fa-sign-in mr-1"></i>登录
+            </button>
+            <button class="px-4 py-2 bg-gradient-to-r from-primary to-indigo-600 text-indigo-900 rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='register.html'">
+                <i class="fa fa-user-plus mr-2"></i>注册
+            </button>
+            <a href="admin_login.html" class="text-gray-600 hover:text-gray-800 transition-all duration-300 text-xs hover:underline px-2">管理员入口</a>
+        </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="md:hidden hidden glass-effect shadow-lg absolute w-full">
+        <div class="container mx-auto px-4 py-3 flex flex-col space-y-1">
+            <a href="index.html" class="bg-primary/5 text-primary py-2 px-3 rounded-lg font-medium flex items-center">
+                <i class="fa fa-home w-5 mr-3 text-center"></i>
+                首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-list-alt w-5 mr-3 text-center"></i>
+                心理测评
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-user-md w-5 mr-3 text-center"></i>
+                咨询服务
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-users w-5 mr-3 text-center"></i>
+                团体活动
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-music w-5 mr-3 text-center"></i>
+                放松体验
+            </a>
+            <a href="healing_treehole.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-tree w-5 mr-3 text-center"></i>
+                治愈树洞
+            </a>
+            <a href="sandbox_simulation_immersive.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-th-large w-5 mr-3 text-center"></i>
+                沙盘模拟
+            </a>
+            <a href="mental_stories.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-book w-5 mr-3 text-center"></i>
+                心理资源
+            </a>
+            <a href="mental_games.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-gamepad w-5 mr-3 text-center"></i>
+                心理游戏
+            </a>
+            
+            <!-- 移动端登录/注册按钮 -->
+            <div class="flex space-x-3 py-3 mt-2">
+                <button class="px-4 py-2.5 text-primary border border-primary rounded-lg hover:bg-primary/5 transition-all duration-300 flex-1 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='login.html'">
+                    <i class="fa fa-sign-in mr-2"></i>登录
+                </button>
+                <button class="px-4 py-2.5 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 flex-1 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='register.html'">
+                    <i class="fa fa-user-plus mr-2"></i>注册
+                </button>
+            </div>
+            
+            <!-- 移动端用户菜单（登录后显示） -->
+            <div id="mobile-user-menu" class="hidden py-2 animate-fade-in">
+                <div class="flex items-center space-x-3 mb-3 pb-3 border-b border-gray-200 bg-white/30 rounded-lg p-2">
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="mobile-user-name" class="text-gray-700 font-medium"></span>
+                </div>
+                <a href="user_profile.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-user-circle mr-2 w-5 text-center"></i>个人中心
+                </a>
+                <a href="assessment_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-list-alt mr-2 w-5 text-center"></i>测评记录
+                </a>
+                <a href="booking_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-check-o mr-2 w-5 text-center"></i>预约记录
+                </a>
+                <a href="activity_registration.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-plus-o mr-2 w-5 text-center"></i>活动报名
+                </a>
+                <a href="#" id="mobile-logout-button" class="block px-4 py-2 text-gray-700 hover:bg-white/50 hover:text-danger transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-sign-out mr-2 w-5 text-center"></i>退出登录
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 导航栏必要的脚本引用 -->
+<script src="components/navbar.js" defer></script>
+<script src="components/fix_duplicate_user_menu.js" defer></script>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow flex items-center justify-center pt-24 pb-12 relative z-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-12">
+                <!-- 左侧动态图形区域 -->
+                <div class="md:w-1/2 hidden md:flex justify-center items-center relative">
+                    <div class="relative w-full max-w-md">
+                        <!-- 三层渐变圆形 -->
+                        <div class="w-[280px] h-[280px] rounded-full bg-gradient-to-br from-primary/20 to-indigo-600/20 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse-slow"></div>
+                        <div class="w-[240px] h-[240px] rounded-full bg-gradient-to-br from-primary/30 to-indigo-600/30 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse-slow" style="animation-delay: 1s;"></div>
+                        <div class="w-[200px] h-[200px] rounded-full bg-gradient-to-br from-primary/40 to-indigo-600/40 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse-slow" style="animation-delay: 2s;"></div>
+                        
+                        <!-- 中心图标 -->
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                            <div class="w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-lg">
+                                <i class="fa fa-heart-o text-4xl text-primary animate-bounce-subtle"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- 装饰性元素 -->
+                        <div class="absolute -top-10 -left-10 w-16 h-16 rounded-full bg-secondary/30 blur-sm animate-bounce-subtle" style="animation-delay: 0.5s;"></div>
+                        <div class="absolute -bottom-5 -right-5 w-12 h-12 rounded-full bg-accent/30 blur-sm animate-bounce-subtle" style="animation-delay: 1.5s;"></div>
+                        <div class="absolute top-20 right-10 w-10 h-10 rounded-full bg-primary/30 blur-sm animate-bounce-subtle" style="animation-delay: 2.5s;"></div>
+                        
+                        <!-- 浮动数据标签 -->
+                        <div class="absolute -top-4 -right-4 bg-primary text-white rounded-full w-20 h-20 flex flex-col items-center justify-center shadow-lg animate-fade-in">
+                            <span class="text-2xl font-bold">98%</span>
+                            <span class="text-xs">用户满意度</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧登录表单 -->
+                <div class="md:w-1/2 w-full max-w-md">
+                    <div class="glass-effect rounded-2xl shadow-xl p-8 backdrop-blur-md animate-fade-in">
+                        <h2 class="text-3xl font-bold text-center mb-8 text-primary animate-slide-up" style="animation-delay: 0.2s;">用户登录</h2>
+                        
+                        <form id="login-form">
+                            <div class="mb-6 animate-slide-up" style="animation-delay: 0.3s;">
+                                <label for="email" class="block text-gray-700 font-medium mb-2">邮箱</label>
+                                <div class="relative form-input-focus">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                        <i class="fa fa-envelope"></i>
+                                    </span>
+                                    <input type="email" id="email" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white/80" placeholder="请输入您的邮箱">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6 animate-slide-up" style="animation-delay: 0.4s;">
+                                <label for="password" class="block text-gray-700 font-medium mb-2">密码</label>
+                                <div class="relative form-input-focus">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                        <i class="fa fa-lock"></i>
+                                    </span>
+                                    <input type="password" id="password" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white/80" placeholder="请输入您的密码">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 cursor-pointer hover:text-primary transition-colors" id="toggle-password">
+                                        <i class="fa fa-eye-slash"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mb-6 animate-slide-up" style="animation-delay: 0.5s;">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="remember-me" class="w-4 h-4 text-primary focus:ring-primary">
+                                    <label for="remember-me" class="ml-2 text-gray-700">记住我</label>
+                                </div>
+                                <a href="forgot_password.html" class="text-primary hover:text-indigo-600 transition-colors inline-flex items-center hover:translate-x-1">
+                                    忘记密码？<i class="fa fa-arrow-right ml-1 text-sm"></i>
+                                </a>
+                            </div>
+                            
+                            <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-lg hover:shadow-lg transition-all-300 text-lg font-medium transform hover:scale-105 animate-slide-up" style="animation-delay: 0.6s;">
+                                登录
+                            </button>
+                              
+                            <div class="text-center mt-6 animate-slide-up" style="animation-delay: 0.7s;">
+                                <p class="text-gray-700">
+                                    还没有账号？
+                                    <a href="register.html" class="text-primary hover:text-indigo-600 font-medium transition-colors inline-flex items-center hover:translate-x-1">
+                                        立即注册 <i class="fa fa-arrow-right ml-1 text-sm"></i>
+                                    </a>
+                                </p>
+                            </div>
+                        </form>
+                        
+                        <div class="mt-8">
+                    <div class="relative flex items-center justify-center">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="flex-shrink mx-4 text-gray-500">其他登录方式</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
+                    
+                    <div class="flex justify-center space-x-6 mt-6">
+                        <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all-300 transform hover:scale-110">
+                            <i class="fa fa-weixin text-xl"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all-300 transform hover:scale-110">
+                            <i class="fa fa-weibo text-xl"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all-300 transform hover:scale-110">
+                            <i class="fa fa-qq text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <!-- 统一页脚组件 -->
+<footer class="bg-[#1e293b] text-white py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <!-- 左侧Logo和文字 -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                    <i class="fa fa-heart"></i>
+                </div>
+                <span class="text-white">心社区</span>
+            </div>
+            
+            <!-- 中间版权信息 -->
+            <div class="text-center">
+                <p class="text-white">© 2025 心社区心理健康支持中心. 保留所有权利.</p>
+            </div>
+            
+            <!-- 右侧图标 -->
+            <div class="flex space-x-4">
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-bell"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- JavaScript -->
+    <script src="common.js"></script>
+    <script>
+        // 登录函数 - 模拟API调用，避免模块导入问题
+        function login(email, password) {
+            // 模拟API调用延迟
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    // 模拟登录成功，创建用户数据
+                    const user = {
+                        data: {
+                            id: '1',
+                            name: '用户' + email.split('@')[0],
+                            email: email,
+                            role: 'user'
+                        },
+                        token: 'mock-token-' + Math.random().toString(36).substring(2)
+                    };
+                    
+                    // 存储token到localStorage
+                    localStorage.setItem('token', user.token);
+                    
+                    resolve(user);
+                }, 1500);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // 移动端菜单切换
+            document.getElementById('menu-toggle').addEventListener('click', function() {
+                const mobileMenu = document.getElementById('mobile-menu');
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // 密码显示/隐藏切换
+            document.getElementById('toggle-password').addEventListener('click', function() {
+                const passwordInput = document.getElementById('password');
+                const icon = this.querySelector('i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            });
+            
+            // 登录表单提交处理
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const emailInput = document.getElementById('email');
+                const passwordInput = document.getElementById('password');
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                
+                try {
+                    // 验证表单
+                    let isValid = true;
+                    if (!validateField(emailInput)) isValid = false;
+                    if (!validateField(passwordInput)) isValid = false;
+                    if (!isValid) return;
+                    
+                    // 显示加载状态
+                    submitButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 登录中...';
+                    submitButton.disabled = true;
+                    
+                    // 模拟登录请求
+                    setTimeout(() => {
+                        try {
+                            // 创建用户数据对象
+                            const email = emailInput.value.trim();
+                            const userData = {
+                                email: email,
+                                name: email.split('@')[0], // 使用邮箱前缀作为用户名
+                                role: 'user', // 默认用户角色
+                                userId: 'user_' + Math.floor(Math.random() * 1000000) // 模拟用户ID
+                            };
+                            
+                            // 生成认证令牌
+                            const token = 'mock_token_' + new Date().getTime();
+                            
+                            // 登录成功
+                            showNotification('登录成功！', 'success');
+                            
+                            // 使用AuthManager统一管理登录状态
+                            if (window.AuthManager) {
+                                window.AuthManager.setLoginStatus(userData, token);
+                                console.log('已通过AuthManager设置登录状态');
+                            } else {
+                                // 兼容方案：直接设置localStorage
+                                localStorage.setItem('auth_token', token);
+                                localStorage.setItem('user_data', JSON.stringify(userData));
+                                localStorage.setItem('isLogin', 'true');
+                                localStorage.removeItem('token');
+                                console.log('已通过localStorage设置登录状态');
+                            }
+                            
+                            // 调用全局登录状态更新函数
+                            if (window.updateGlobalLoginStatus) {
+                                window.updateGlobalLoginStatus();
+                                console.log('已调用全局登录状态更新函数');
+                            }
+                            
+                            console.log('登录成功，已设置auth_token');
+                            
+                            // 延迟跳转以显示通知并确保localStorage已保存
+                            setTimeout(() => {
+                                console.log('跳转到个人界面');
+                                window.location.href = 'user_profile.html';
+                            }, 1000);
+                        } catch (error) {
+                            console.error('登录错误:', error);
+                            // 显示错误提示
+                            showNotification(error.message || '登录失败，请检查邮箱和密码', 'error');
+                        } finally {
+                            // 恢复按钮状态
+                            submitButton.innerHTML = originalText;
+                            submitButton.disabled = false;
+                        }
+                    }, 1500);
+                } catch (error) {
+                    console.error('表单处理错误:', error);
+                    showNotification('发生错误，请重试', 'error');
+                    submitButton.innerHTML = originalText;
+                    submitButton.disabled = false;
+                }
+            });
+            
+            // 字段验证
+            function validateField(field) {
+                const value = field.value.trim();
+                const fieldName = field.previousElementSibling.textContent;
+                
+                if (!value) {
+                    showError(field, `${fieldName}不能为空`);
+                    return false;
+                }
+                
+                if (field.id === 'email') {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        showError(field, '请输入有效的邮箱地址');
+                        return false;
+                    }
+                }
+                
+                if (field.id === 'password') {
+                    if (value.length < 6) {
+                        showError(field, '密码长度不能少于6位');
+                        return false;
+                    }
+                }
+                
+                // 验证通过
+                field.classList.remove('border-red-500', 'focus:ring-red-500');
+                field.classList.add('border-gray-300', 'focus:ring-primary');
+                
+                const errorElement = field.nextElementSibling;
+                if (errorElement && errorElement.classList.contains('text-red-500')) {
+                    errorElement.remove();
+                }
+                
+                return true;
+            }
+            
+            // 显示错误信息
+            function showError(field, message) {
+                field.classList.remove('border-gray-300', 'focus:ring-primary');
+                field.classList.add('border-red-500', 'focus:ring-red-500');
+                
+                // 检查是否已有错误信息
+                let errorElement = field.nextElementSibling;
+                if (errorElement && errorElement.classList.contains('text-red-500')) {
+                    errorElement.textContent = message;
+                } else {
+                    errorElement = document.createElement('p');
+                    errorElement.className = 'text-red-500 text-sm mt-1';
+                    errorElement.textContent = message;
+                    field.parentNode.appendChild(errorElement);
+                }
+            }
+            
+            // 检查showNotification函数是否已存在（避免重复定义）
+            if (typeof window.showNotification !== 'function') {
+                function showNotification(message, type = 'info') {
+                    // 创建通知元素
+                    const notification = document.createElement('div');
+                    
+                    // 设置样式和内容
+                    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full opacity-0`;
+                    
+                    if (type === 'success') {
+                        notification.classList.add('bg-green-500', 'text-white');
+                        notification.innerHTML = `<i class="fa fa-check-circle mr-2"></i>${message}`;
+                    } else if (type === 'error') {
+                        notification.classList.add('bg-red-500', 'text-white');
+                        notification.innerHTML = `<i class="fa fa-exclamation-circle mr-2"></i>${message}`;
+                    } else {
+                        notification.classList.add('bg-blue-500', 'text-white');
+                        notification.innerHTML = `<i class="fa fa-info-circle mr-2"></i>${message}`;
+                    }
+                    
+                    // 添加到页面
+                    document.body.appendChild(notification);
+                    
+                    // 显示通知
+                    setTimeout(() => {
+                        notification.classList.remove('translate-x-full', 'opacity-0');
+                    }, 10);
+                    
+                    // 自动关闭
+                    setTimeout(() => {
+                        notification.classList.add('translate-x-full', 'opacity-0');
+                        
+                        // 移除元素
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 300);
+                    }, 3000);
+                }
+            }
+            
+            // 输入框事件监听
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('blur', function() {
+                    validateField(this);
+                });
+                
+                // 只在用户输入时清除错误状态，不进行完整验证
+                input.addEventListener('input', function() {
+                    // 如果有错误信息，先清除
+                    const errorElement = this.nextElementSibling;
+                    if (errorElement && errorElement.classList.contains('text-red-500')) {
+                        errorElement.remove();
+                    }
+                    // 恢复输入框样式
+                    this.classList.remove('border-red-500', 'focus:ring-red-500');
+                    this.classList.add('border-gray-300', 'focus:ring-primary');
+                });
+            });
+        });
+    </script>
+    <!-- 数据可视化脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 活跃用户图表
+            const activeUsersCtx = document.getElementById('activeUsersChart').getContext('2d');
+            new Chart(activeUsersCtx, {
+                type: 'line',
+                data: {
+                    labels: ['', '', '', '', '', '', '', '', '', ''],
+                    datasets: [{
+                        data: [950, 1000, 1050, 980, 1100, 1150, 1180, 1200, 1234, 1250],
+                        borderColor: '#4A90E2',
+                        backgroundColor: 'rgba(74, 144, 226, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } },
+                    elements: { point: { radius: 0 } }
+                }
+            });
+            
+            // 今日咨询图表
+            const todayConsultCtx = document.getElementById('todayConsultChart').getContext('2d');
+            new Chart(todayConsultCtx, {
+                type: 'line',
+                data: {
+                    labels: ['', '', '', '', '', '', '', '', '', ''],
+                    datasets: [{
+                        data: [45, 50, 55, 60, 65, 68, 72, 75, 78, 80],
+                        borderColor: '#50C878',
+                        backgroundColor: 'rgba(80, 200, 120, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } },
+                    elements: { point: { radius: 0 } }
+                }
+            });
+            
+            // 心理健康问题分布图表
+            const mentalHealthCtx = document.getElementById('mentalHealthChart').getContext('2d');
+            new Chart(mentalHealthCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['焦虑', '抑郁', '压力', '其他'],
+                    datasets: [{
+                        data: [45, 30, 20, 5],
+                        backgroundColor: ['#4A90E2', '#50C878', '#9B59B6', '#F39C12'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    cutout: '70%'
+                }
+            });
+            
+            // 用户年龄分布图表
+            const ageDistributionCtx = document.getElementById('ageDistributionChart').getContext('2d');
+            new Chart(ageDistributionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['18-25', '26-35', '36-45', '46-55', '56+'],
+                    datasets: [{
+                        data: [35, 40, 15, 8, 2],
+                        backgroundColor: [
+                            'rgba(74, 144, 226, 0.7)',
+                            'rgba(80, 200, 120, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(243, 156, 18, 0.7)',
+                            'rgba(231, 76, 60, 0.7)'
+                        ],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { fontSize: 8 }
+                        },
+                        y: {
+                            grid: { display: true, color: 'rgba(0,0,0,0.05)' },
+                            ticks: { fontSize: 8 }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    
+
+</body>
+</html>
