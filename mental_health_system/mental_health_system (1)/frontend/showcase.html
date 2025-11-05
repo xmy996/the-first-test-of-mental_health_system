@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心社区 - 心理健康支持平台</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 统一的 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4A90E2',
+                        secondary: '#50C878',
+                        accent: '#FFB6C1',
+                        neutral: '#F5F5DC',
+                        dark: '#333333',
+                        light: '#F8F9FA'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .transition-all-300 {
+                transition: all 0.3s ease;
+            }
+            .feature-card {
+                @apply bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all-300;
+            }
+            .feature-icon {
+                @apply w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto text-primary text-2xl;
+            }
+            .btn-primary {
+                @apply px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300;
+            }
+            .btn-secondary {
+                @apply px-6 py-3 text-primary border border-primary rounded-md hover:bg-primary hover:text-white transition-all-300;
+            }
+        }
+    </style>
+<style>
+
+    /* 全局样式重置 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 全局颜色变量 */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background-color: var(--bg-primary);
+    }
+    
+    /* 统一按钮样式 */
+    button {
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        outline: none;
+    }
+    
+    /* 主按钮样式 - 注册按钮 */
+    .btn-primary {
+        background-color: var(--secondary-color);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #7c3aed;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+    }
+    
+    /* 次要按钮样式 - 登录按钮 */
+    .btn-secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        transform: translateY(-1px);
+    }
+    
+    /* 导航栏样式 */
+    nav {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .btn-primary,
+        .btn-secondary {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* 卡片样式 */
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+    }
+    
+    /* 输入框样式 */
+    input,
+    textarea,
+    select {
+        font-family: inherit;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+</style>
+</head>
+<body class="bg-light font-sans text-dark">
+<!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300 py-3">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <!-- Logo -->
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                <i class="fa fa-heart-o text-xl"></i>
+            </div>
+            <span class="text-xl font-bold text-primary tracking-wide">心社区</span>
+        </div>
+        
+        <!-- 桌面端导航 -->
+        <div class="hidden md:flex nav-links items-center space-x-1">
+            <a href="index.html" class="text-primary border-b-2 border-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center">
+                <i class="fa fa-home mr-2"></i>首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-list-alt mr-2"></i>心理测评
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-user-md mr-2"></i>咨询服务
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-users mr-2"></i>团体活动
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-music mr-2"></i>放松体验
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            
+            <!-- 更多服务下拉菜单 -->
+            <div class="relative" id="desktop-more-menu">
+                <button id="desktop-more-menu-button" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center gap-1 relative group">
+                    更多服务
+                    <i class="fa fa-angle-down transition-transform duration-300 group-hover:rotate-180"></i>
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </button>
+                <div id="desktop-more-dropdown" class="hidden absolute top-full left-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="healing_treehole.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-tree mr-2"></i>治愈树洞
+                    </a>
+                    <a href="sandbox_simulation_immersive.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-cubes mr-2"></i>沙盘模拟
+                    </a>
+                    <a href="mental_stories.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-book mr-2"></i>心理资源
+                    </a>
+                    <a href="mental_games.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-gamepad mr-2"></i>心理游戏
+                    </a>
+                                    <a href="psychology_experiments.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-flask mr-2"></i>心理实验
+                    </a>
+                    </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单按钮 -->
+        <div class="md:hidden">
+            <button id="menu-toggle" class="text-gray-700 focus:outline-none transition-transform duration-300 hover:rotate-90 p-2 rounded-md hover:bg-gray-100">
+                <i class="fa fa-bars text-xl"></i>
+                <span class="sr-only">打开菜单</span>
+            </button>
+        </div>
+        
+        <!-- 用户菜单 -->
+        <div id="user-menu" class="hidden md:flex items-center space-x-4">
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none group p-1 rounded-full hover:bg-white/30 transition-all duration-300 focus:ring-2 focus:ring-primary/50">
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="user-name" class="text-gray-700 group-hover:text-primary transition-colors"></span>
+                    <i class="fa fa-angle-down text-gray-500 group-hover:text-primary transition-transform duration-300 group-hover:rotate-180"></i>
+                </button>
+                <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="user_profile.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-user-circle w-4 mr-3 text-center"></i>
+                        <span>个人中心</span>
+                    </a>
+                    <a href="assessment_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-list-alt w-4 mr-3 text-center"></i>
+                        <span>测评记录</span>
+                    </a>
+                    <a href="booking_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-check-o w-4 mr-3 text-center"></i>
+                        <span>预约记录</span>
+                    </a>
+                    <a href="activity_registration.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-plus-o w-4 mr-3 text-center"></i>
+                        <span>活动报名</span>
+                    </a>
+                    <hr class="my-1 border-gray-200">
+                    <a href="#" id="logout-button" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-danger transition-all duration-200 flex items-center">
+                        <i class="fa fa-sign-out mr-3 w-4 text-center"></i>
+                        <span>退出登录</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 登录/注册按钮 -->
+        <div id="auth-buttons" class="hidden md:flex items-center space-x-3">
+            <button class="px-4 py-2 text-primary border-2 border-primary rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-medium shadow-sm hover:shadow transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='login.html'">
+                <i class="fa fa-sign-in mr-1 mr-1"></i>登录
+            </button>
+                    <button class="px-4 py-2 bg-gradient-to-r from-primary to-indigo-600 text-indigo-900 rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='register.html'">
+                <i class="fa fa-user-plus mr-1 mr-2"></i>注册
+            </button>
+                </div>
+                <div id="mobile-user-menu" class="py-2">
+                    <span id="mobile-user-name" class="text-gray-700 py-2">用户名</span>
+                    <a href="user_profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">个人中心</a>
+                    <a href="assessment_history.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">测评记录</a>
+                    <a href="booking_history.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">预约记录</a>
+                    <a href="activity_registration.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">活动报名</a>
+                    <a href="#" id="mobile-logout-button" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">退出登录</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="pt-24 pb-16">
+        <!-- 欢迎区 -->
+        <section class="py-16 bg-gradient-to-r from-blue-50 to-green-50">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-1/2 mb-8 md:mb-0">
+                        <h1 class="text-4xl md:text-5xl font-bold mb-6 text-primary">
+                            心社区功能展示
+                        </h1>
+                        <p class="text-xl mb-8 text-gray-700">
+                            探索我们完善的心理健康社区支持中心网站，体验统一的网站样式、完善的导航系统、
+                            管理员登录界面和用户个人中心等功能。
+                        </p>
+                        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                            <button id="demo-login" class="px-6 py-3 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300 text-lg font-medium">
+                                演示登录
+                            </button>
+                            <button id="view-all-features" class="px-6 py-3 text-primary border border-primary rounded-md hover:bg-primary hover:text-white transition-all-300 text-lg font-medium">
+                                查看所有功能
+                            </button>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 flex justify-center">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/40d64852770f46f8af7409de48de22e5~tplv-a9rns2rl98-image.image?rcl=202511021051458F2FB69365DFCE83C087&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764643954&x-signature=X4g03RVtksJbXiwOtKAUPwp6qQU%3D" alt="心理健康插图" class="w-full max-w-md animate-float">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能概览 -->
+        <section class="py-16">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12 text-primary">主要功能</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 统一网站样式 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa fa-paint-brush"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-4">统一网站样式</h3>
+                        <p class="text-gray-600 text-center mb-6">
+                            网站采用柔和的蓝绿色调为主，象征平静与希望，辅以温暖的米色和白色，
+                            营造舒适、专业的视觉体验。
+                        </p>
+                        <div class="text-center">
+                            <button class="view-feature px-4 py-2 text-primary hover:text-blue-700 font-medium inline-flex items-center" data-feature="style">
+                                查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 完善导航系统 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa fa-compass"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-4">完善导航系统</h3>
+                        <p class="text-gray-600 text-center mb-6">
+                            所有页面使用文件链接而非锚点链接，确保跳转逻辑正确，
+                            提供清晰的用户导航体验。
+                        </p>
+                        <div class="text-center">
+                            <button class="view-feature px-4 py-2 text-primary hover:text-blue-700 font-medium inline-flex items-center" data-feature="navigation">
+                                查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 用户认证系统 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa fa-user-circle"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-4">用户认证系统</h3>
+                        <p class="text-gray-600 text-center mb-6">
+                            实现真实的用户认证功能，支持不同用户登录，
+                            使用localStorage保持登录状态。
+                        </p>
+                        <div class="text-center">
+                            <button class="view-feature px-4 py-2 text-primary hover:text-blue-700 font-medium inline-flex items-center" data-feature="auth">
+                                查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 管理员登录界面 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa fa-lock"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-4">管理员登录界面</h3>
+                        <p class="text-gray-600 text-center mb-6">
+                            为管理员提供专门的登录入口和后台管理界面，
+                            实现对用户、测评、预约和活动的管理功能。
+                        </p>
+                        <div class="text-center">
+                            <button class="view-feature px-4 py-2 text-primary hover:text-blue-700 font-medium inline-flex items-center" data-feature="admin">
+                                查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 用户个人中心 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa fa-user"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-4">用户个人中心</h3>
+                        <p class="text-gray-600 text-center mb-6">
+                            提供个人概览、测评记录、预约记录和活动报名等功能，
+                            让用户可以方便地管理自己的心理健康服务。
+                        </p>
+                        <div class="text-center">
+                            <button class="view-feature px-4 py-2 text-primary hover:text-blue-700 font-medium inline-flex items-center" data-feature="profile">
+                                查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- AI助手功能 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa fa-robot"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-4">AI助手功能</h3>
+                        <p class="text-gray-600 text-center mb-6">
+                            网站右下角添加了AI助手功能，可以为用户提供即时的心理健康支持和建议，
+                            增强用户体验。
+                        </p>
+                        <div class="text-center">
+                            <button class="view-feature px-4 py-2 text-primary hover:text-blue-700 font-medium inline-flex items-center" data-feature="ai">
+                                查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能详情 -->
+        <section id="feature-details" class="py-16 bg-gray-50 hidden">
+            <div class="container mx-auto px-4">
+                <button id="back-to-features" class="mb-8 inline-flex items-center text-primary hover:text-blue-700">
+                    <i class="fa fa-arrow-left mr-2"></i> 返回功能列表
+                </button>
+                
+                <div id="feature-content">
+                    <!-- 功能详情内容将通过JavaScript动态加载 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能演示 -->
+        <section class="py-16">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12 text-primary">功能演示</h2>
+                
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold mb-6 text-primary">用户认证流程演示</h3>
+                        
+                        <div class="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
+                            <!-- 登录表单 -->
+                            <div class="md:w-1/2">
+                                <div class="bg-gray-50 rounded-lg p-6">
+                                    <h4 class="text-xl font-bold mb-4">登录演示</h4>
+                                    
+                                    <form id="demo-login-form">
+                                        <div class="mb-4">
+                                            <label for="demo-email" class="block text-gray-700 font-medium mb-2">邮箱</label>
+                                            <div class="relative">
+                                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                                    <i class="fa fa-envelope"></i>
+                                                </span>
+                                                <input type="email" id="demo-email" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" value="demo@example.com" readonly>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-6">
+                                            <label for="demo-password" class="block text-gray-700 font-medium mb-2">密码</label>
+                                            <div class="relative">
+                                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                                    <i class="fa fa-lock"></i>
+                                                </span>
+                                                <input type="password" id="demo-password" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" value="password" readonly>
+                                            </div>
+                                        </div>
+                                        
+                                        <button type="submit" class="w-full py-3 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300 text-lg font-medium">
+                                            演示登录
+                                        </button>
+                                    </form>
+                                    
+                                    <div class="mt-6 text-center">
+                                        <p class="text-gray-600">
+                                            或者使用管理员账号登录
+                                        </p>
+                                        <button id="admin-login" class="mt-2 px-4 py-2 text-primary border border-primary rounded-md hover:bg-primary hover:text-white transition-all-300">
+                                            管理员登录
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 登录结果 -->
+                            <div class="md:w-1/2">
+                                <div class="bg-gray-50 rounded-lg p-6 h-full">
+                                    <h4 class="text-xl font-bold mb-4">登录结果</h4>
+                                    
+                                    <div id="login-result" class="hidden">
+                                        <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+                                            <div class="flex">
+                                                <div class="flex-shrink-0">
+                                                    <i class="fa fa-check-circle text-green-500"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <p class="text-green-700">登录成功！</p>
+                                                    <p class="text-sm text-green-700" id="login-user-type">普通用户</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-6">
+                                            <h5 class="font-medium mb-2">登录状态</h5>
+                                            <p class="text-gray-700">您已成功登录，可以访问个人中心的各个功能页面。</p>
+                                        </div>
+                                        
+                                        <div class="mb-6">
+                                            <h5 class="font-medium mb-2">可访问功能</h5>
+                                            <ul class="list-disc list-inside space-y-2 text-gray-700" id="accessible-features">
+                                                <li>个人中心</li>
+                                                <li>测评记录</li>
+                                                <li>预约记录</li>
+                                                <li>活动报名</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="flex justify-between">
+                                            <button id="view-profile" class="px-4 py-2 text-primary border border-primary rounded-md hover:bg-primary hover:text-white transition-all-300">
+                                                查看个人中心
+                                            </button>
+                                            <button id="logout-demo" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-all-300">
+                                                退出登录
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="login-prompt" class="flex flex-col items-center justify-center h-full">
+                                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/8bbb3bc738e544a484b5e1b79123fb4c~tplv-a9rns2rl98-image.image?rcl=202511021051458F2FB69365DFCE83C087&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764643957&x-signature=A%2FLmu1qHpOR1GwtCGx06vHtvRME%3D" alt="登录提示" class="w-32 h-32 mb-4">
+                                        <p class="text-gray-600 text-center">
+                                            点击左侧的"演示登录"按钮<br>体验用户认证流程
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 优化亮点 -->
+        <section class="py-16 bg-gradient-to-r from-blue-50 to-green-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12 text-primary">优化亮点</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 优化点1 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fa fa-code text-primary text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-3">代码结构优化</h3>
+                                <p class="text-gray-700">
+                                    将通用功能模块提取到common.js中，实现代码复用，包括用户认证、导航栏显示和AI助手等功能，
+                                    使代码结构更加清晰，便于维护。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 优化点2 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fa fa-mobile text-secondary text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-3">响应式设计优化</h3>
+                                <p class="text-gray-700">
+                                    优化了移动端菜单和导航系统，确保在不同设备上都能提供良好的用户体验，
+                                    包括移动端专用的菜单按钮和下拉菜单。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 优化点3 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fa fa-user-circle text-accent text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-3">用户体验优化</h3>
+                                <p class="text-gray-700">
+                                    完善了用户认证流程，实现了真实的用户登录功能，使用localStorage保持登录状态，
+                                    用户登录后可以访问个人中心的各个功能页面。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 优化点4 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fa fa-robot text-yellow-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-3">AI助手功能</h3>
+                                <p class="text-gray-700">
+                                    添加了AI助手功能，位于页面右下角，可以为用户提供即时的心理健康支持和建议，
+                                    增强用户体验和互动性。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 后续优化计划 -->
+        <section class="py-16">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12 text-primary">后续优化计划</h2>
+                
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- 计划1 -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                                <i class="fa fa-database text-primary text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">后端功能完善</h3>
+                            <p class="text-gray-700">
+                                完善后端API接口，实现真实的数据存储和交互，包括用户数据、测评记录、预约信息等，
+                                确保系统功能的完整性和实用性。
+                            </p>
+                        </div>
+                        
+                        <!-- 计划2 -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                                <i class="fa fa-line-chart text-secondary text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">数据分析功能</h3>
+                            <p class="text-gray-700">
+                                增强数据分析功能，提供更详细的用户心理健康报告和趋势分析，
+                                帮助用户更好地了解自己的心理状态变化。
+                            </p>
+                        </div>
+                        
+                        <!-- 计划3 -->
+                        <div class="border border-gray-200 rounded-lg p-6">
+                            <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-4">
+                                <i class="fa fa-comments text-accent text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">在线咨询功能</h3>
+                            <p class="text-gray-700">
+                                实现在线咨询功能，支持用户与心理咨询师进行实时交流，
+                                提供更便捷的心理健康服务。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <!-- 统一页脚组件 -->
+<footer class="bg-[#1e293b] text-white py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <!-- 左侧Logo和文字 -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                    <i class="fa fa-heart"></i>
+                </div>
+                <span class="text-white">心社区</span>
+            </div>
+            
+            <!-- 中间版权信息 -->
+            <div class="text-center">
+                <p class="text-white">© 2025 心社区心理健康支持中心. 保留所有权利.</p>
+            </div>
+            
+            <!-- 右侧图标 -->
+            <div class="flex space-x-4">
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-bell"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- AI助手 -->
+    <div id="ai-assistant" class="fixed bottom-6 right-6 z-40">
+        <button id="ai-toggle" class="w-16 h-16 bg-primary rounded-full shadow-lg flex items-center justify-center text-white hover:bg-blue-600 transition-all-300">
+            <i class="fa fa-comment-dots text-2xl"></i>
+        </button>
+        
+        <div id="ai-chat" class="hidden absolute bottom-20 right-0 w-80 bg-white rounded-xl shadow-2xl overflow-hidden">
+            <div class="bg-primary text-white p-4 flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fa fa-robot mr-2"></i>
+                    <span class="font-bold">AI心理助手</span>
+                </div>
+                <button id="ai-close" class="text-white hover:text-gray-200 focus:outline-none">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="ai-messages" class="p-4 h-80 overflow-y-auto bg-gray-50">
+                <div class="flex mb-4">
+                    <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0">
+                        <i class="fa fa-robot"></i>
+                    </div>
+                    <div class="ml-2 bg-white p-3 rounded-lg shadow max-w-[80%]">
+                        <p>您好！我是AI心理助手，很高兴为您提供心理健康支持和建议。请问有什么可以帮助您的吗？</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t">
+                <div class="flex">
+                    <input type="text" id="ai-input" class="flex-grow border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="请输入您的问题...">
+                    <button id="ai-send" class="bg-primary text-white px-4 py-2 rounded-r-md hover:bg-blue-600 transition-all-300">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="mt-2 text-xs text-gray-500 text-center">
+                    AI助手仅提供参考，如有紧急情况请联系专业人士
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 用户菜单切换
+        document.getElementById('user-menu-button').addEventListener('click', function() {
+            const userDropdown = document.getElementById('user-dropdown');
+            userDropdown.classList.toggle('hidden');
+        });
+        
+        // 点击页面其他地方关闭用户菜单
+        document.addEventListener('click', function(e) {
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userDropdown = document.getElementById('user-dropdown');
+            
+            if (!userMenuButton.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+        
+        // AI助手切换
+        document.getElementById('ai-toggle').addEventListener('click', function() {
+            const aiChat = document.getElementById('ai-chat');
+            aiChat.classList.toggle('hidden');
+        });
+        
+        // 关闭AI助手
+        document.getElementById('ai-close').addEventListener('click', function() {
+            const aiChat = document.getElementById('ai-chat');
+            aiChat.classList.add('hidden');
+        });
+        
+        // AI助手发送消息
+        document.getElementById('ai-send').addEventListener('click', sendAiMessage);
+        document.getElementById('ai-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendAiMessage();
+            }
+        });
+        
+        function sendAiMessage() {
+            const aiInput = document.getElementById('ai-input');
+            const message = aiInput.value.trim();
+            
+            if (message) {
+                // 添加用户消息
+                const aiMessages = document.getElementById('ai-messages');
+                aiMessages.innerHTML += `
+                    <div class="flex justify-end mb-4">
+                        <div class="mr-2 bg-primary p-3 rounded-lg shadow text-white max-w-[80%]">
+                            <p>${message}</p>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 flex-shrink-0">
+                            <i class="fa fa-user"></i>
+                        </div>
+                    </div>
+                `;
+                
+                // 清空输入框
+                aiInput.value = '';
+                
+                // 滚动到底部
+                aiMessages.scrollTop = aiMessages.scrollHeight;
+                
+                // 模拟AI回复
+                setTimeout(() => {
+                    let response = '';
+                    
+                    if (message.includes('你好') || message.includes('您好') || message.includes('hi') || message.includes('hello')) {
+                        response = '您好！很高兴为您提供帮助。请问您最近的心理状态如何？';
+                    } else if (message.includes('压力') || message.includes('紧张')) {
+                        response = '面对压力时，您可以尝试深呼吸、冥想或进行适量的体育锻炼来缓解。如果压力持续存在，建议您预约我们的心理咨询师进行专业指导。';
+                    } else if (message.includes('焦虑') || message.includes('担心')) {
+                        response = '焦虑是很常见的情绪反应。您可以尝试一些放松技巧，如深呼吸、渐进性肌肉放松等。如果焦虑感影响到您的日常生活，建议您进行专业的心理测评或咨询。';
+                    } else if (message.includes('抑郁') || message.includes('情绪低落')) {
+                        response = '感到情绪低落时，可以尝试与亲友交流、参与社交活动或进行自己喜欢的事情。如果情绪低落持续时间较长，建议您寻求专业的心理帮助。';
+                    } else if (message.includes('测评') || message.includes('测试')) {
+                        response = '我们提供多种专业的心理测评工具，包括情绪健康测评、心理健康测评和压力水平测评等。您可以在首页点击"开始心理测评"按钮进行体验。';
+                    } else if (message.includes('咨询') || message.includes('预约')) {
+                        response = '我们有专业的心理咨询师团队，可以为您提供一对一的心理咨询服务。您可以在"咨询服务"页面查看咨询师列表并进行预约。';
+                    } else {
+                        response = '感谢您的分享。作为AI心理助手，我可以为您提供一些心理健康方面的建议和支持。您可以尝试使用我们的心理测评工具，或者预约专业的心理咨询师进行交流。';
+                    }
+                    
+                    aiMessages.innerHTML += `
+                        <div class="flex mb-4">
+                            <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0">
+                                <i class="fa fa-robot"></i>
+                            </div>
+                            <div class="ml-2 bg-white p-3 rounded-lg shadow max-w-[80%]">
+                                <p>${response}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 滚动到底部
+                    aiMessages.scrollTop = aiMessages.scrollHeight;
+                }, 1000);
+            }
+        }
+        
+        // 功能详情展示
+        const featureButtons = document.querySelectorAll('.view-feature');
+        const featureDetails = document.getElementById('feature-details');
+        const featureContent = document.getElementById('feature-content');
+        const backToFeatures = document.getElementById('back-to-features');
+        
+        featureButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const feature = this.getAttribute('data-feature');
+                let content = '';
+                
+                switch(feature) {
+                    case 'style':
+                        content = `
+                            <h3 class="text-2xl font-bold mb-6 text-primary">统一网站样式</h3>
+                            <div class="bg-white rounded-lg p-6 mb-8">
+                                <h4 class="text-xl font-bold mb-4">设计理念</h4>
+                                <p class="text-gray-700 mb-4">
+                                    网站采用柔和的蓝绿色调为主，象征平静与希望，辅以温暖的米色和白色，营造舒适、专业的视觉体验。
+                                    设计风格简洁大方，注重用户体验和可读性。
+                                </p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div class="bg-blue-50 p-4 rounded-lg">
+                                        <h5 class="font-medium mb-2">主色调</h5>
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-primary rounded-full mr-2"></div>
+                                            <span>#4A90E2</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-green-50 p-4 rounded-lg">
+                                        <h5 class="font-medium mb-2">辅助色</h5>
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-secondary rounded-full mr-2"></div>
+                                            <span>#50C878</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-pink-50 p-4 rounded-lg">
+                                        <h5 class="font-medium mb-2">强调色</h5>
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-accent rounded-full mr-2"></div>
+                                            <span>#FFB6C1</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-yellow-50 p-4 rounded-lg">
+                                        <h5 class="font-medium mb-2">中性色</h5>
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-neutral rounded-full mr-2"></div>
+                                            <span>#F5F5DC</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-6">
+                                <h4 class="text-xl font-bold mb-4">样式统一</h4>
+                                <p class="text-gray-700 mb-4">
+                                    所有页面使用统一的样式和组件，包括按钮、卡片、表单等，确保网站整体风格一致。
+                                    使用Tailwind CSS实现响应式设计，确保在不同设备上都能提供良好的用户体验。
+                                </p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="border border-gray-200 rounded-lg p-4 text-center">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <i class="fa fa-desktop text-primary text-xl"></i>
+                                        </div>
+                                        <h5 class="font-medium">桌面端</h5>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4 text-center">
+                                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <i class="fa fa-tablet text-secondary text-xl"></i>
+                                        </div>
+                                        <h5 class="font-medium">平板端</h5>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4 text-center">
+                                        <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <i class="fa fa-mobile text-accent text-xl"></i>
+                                        </div>
+                                        <h5 class="font-medium">移动端</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'navigation':
+                        content = `
+                            <h3 class="text-2xl font-bold mb-6 text-primary">完善导航系统</h3>
+                            <div class="bg-white rounded-lg p-6 mb-8">
+                                <h4 class="text-xl font-bold mb-4">导航结构</h4>
+                                <p class="text-gray-700 mb-4">
+                                    网站采用清晰的导航结构，包括主导航栏和移动端菜单，确保用户可以轻松找到所需的功能和信息。
+                                </p>
+                                <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                                    <h5 class="font-medium mb-2">主导航菜单</h5>
+                                    <ul class="list-disc list-inside space-y-1 text-gray-700">
+                                        <li>首页</li>
+                                        <li>心理测评</li>
+                                        <li>咨询服务</li>
+                                        <li>团体活动</li>
+                                        <li>放松体验</li>
+                                    </ul>
+                                </div>
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <h5 class="font-medium mb-2">用户菜单</h5>
+                                    <ul class="list-disc list-inside space-y-1 text-gray-700">
+                                        <li>个人中心</li>
+                                        <li>测评记录</li>
+                                        <li>预约记录</li>
+                                        <li>活动报名</li>
+                                        <li>退出登录</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-6">
+                                <h4 class="text-xl font-bold mb-4">链接优化</h4>
+                                <p class="text-gray-700 mb-4">
+                                    所有页面使用文件链接而非锚点链接，确保跳转逻辑正确，提供清晰的用户导航体验。
+                                    链接使用相对路径，便于网站的迁移和维护。
+                                </p>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h5 class="font-medium mb-2">链接示例</h5>
+                                    <pre class="text-sm text-gray-700 bg-white p-3 rounded border border-gray-200 overflow-x-auto">
+&lt;a href="index.html" class="text-primary hover:text-blue-700"&gt;首页&lt;/a&gt;
+&lt;a href="assessment_list.html" class="text-gray-700 hover:text-primary"&gt;心理测评&lt;/a&gt;
+&lt;a href="consultant_list.html" class="text-gray-700 hover:text-primary"&gt;咨询服务&lt;/a&gt;</pre>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'auth':
+                        content = `
+                            <h3 class="text-2xl font-bold mb-6 text-primary">用户认证系统</h3>
+                            <div class="bg-white rounded-lg p-6 mb-8">
+                                <h4 class="text-xl font-bold mb-4">认证流程</h4>
+                                <p class="text-gray-700 mb-4">
+                                    实现真实的用户认证功能，支持不同用户登录，使用localStorage保持登录状态。
+                                </p>
+                                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-6">
+                                    <div class="flex-1 bg-blue-50 p-4 rounded-lg text-center">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <i class="fa fa-user-plus text-primary text-xl"></i>
+                                        </div>
+                                        <h5 class="font-medium mb-1">用户注册</h5>
+                                        <p class="text-sm text-gray-600">创建新用户账号</p>
+                                    </div>
+                                    <div class="hidden md:flex items-center justify-center">
+                                        <i class="fa fa-arrow-right text-gray-400"></i>
+                                    </div>
+                                    <div class="md:hidden flex items-center justify-center">
+                                        <i class="fa fa-arrow-down text-gray-400"></i>
+                                    </div>
+                                    <div class="flex-1 bg-green-50 p-4 rounded-lg text-center">
+                                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <i class="fa fa-sign-in text-secondary text-xl"></i>
+                                        </div>
+                                        <h5 class="font-medium mb-1">用户登录</h5>
+                                        <p class="text-sm text-gray-600">验证用户身份</p>
+                                    </div>
+                                    <div class="hidden md:flex items-center justify-center">
+                                        <i class="fa fa-arrow-right text-gray-400"></i>
+                                    </div>
+                                    <div class="md:hidden flex items-center justify-center">
+                                        <i class="fa fa-arrow-down text-gray-400"></i>
+                                    </div>
+                                    <div class="flex-1 bg-pink-50 p-4 rounded-lg text-center">
+                                        <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <i class="fa fa-check-circle text-accent text-xl"></i>
+                                        </div>
+                                        <h5 class="font-medium mb-1">访问资源</h5>
+                                        <p class="text-sm text-gray-600">访问个人中心等功能</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-6">
+                                <h4 class="text-xl font-bold mb-4">登录状态管理</h4>
+                                <p class="text-gray-700 mb-4">
+                                    使用localStorage存储用户登录状态，用户登录后可以访问个人中心的各个功能页面。
+                                    登录状态在页面刷新后仍然保持，直到用户主动退出登录。
+                                </p>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h5 class="font-medium mb-2">登录状态示例</h5>
+                                    <pre class="text-sm text-gray-700 bg-white p-3 rounded border border-gray-200 overflow-x-auto">
+// 登录成功后保存用户信息
+localStorage.setItem('user', JSON.stringify({
+    id: '123',
+    name: '用户名',
+    email: 'user@example.com',
+    role: 'user'
+}));
+
+// 检查用户是否登录
+function checkLogin() {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+}
+
+// 退出登录
+function logout() {
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+}</pre>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'admin':
+                        content = `
+                            <h3 class="text-2xl font-bold mb-6 text-primary">管理员登录界面</h3>
+                            <div class="bg-white rounded-lg p-6 mb-8">
+                                <h4 class="text-xl font-bold mb-4">管理员功能</h4>
+                                <p class="text-gray-700 mb-4">
+                                    为管理员提供专门的登录入口和后台管理界面，实现对用户、测评、预约和活动的管理功能。
+                                </p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-users text-primary mr-2"></i>
+                                            <h5 class="font-medium">用户管理</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            查看和管理所有用户账号，包括用户信息、登录状态等。
+                                        </p>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-file-text text-secondary mr-2"></i>
+                                            <h5 class="font-medium">测评管理</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            创建和管理心理测评问卷，查看用户测评结果。
+                                        </p>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-calendar text-accent mr-2"></i>
+                                            <h5 class="font-medium">预约管理</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            查看和管理用户的咨询预约，安排咨询师工作时间。
+                                        </p>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-calendar-check-o text-yellow-600 mr-2"></i>
+                                            <h5 class="font-medium">活动管理</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            创建和管理团体活动，查看活动报名情况。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-6">
+                                <h4 class="text-xl font-bold mb-4">管理员界面</h4>
+                                <p class="text-gray-700 mb-4">
+                                    管理员登录后进入专门的管理后台，提供直观的数据仪表盘和管理功能。
+                                </p>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h5 class="font-medium mb-2">管理员仪表盘功能</h5>
+                                    <ul class="list-disc list-inside space-y-1 text-gray-700">
+                                        <li>数据概览：显示用户数量、测评数量、预约数量等关键指标</li>
+                                        <li>用户管理：查看和管理所有用户账号</li>
+                                        <li>测评管理：创建和管理心理测评问卷</li>
+                                        <li>预约管理：查看和管理用户的咨询预约</li>
+                                        <li>活动管理：创建和管理团体活动</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'profile':
+                        content = `
+                            <h3 class="text-2xl font-bold mb-6 text-primary">用户个人中心</h3>
+                            <div class="bg-white rounded-lg p-6 mb-8">
+                                <h4 class="text-xl font-bold mb-4">个人中心功能</h4>
+                                <p class="text-gray-700 mb-4">
+                                    提供个人概览、测评记录、预约记录和活动报名等功能，让用户可以方便地管理自己的心理健康服务。
+                                </p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-user-circle text-primary mr-2"></i>
+                                            <h5 class="font-medium">个人概览</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            查看个人基本信息、心理健康状态概览等。
+                                        </p>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-file-text text-secondary mr-2"></i>
+                                            <h5 class="font-medium">测评记录</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            查看历史测评记录，跟踪心理健康变化趋势。
+                                        </p>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-calendar text-accent mr-2"></i>
+                                            <h5 class="font-medium">预约记录</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            查看和管理咨询预约，包括预约详情、取消预约等。
+                                        </p>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-calendar-check-o text-yellow-600 mr-2"></i>
+                                            <h5 class="font-medium">活动报名</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            查看和管理团体活动报名，包括活动详情、取消报名等。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-6">
+                                <h4 class="text-xl font-bold mb-4">数据可视化</h4>
+                                <p class="text-gray-700 mb-4">
+                                    个人中心提供丰富的数据可视化功能，帮助用户直观地了解自己的心理健康状态和变化趋势。
+                                </p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium mb-4 text-center">心理健康趋势</h5>
+                                        <canvas id="mentalHealthChart" height="200"></canvas>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium mb-4 text-center">情绪分布</h5>
+                                        <canvas id="emotionChart" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'ai':
+                        content = `
+                            <h3 class="text-2xl font-bold mb-6 text-primary">AI助手功能</h3>
+                            <div class="bg-white rounded-lg p-6 mb-8">
+                                <h4 class="text-xl font-bold mb-4">AI助手介绍</h4>
+                                <p class="text-gray-700 mb-4">
+                                    网站右下角添加了AI助手功能，可以为用户提供即时的心理健康支持和建议，增强用户体验和互动性。
+                                </p>
+                                <div class="flex justify-center mb-6">
+                                    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/8bbb3bc738e544a484b5e1b79123fb4c~tplv-a9rns2rl98-image.image?rcl=202511021051458F2FB69365DFCE83C087&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1764643957&x-signature=A%2FLmu1qHpOR1GwtCGx06vHtvRME%3D" alt="AI助手" class="w-64">
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-6">
+                                <h4 class="text-xl font-bold mb-4">AI助手功能</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-comments text-primary mr-2"></i>
+                                            <h5 class="font-medium">即时对话</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            用户可以随时与AI助手进行对话，获取心理健康方面的支持和建议。
+                                        </p>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-info-circle text-secondary mr-2"></i>
+                                            <h5 class="font-medium">信息查询</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            用户可以查询心理健康知识、服务信息等内容。
+                                        </p>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-lightbulb-o text-accent mr-2"></i>
+                                            <h5 class="font-medium">个性化建议</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            根据用户的问题和需求，提供个性化的心理健康建议。
+                                        </p>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fa fa-link text-yellow-600 mr-2"></i>
+                                            <h5 class="font-medium">服务引导</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">
+                                            引导用户使用网站的其他功能，如心理测评、咨询服务等。
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h5 class="font-medium mb-2">使用场景</h5>
+                                    <ul class="list-disc list-inside space-y-1 text-gray-700">
+                                        <li>用户有轻微心理困扰时，提供即时支持和建议</li>
+                                        <li>用户想了解心理健康知识时，提供专业信息</li>
+                                        <li>用户不确定需要哪种服务时，提供引导和推荐</li>
+                                        <li>用户需要放松技巧时，提供简单易行的方法</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                }
+                
+                featureContent.innerHTML = content;
+                featureDetails.classList.remove('hidden');
+                window.scrollTo({ top: featureDetails.offsetTop - 80, behavior: 'smooth' });
+                
+                // 初始化图表
+                if (feature === 'profile') {
+                    // 心理健康趋势图表
+                    const mentalHealthCtx = document.getElementById('mentalHealthChart').getContext('2d');
+                    new Chart(mentalHealthCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                            datasets: [{
+                                label: '心理健康指数',
+                                data: [75, 72, 68, 70, 74, 78],
+                                borderColor: '#4A90E2',
+                                backgroundColor: 'rgba(74, 144, 226, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    min: 60,
+                                    max: 100
+                                }
+                            }
+                        }
+                    });
+                    
+                    // 情绪分布图表
+                    const emotionCtx = document.getElementById('emotionChart').getContext('2d');
+                    new Chart(emotionCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['积极', '中性', '消极'],
+                            datasets: [{
+                                data: [65, 25, 10],
+                                backgroundColor: [
+                                    '#50C878',
+                                    '#4A90E2',
+                                    '#FFB6C1'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        
+        backToFeatures.addEventListener('click', function() {
+            featureDetails.classList.add('hidden');
+            window.scrollTo({ top: document.querySelector('section:nth-of-type(2)').offsetTop - 80, behavior: 'smooth' });
+        });
+        
+        // 演示登录功能
+        document.getElementById('demo-login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 模拟登录成功
+            const user = {
+                id: '123',
+                name: '张小明',
+                email: 'demo@example.com',
+                role: 'user'
+            };
+            
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            // 更新导航栏
+            updateNavigation();
+            
+            // 显示登录结果
+            document.getElementById('login-prompt').classList.add('hidden');
+            document.getElementById('login-result').classList.remove('hidden');
+            document.getElementById('login-user-type').textContent = '普通用户';
+            
+            // 更新可访问功能
+            const accessibleFeatures = document.getElementById('accessible-features');
+            accessibleFeatures.innerHTML = `
+                <li>个人中心</li>
+                <li>测评记录</li>
+                <li>预约记录</li>
+                <li>活动报名</li>
+            `;
+        });
+        
+        // 管理员登录
+        document.getElementById('admin-login').addEventListener('click', function() {
+            // 模拟管理员登录
+            const admin = {
+                id: '456',
+                name: '管理员',
+                email: 'admin@example.com',
+                role: 'admin'
+            };
+            
+            localStorage.setItem('user', JSON.stringify(admin));
+            
+            // 更新导航栏
+            updateNavigation();
+            
+            // 显示登录结果
+            document.getElementById('login-prompt').classList.add('hidden');
+            document.getElementById('login-result').classList.remove('hidden');
+            document.getElementById('login-user-type').textContent = '管理员';
+            
+            // 更新可访问功能
+            const accessibleFeatures = document.getElementById('accessible-features');
+            accessibleFeatures.innerHTML = `
+                <li>管理员仪表盘</li>
+                <li>用户管理</li>
+                <li>测评管理</li>
+                <li>预约管理</li>
+                <li>活动管理</li>
+            `;
+        });
+        
+        // 退出登录
+        document.getElementById('logout-demo').addEventListener('click', function() {
+            localStorage.removeItem('user');
+            
+            // 更新导航栏
+            updateNavigation();
+            
+            // 显示登录提示
+            document.getElementById('login-result').classList.add('hidden');
+            document.getElementById('login-prompt').classList.remove('hidden');
+        });
+        
+        // 查看个人中心
+        document.getElementById('view-profile').addEventListener('click', function() {
+            window.location.href = 'user_profile.html';
+        });
+        
+        // 演示登录按钮
+        document.getElementById('demo-login').addEventListener('click', function() {
+            // 模拟登录成功
+            const user = {
+                id: '123',
+                name: '张小明',
+                email: 'demo@example.com',
+                role: 'user'
+            };
+            
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            // 更新导航栏
+            updateNavigation();
+            
+            // 显示提示
+            alert('登录成功！您可以访问个人中心查看更多功能。');
+        });
+        
+        // 查看所有功能按钮
+        document.getElementById('view-all-features').addEventListener('click', function() {
+            window.scrollTo({ top: document.querySelector('section:nth-of-type(2)').offsetTop - 80, behavior: 'smooth' });
+        });
+        
+        // 更新导航栏
+        function updateNavigation() {
+            const user = localStorage.getItem('user');
+            
+            if (user) {
+                const userData = JSON.parse(user);
+                
+                // 显示用户菜单，隐藏登录/注册按钮
+                document.getElementById('auth-buttons').classList.add('hidden');
+                document.getElementById('user-menu').classList.remove('hidden');
+                document.getElementById('mobile-auth-buttons').classList.add('hidden');
+                document.getElementById('mobile-user-menu').classList.remove('hidden');
+                
+                // 更新用户名
+                document.getElementById('user-name').textContent = userData.name;
+                document.getElementById('mobile-user-name').textContent = userData.name;
+            } else {
+                // 显示登录/注册按钮，隐藏用户菜单
+                document.getElementById('auth-buttons').classList.remove('hidden');
+                document.getElementById('user-menu').classList.add('hidden');
+                document.getElementById('mobile-auth-buttons').classList.remove('hidden');
+                document.getElementById('mobile-user-menu').classList.add('hidden');
+            }
+        }
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNavigation();
+            
+            // 退出登录按钮
+            document.getElementById('logout-button').addEventListenerEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('user');
+                updateNavigation();
+                window.location.href = 'index.html';
+            });
+            
+            document.getElementById('mobile-logout-button').addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('user');
+                updateNavigation();
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>

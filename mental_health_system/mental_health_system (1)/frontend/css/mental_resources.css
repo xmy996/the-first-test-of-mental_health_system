@@ -1,0 +1,249 @@
+/* 心理资源页面样式 */
+
+/* 板块头部样式 */
+section[data-section] {
+    transition: all 0.5s ease-in-out;
+}
+
+section[data-section] .w-12.h-12 {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+section[data-section] h2 {
+    background: linear-gradient(90deg, #4361ee, #7209b7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    position: relative;
+    display: inline-block;
+}
+
+section[data-section] h2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #4361ee, #7209b7);
+    border-radius: 3px;
+}
+
+/* 各板块特定颜色 */
+section[data-section="stories"] .w-12.h-12 {
+    background-color: rgba(67, 97, 238, 0.15);
+}
+
+section[data-section="videos"] .w-12.h-12 {
+    background-color: rgba(59, 130, 246, 0.15);
+}
+
+section[data-section="books"] .w-12.h-12 {
+    background-color: rgba(16, 185, 129, 0.15);
+}
+
+section[data-section="articles"] .w-12.h-12 {
+    background-color: rgba(139, 92, 246, 0.15);
+}
+
+/* 卡片通用样式 */
+.resource-card {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+
+.resource-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px) scale(1.02);
+}
+
+.resource-card:hover::before {
+    opacity: 1;
+}
+
+/* 分类按钮样式 */
+.story-category-btn,
+.video-category-btn,
+.book-category-btn,
+.article-category-btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.story-category-btn::after,
+.video-category-btn::after,
+.book-category-btn::after,
+.article-category-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    z-index: -1;
+}
+
+.story-category-btn:hover::after,
+.video-category-btn:hover::after,
+.book-category-btn:hover::after,
+.article-category-btn:hover::after {
+    height: 100%;
+}
+
+/* 视频卡片特定样式 */
+.video-card .w-16.h-16 {
+    transform: scale(1);
+    transition: all 0.3s ease;
+}
+
+.video-card:hover .w-16.h-16 {
+    transform: scale(1.1);
+}
+
+/* 书籍卡片特定样式 */
+.book-card .h-64 {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+}
+
+.book-card img {
+    transition: transform 0.5s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.book-card:hover img {
+    transform: scale(1.05) translateY(-5px);
+}
+
+/* 查看更多按钮样式 */
+section[data-section] .text-center button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 1;
+}
+
+section[data-section] .text-center button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s ease;
+    z-index: -1;
+}
+
+section[data-section] .text-center button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+section[data-section] .text-center button:hover::before {
+    left: 100%;
+}
+
+/* 板块切换按钮样式 */
+.section-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    z-index: 1;
+}
+
+.section-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: all 0.6s ease;
+    z-index: -1;
+}
+
+.section-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.section-btn:hover::before {
+    left: 100%;
+}
+
+/* 标签样式 */
+span.bg-blue-500, span.bg-purple-500, span.bg-green-500, span.bg-amber-500 {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    transition: transform 0.3s ease;
+}
+
+.resource-card:hover span.bg-blue-500,
+.resource-card:hover span.bg-purple-500,
+.resource-card:hover span.bg-green-500,
+.resource-card:hover span.bg-amber-500 {
+    transform: scale(1.1);
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in.slide-up {
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    section[data-section] .mb-8 {
+        margin-left: 1rem;
+    }
+    
+    section[data-section] .ml-16 {
+        margin-left: 4rem;
+    }
+    
+    .section-btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .resource-card {
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* 加载动画 */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}

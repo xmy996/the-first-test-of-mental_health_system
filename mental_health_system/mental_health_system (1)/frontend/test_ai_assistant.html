@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心社区 - 心理健康支持平台</title>
+    <script src="ai-assistant.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+
+    /* 全局样式重置 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 全局颜色变量 */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background-color: var(--bg-primary);
+    }
+    
+    /* 统一按钮样式 */
+    button {
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        outline: none;
+    }
+    
+    /* 主按钮样式 - 注册按钮 */
+    .btn-primary {
+        background-color: var(--secondary-color);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #7c3aed;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+    }
+    
+    /* 次要按钮样式 - 登录按钮 */
+    .btn-secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        transform: translateY(-1px);
+    }
+    
+    /* 导航栏样式 */
+    nav {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .btn-primary,
+        .btn-secondary {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* 卡片样式 */
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+    }
+    
+    /* 输入框样式 */
+    input,
+    textarea,
+    select {
+        font-family: inherit;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+</style>
+</head>
+<body>
+<!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<!-- 统一导航栏组件 -->
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300 py-3">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <!-- Logo -->
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                <i class="fa fa-heart-o text-xl"></i>
+            </div>
+            <span class="text-xl font-bold text-primary tracking-wide">心社区</span>
+        </div>
+        
+        <!-- 桌面端导航 -->
+        <div class="hidden md:flex nav-links items-center space-x-1">
+            <a href="index.html" class="text-primary border-b-2 border-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center">
+                <i class="fa fa-home mr-2"></i>首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-list-alt mr-2"></i>心理测评
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-user-md mr-2"></i>咨询服务
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-users mr-2"></i>团体活动
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 relative group flex items-center">
+                <i class="fa fa-music mr-2"></i>放松体验
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            
+            <!-- 更多服务下拉菜单 -->
+            <div class="relative" id="desktop-more-menu">
+                <button id="desktop-more-menu-button" class="text-gray-700 hover:text-primary transition-all duration-300 font-medium py-1 px-3 hover:scale-105 flex items-center gap-1 relative group">
+                    更多服务
+                    <i class="fa fa-angle-down transition-transform duration-300 group-hover:rotate-180"></i>
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </button>
+                <div id="desktop-more-dropdown" class="hidden absolute top-full left-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="healing_treehole.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-tree mr-2"></i>治愈树洞
+                    </a>
+                    <a href="sandbox_simulation_immersive.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-cubes mr-2"></i>沙盘模拟
+                    </a>
+                    <a href="mental_stories.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-book mr-2"></i>心理资源
+                    </a>
+                    <a href="mental_games.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-gamepad mr-2"></i>心理游戏
+                    </a>
+                                    <a href="psychology_experiments.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                        <i class="fa fa-flask mr-2"></i>心理实验
+                    </a>
+                    </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单按钮 -->
+        <div class="md:hidden">
+            <button id="menu-toggle" class="text-gray-700 focus:outline-none transition-transform duration-300 hover:rotate-90 p-2 rounded-md hover:bg-gray-100">
+                <i class="fa fa-bars text-xl"></i>
+                <span class="sr-only">打开菜单</span>
+            </button>
+        </div>
+        
+        <!-- 用户菜单 -->
+        <div id="user-menu" class="hidden md:flex items-center space-x-4">
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none group p-1 rounded-full hover:bg-white/30 transition-all duration-300 focus:ring-2 focus:ring-primary/50">
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="user-name" class="text-gray-700 group-hover:text-primary transition-colors"></span>
+                    <i class="fa fa-angle-down text-gray-500 group-hover:text-primary transition-transform duration-300 group-hover:rotate-180"></i>
+                </button>
+                <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2 animate-fade-in transform origin-top-right">
+                    <a href="user_profile.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-user-circle w-4 mr-3 text-center"></i>
+                        <span>个人中心</span>
+                    </a>
+                    <a href="assessment_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-list-alt w-4 mr-3 text-center"></i>
+                        <span>测评记录</span>
+                    </a>
+                    <a href="booking_history.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-check-o w-4 mr-3 text-center"></i>
+                        <span>预约记录</span>
+                    </a>
+                    <a href="activity_registration.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all duration-200 flex items-center">
+                        <i class="fa fa-calendar-plus-o w-4 mr-3 text-center"></i>
+                        <span>活动报名</span>
+                    </a>
+                    <hr class="my-1 border-gray-200">
+                    <a href="#" id="logout-button" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-danger transition-all duration-200 flex items-center">
+                        <i class="fa fa-sign-out mr-3 w-4 text-center"></i>
+                        <span>退出登录</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 登录/注册按钮 -->
+        <div id="auth-buttons" class="hidden md:flex items-center space-x-3">
+            <button class="px-4 py-2 text-primary border-2 border-primary rounded-lg hover:bg-primary/5 hover:text-primary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-medium shadow-sm hover:shadow transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='login.html'">
+                <i class="fa fa-sign-in mr-1"></i>登录
+            </button>
+            <button class="px-4 py-2 bg-gradient-to-r from-primary to-indigo-600 text-indigo-900 rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0" onclick="window.location.href='register.html'">
+                <i class="fa fa-user-plus mr-2"></i>注册
+            </button>
+            <a href="admin_login.html" class="text-gray-600 hover:text-gray-800 transition-all duration-300 text-xs hover:underline px-2">管理员入口</a>
+        </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="md:hidden hidden glass-effect shadow-lg absolute w-full">
+        <div class="container mx-auto px-4 py-3 flex flex-col space-y-1">
+            <a href="index.html" class="bg-primary/5 text-primary py-2 px-3 rounded-lg font-medium flex items-center">
+                <i class="fa fa-home w-5 mr-3 text-center"></i>
+                首页
+            </a>
+            <a href="assessment_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-list-alt w-5 mr-3 text-center"></i>
+                心理测评
+            </a>
+            <a href="consultant_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-user-md w-5 mr-3 text-center"></i>
+                咨询服务
+            </a>
+            <a href="activity_list.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-users w-5 mr-3 text-center"></i>
+                团体活动
+            </a>
+            <a href="relaxation_music.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-music w-5 mr-3 text-center"></i>
+                放松体验
+            </a>
+            <a href="healing_treehole.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-tree w-5 mr-3 text-center"></i>
+                治愈树洞
+            </a>
+            <a href="sandbox_simulation_immersive.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-th-large w-5 mr-3 text-center"></i>
+                沙盘模拟
+            </a>
+            <a href="mental_stories.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-book w-5 mr-3 text-center"></i>
+                心理资源
+            </a>
+            <a href="mental_games.html" class="text-gray-700 hover:text-primary transition-all duration-300 py-2 px-3 rounded-lg font-medium flex items-center hover:bg-gray-50">
+                <i class="fa fa-gamepad w-5 mr-3 text-center"></i>
+                心理游戏
+            </a>
+            
+            <!-- 移动端登录/注册按钮 -->
+            <div class="flex space-x-3 py-3 mt-2">
+                <button class="px-4 py-2.5 text-primary border border-primary rounded-lg hover:bg-primary/5 transition-all duration-300 flex-1 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='login.html'">
+                    <i class="fa fa-sign-in mr-2"></i>登录
+                </button>
+                <button class="px-4 py-2.5 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 flex-1 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30" onclick="window.location.href='register.html'">
+                    <i class="fa fa-user-plus mr-2"></i>注册
+                </button>
+            </div>
+            
+            <!-- 移动端用户菜单（登录后显示） -->
+            <div id="mobile-user-menu" class="hidden py-2 animate-fade-in">
+                <div class="flex items-center space-x-3 mb-3 pb-3 border-b border-gray-200 bg-white/30 rounded-lg p-2">
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span id="mobile-user-name" class="text-gray-700 font-medium"></span>
+                </div>
+                <a href="user_profile.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-user-circle mr-2 w-5 text-center"></i>个人中心
+                </a>
+                <a href="assessment_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-list-alt mr-2 w-5 text-center"></i>测评记录
+                </a>
+                <a href="booking_history.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-check-o mr-2 w-5 text-center"></i>预约记录
+                </a>
+                <a href="activity_registration.html" class="block px-4 py-2 text-gray-700 hover:bg-white/50 transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-calendar-plus-o mr-2 w-5 text-center"></i>活动报名
+                </a>
+                <a href="#" id="mobile-logout-button" class="block px-4 py-2 text-gray-700 hover:bg-white/50 hover:text-danger transition-all duration-300 rounded-lg my-1">
+                    <i class="fa fa-sign-out mr-2 w-5 text-center"></i>退出登录
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 修复重复元素的脚本 -->
+<script>
+// 动态确定脚本路径，确保在所有目录级别都能正确加载
+function getBasePath() {
+    const path = window.location.pathname;
+    const depth = (path.match(/\//g) || []).length - 1;
+    return ''.padStart(depth, '../');
+}
+const basePath = getBasePath();
+
+// 动态加载fix_duplicate_user_menu.js脚本
+const fixScript = document.createElement('script');
+fixScript.src = basePath + 'fix_duplicate_user_menu.js';
+fixScript.onload = function() {
+    console.log('✅ 修复脚本已成功加载');
+};
+fixScript.onerror = function() {
+    console.error('❌ 修复脚本加载失败，尝试备用路径...');
+    fixScript.src = 'fix_duplicate_user_menu.js';
+    document.head.appendChild(fixScript);
+};
+document.head.appendChild(fixScript);
+
+// 动态加载navbar.js脚本
+const navbarScript = document.createElement('script');
+navbarScript.src = basePath + 'navbar.js';
+navbarScript.onload = function() {
+    console.log('✅ 导航栏脚本已成功加载');
+};
+navbarScript.onerror = function() {
+    console.error('❌ 导航栏脚本加载失败，尝试备用路径...');
+    navbarScript.src = 'navbar.js';
+    document.head.appendChild(navbarScript);
+};
+document.head.appendChild(navbarScript);
+</script>
+
+<!-- 导航栏必要的脚本引用 -->
+<script src="components/navbar.js" defer></script>
+<script src="components/fix_duplicate_user_menu.js" defer></script>
+    <h1>AI助手功能测试</h1>
+    
+    <div class="test-section">
+        <h2>测试说明</h2>
+        <div class="test-instructions">
+            <p>本页面用于测试AI助手组件的基本功能：</p>
+            <ol>
+                <li>AI助手按钮应该显示在页面右下角</li>
+                <li>点击按钮可以打开/关闭聊天窗口</li>
+                <li>可以发送消息并收到AI助手的响应</li>
+                <li>支持多轮对话</li>
+            </ol>
+            <p>请尝试以下测试用例：</p>
+            <ul>
+                <li>打招呼："你好"、"嗨"、"早上好"</li>
+                <li>询问心理健康知识："什么是焦虑症？"、"如何缓解压力？"</li>
+                <li>寻求帮助："我感到难过"、"我最近压力很大"</li>
+                <li>感谢和道别："谢谢"、"再见"</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>AI助手初始化状态</h2>
+        <p>AI助手应该已经自动初始化并在页面右下角显示。如果没有显示，请检查控制台是否有错误信息。</p>
+    </div>
+    
+    <!-- AI助手会自动在页面底部添加按钮和聊天窗口 -->
+    
+    <script src="test_ai_assistant_functionality.js"></script>
+    <script src="test_multi_turn_dialogue.js"></script>
+    <script src="test_user_status_behavior.js"></script>
+    <script>
+        // 页面加载后打印AI助手初始化信息
+        window.addEventListener('load', function() {
+            console.log('AI助手测试页面加载完成');
+            console.log('AI助手实例:', window.aiAssistant);
+            
+            // 执行AI助手功能测试
+            if (typeof generateTestSummary === 'function') {
+                console.log('执行AI助手功能测试...');
+            }
+        });
+    </script>
+<!-- 统一页脚组件 -->
+<footer class="bg-[#1e293b] text-white py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <!-- 左侧Logo和文字 -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                    <i class="fa fa-heart"></i>
+                </div>
+                <span class="text-white">心社区</span>
+            </div>
+            
+            <!-- 中间版权信息 -->
+            <div class="text-center">
+                <p class="text-white">© 2025 心社区心理健康支持中心. 保留所有权利.</p>
+            </div>
+            
+            <!-- 右侧图标 -->
+            <div class="flex space-x-4">
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-bell"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心社区 - 心理健康支持平台</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 引入Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- Tailwind CSS配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        info: '#86909C',
+                        light: '#F2F3F5',
+                        dark: '#4E5969',
+                        positive: '#00B42A',
+                        negative: '#F53F3F'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- 自定义样式 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .prime-display {
+                min-height: 400px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                overflow: hidden;
+            }
+            .rating-button {
+                transition: all 0.2s ease;
+            }
+            .rating-button:hover {
+                transform: scale(1.05);
+            }
+            .rating-button:active {
+                transform: scale(0.98);
+            }
+            .word-appear {
+                animation: wordAppear 0.1s ease-in;
+            }
+            @keyframes wordAppear {
+                from { opacity: 0; transform: scale(0.9); }
+                to { opacity: 1; transform: scale(1); }
+            }
+            .mask-display {
+                animation: maskDisplay 0.1s ease-in-out;
+            }
+            @keyframes maskDisplay {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            .scale-in {
+                animation: scaleIn 0.3s ease-out;
+            }
+            @keyframes scaleIn {
+                from { opacity: 0; transform: scale(0.95); }
+                to { opacity: 1; transform: scale(1); }
+            }
+            .fade-in {
+                animation: fadeIn 0.5s ease-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        }
+    </style>
+<link rel="stylesheet" href="experiments-responsive.css">
+<style>
+
+    /* 全局样式重置 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 全局颜色变量 */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background-color: var(--bg-primary);
+    }
+    
+    /* 统一按钮样式 */
+    button {
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        outline: none;
+    }
+    
+    /* 主按钮样式 - 注册按钮 */
+    .btn-primary {
+        background-color: var(--secondary-color);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #7c3aed;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+    }
+    
+    /* 次要按钮样式 - 登录按钮 */
+    .btn-secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        transform: translateY(-1px);
+    }
+    
+    /* 导航栏样式 */
+    nav {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .btn-primary,
+        .btn-secondary {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* 卡片样式 */
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+    }
+    
+    /* 输入框样式 */
+    input,
+    textarea,
+    select {
+        font-family: inherit;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+</style>
+</head>
+<body class="bg-light min-h-screen flex flex-col">
+    <!-- 导航栏组件 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav id="main-nav"></nav>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- 页面标题 -->
+        <div class="text-center mb-8">
+            <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-primary mb-2">情绪启动实验</h1>
+            <p class="text-dark text-base">探索潜意识情绪如何影响你的判断</p>
+        </div>
+
+        <!-- 实验容器 -->
+        <div class="bg-white rounded-xl shadow-md p-6 md:p-8 max-w-4xl mx-auto">
+            <!-- 准备阶段 -->
+            <div id="preparation-stage" class="space-y-6">
+                <div class="bg-light rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-dark mb-4">实验介绍</h2>
+                    <p class="text-dark mb-4">本实验基于情绪启动效应（Affective Priming）理论，验证潜意识接触的情绪刺激会如何影响你对后续中性刺激的评价。</p>
+                    <p class="text-dark">在心理学中，情绪启动效应指的是一个与情绪相关的刺激（如积极或消极的词语）会影响对随后呈现的中性刺激的评价，即使这些情绪刺激呈现的时间短到无法被有意识地察觉。</p>
+                </div>
+
+                <div class="bg-light rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-dark mb-4">实验步骤</h2>
+                    <ol class="list-decimal list-inside space-y-2 text-dark">
+                        <li>屏幕中央将快速闪现一个词语（时间很短，可能无法看清）</li>
+                        <li>随后会显示一个中性词语</li>
+                        <li>请根据你当下的感受，对这个中性词语进行愉悦度评价（1-7分）</li>
+                        <li>1分表示"非常不愉悦"，4分表示"中性"，7分表示"非常愉悦"</li>
+                        <li>实验共有36轮，每种情绪启动词会出现多次</li>
+                    </ol>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="start-tutorial" class="bg-primary hover:bg-primary/90 text-white py-3 px-8 rounded-lg font-medium transition-all transform hover:scale-105">
+                        开始教程
+                    </button>
+                </div>
+            </div>
+
+            <!-- 教程阶段 -->
+            <div id="tutorial-stage" class="hidden space-y-6 scale-in">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold text-dark mb-4">实验演示</h2>
+                    <p class="text-dark mb-2">请了解实验的具体流程</p>
+                    <p class="text-info text-sm">教程中会放慢速度，实际实验中情绪词闪现速度很快</p>
+                </div>
+
+                <div class="prime-display bg-light rounded-lg">
+                    <!-- 注视点 -->
+                    <div id="tutorial-fixation" class="text-6xl font-bold text-dark mb-8">+</div>
+                    
+                    <!-- 情绪词 -->
+                    <div id="tutorial-prime" class="hidden text-4xl font-bold mb-8"></div>
+                    
+                    <!-- 掩码 -->
+                    <div id="tutorial-mask" class="hidden text-4xl font-bold mb-8">#####</div>
+                    
+                    <!-- 目标词 -->
+                    <div id="tutorial-target" class="hidden text-3xl font-bold text-dark mb-8"></div>
+                    
+                    <!-- 评分按钮 -->
+                    <div id="tutorial-ratings" class="hidden grid grid-cols-7 gap-2 max-w-md w-full">
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="1">
+                            <span class="block font-bold text-negative">1</span>
+                            <span class="text-xs text-dark">不愉悦</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="2">
+                            <span class="block font-bold text-dark">2</span>
+                            <span class="text-xs text-dark">较不愉悦</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="3">
+                            <span class="block font-bold text-dark">3</span>
+                            <span class="text-xs text-dark">轻微不愉悦</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="4">
+                            <span class="block font-bold text-primary">4</span>
+                            <span class="text-xs text-dark">中性</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="5">
+                            <span class="block font-bold text-dark">5</span>
+                            <span class="text-xs text-dark">轻微愉悦</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="6">
+                            <span class="block font-bold text-dark">6</span>
+                            <span class="text-xs text-dark">较愉悦</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="7">
+                            <span class="block font-bold text-positive">7</span>
+                            <span class="text-xs text-dark">非常愉悦</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="start-experiment" class="bg-primary hover:bg-primary/90 text-white py-2 px-6 rounded-lg font-medium transition-all transform hover:scale-105">
+                        开始实验
+                    </button>
+                </div>
+            </div>
+
+            <!-- 实验阶段 -->
+            <div id="experiment-stage" class="hidden space-y-6">
+                <!-- 进度信息 -->
+                <div class="text-center">
+                    <div class="inline-block text-dark font-medium mb-2">
+                        试次: <span id="current-trial">1</span>/<span id="total-trials">36</span>
+                    </div>
+                    <div class="w-full bg-light rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- 主要显示区域 -->
+                <div class="prime-display bg-light rounded-lg">
+                    <!-- 注视点 -->
+                    <div id="fixation-point" class="text-6xl font-bold text-dark">+</div>
+                    
+                    <!-- 情绪词 -->
+                    <div id="prime-word" class="hidden text-4xl font-bold"></div>
+                    
+                    <!-- 掩码 -->
+                    <div id="mask" class="hidden text-4xl font-bold">#####</div>
+                    
+                    <!-- 目标词 -->
+                    <div id="target-word" class="hidden text-3xl font-bold text-dark"></div>
+                    
+                    <!-- 评分按钮 -->
+                    <div id="rating-buttons" class="hidden grid grid-cols-7 gap-2 max-w-md w-full">
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="1">
+                            <span class="block font-bold text-negative">1</span>
+                            <span class="text-xs text-dark">不愉悦</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="2">
+                            <span class="block font-bold text-dark">2</span>
+                            <span class="text-xs text-dark">较不愉悦</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="3">
+                            <span class="block font-bold text-dark">3</span>
+                            <span class="text-xs text-dark">轻微不愉悦</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="4">
+                            <span class="block font-bold text-primary">4</span>
+                            <span class="text-xs text-dark">中性</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="5">
+                            <span class="block font-bold text-dark">5</span>
+                            <span class="text-xs text-dark">轻微愉悦</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="6">
+                            <span class="block font-bold text-dark">6</span>
+                            <span class="text-xs text-dark">较愉悦</span>
+                        </button>
+                        <button class="rating-button bg-light p-3 rounded-lg text-center" data-rating="7">
+                            <span class="block font-bold text-positive">7</span>
+                            <span class="text-xs text-dark">非常愉悦</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 结果阶段 -->
+            <div id="result-stage" class="hidden space-y-6">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold text-dark mb-2">实验完成！</h2>
+                    <p class="text-dark">你的情绪启动效应分析</p>
+                </div>
+
+                <!-- 结果图表 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-light rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-dark mb-4">情绪启动效应对比</h3>
+                        <div class="w-full h-64">
+                            <canvas id="priming-effect-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-light rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-dark mb-4">评价分布</h3>
+                        <div class="w-full h-64">
+                            <canvas id="rating-distribution-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 结果统计 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-light rounded-lg p-4 text-center">
+                        <p class="text-dark text-sm">积极启动平均评分</p>
+                        <p id="positive-mean-rating" class="text-positive font-bold text-xl">0.0</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4 text-center">
+                        <p class="text-dark text-sm">中性启动平均评分</p>
+                        <p id="neutral-mean-rating" class="text-primary font-bold text-xl">0.0</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4 text-center">
+                        <p class="text-dark text-sm">消极启动平均评分</p>
+                        <p id="negative-mean-rating" class="text-negative font-bold text-xl">0.0</p>
+                    </div>
+                </div>
+
+                <!-- 启动效应强度 -->
+                <div class="bg-light rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-dark mb-3">情绪启动效应强度</h3>
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium text-dark">启动效应指数</span>
+                            <span id="priming-index" class="text-primary font-bold"></span>
+                        </div>
+                        <div class="w-full bg-light rounded-full h-3">
+                            <div id="priming-index-bar" class="bg-primary h-3 rounded-full" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    <p class="text-dark text-sm">
+                        启动效应指数 = (积极启动平均评分 - 消极启动平均评分) / (积极启动平均评分 + 消极启动平均评分) × 100
+                    </p>
+                </div>
+
+                <!-- 结果解读 -->
+                <div class="bg-light rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-dark mb-3">结果解读</h3>
+                    <p id="result-interpretation" class="text-dark">
+                        你的情绪启动效应表明...
+                    </p>
+                    <p class="text-info text-sm mt-3">*实验结果仅作科普参考，不构成心理诊断</p>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button id="save-result" class="bg-primary hover:bg-primary/90 text-white py-2 px-6 rounded-lg font-medium transition-all">
+                        <i class="fa fa-save mr-2"></i> 保存结果
+                    </button>
+                    <button id="restart-experiment" class="bg-info hover:bg-info/90 text-white py-2 px-6 rounded-lg font-medium transition-all">
+                        <i class="fa fa-refresh mr-2"></i> 重新开始
+                    </button>
+                    <button id="back-to-hall" class="bg-dark hover:bg-dark/90 text-white py-2 px-6 rounded-lg font-medium transition-all">
+                        <i class="fa fa-arrow-left mr-2"></i> 返回大厅
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚组件 -->
+    <!-- 统一页脚组件 -->
+<footer class="bg-[#1e293b] text-white py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <!-- 左侧Logo和文字 -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                    <i class="fa fa-heart"></i>
+                </div>
+                <span class="text-white">心社区</span>
+            </div>
+            
+            <!-- 中间版权信息 -->
+            <div class="text-center">
+                <p class="text-white">© 2025 心社区心理健康支持中心. 保留所有权利.</p>
+            </div>
+            
+            <!-- 右侧图标 -->
+            <div class="flex space-x-4">
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-bell"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- 引入公共脚本 -->
+    <script src="common.js"></script>
+    <!-- 引入API模块 -->
+    <script type="module">
+      // 导入API函数
+      import { 
+        isAuthenticated, 
+        saveExperimentResult, 
+        saveExperimentResultToLocal,
+        getExperimentStats 
+      } from './api.js';
+      
+      // 将API函数暴露给全局作用域，供后续脚本使用
+      window.API = {
+        isAuthenticated,
+        saveExperimentResult,
+        saveExperimentResultToLocal,
+        getExperimentStats
+      };
+    </script>
+    <!-- 实验脚本 -->
+    <script>
+        // 实验配置
+        const config = {
+            totalTrials: 36, // 总共36轮实验
+            // 情绪词分类
+            words: {
+                positive: [
+                    "快乐", "成功", "幸福", "美好", "爱情", "欢乐", 
+                    "胜利", "希望", "喜悦", "繁荣", "和谐", "满足"
+                ],
+                negative: [
+                    "悲伤", "失败", "痛苦", "灾难", "恐惧", "愤怒", 
+                    "绝望", "仇恨", "死亡", "疾病", "贫困", "战争"
+                ],
+                neutral: [
+                    "桌子", "窗户", "纸张", "椅子", "书本", "手机", 
+                    "电脑", "钢笔", "铅笔", "杯子", "盘子", "叉子"
+                ],
+                // 目标中性词（用于评价）
+                targets: [
+                    "瓶子", "键盘", "鼠标", "台灯", "日历", "时钟",
+                    "书包", "钱包", "钥匙", "眼镜", "帽子", "鞋子",
+                    "桌子", "椅子", "窗户", "门", "地板", "墙壁"
+                ]
+            },
+            // 时间配置（毫秒）
+            timing: {
+                fixationTime: 1500,    // 注视点显示时间
+                primeDisplayTime: 50,  // 情绪词显示时间（潜意识水平）
+                maskTime: 200,         // 掩码显示时间
+                targetTime: 10000,     // 目标词显示和评价时间（超时自动继续）
+                feedbackTime: 500      // 反馈显示时间
+            },
+            // 实验设计：3种启动类型各12次
+            trialDistribution: {
+                positive: 12,
+                negative: 12,
+                neutral: 12
+            }
+        };
+
+        // DOM元素
+        const elements = {
+            preparation: document.getElementById('preparation-stage'),
+            tutorial: document.getElementById('tutorial-stage'),
+            experiment: document.getElementById('experiment-stage'),
+            result: document.getElementById('result-stage'),
+            startTutorial: document.getElementById('start-tutorial'),
+            startExperiment: document.getElementById('start-experiment'),
+            // 教程元素
+            tutorialFixation: document.getElementById('tutorial-fixation'),
+            tutorialPrime: document.getElementById('tutorial-prime'),
+            tutorialMask: document.getElementById('tutorial-mask'),
+            tutorialTarget: document.getElementById('tutorial-target'),
+            tutorialRatings: document.getElementById('tutorial-ratings'),
+            // 实验元素
+            currentTrial: document.getElementById('current-trial'),
+            totalTrials: document.getElementById('total-trials'),
+            progressBar: document.getElementById('progress-bar'),
+            fixationPoint: document.getElementById('fixation-point'),
+            primeWord: document.getElementById('prime-word'),
+            mask: document.getElementById('mask'),
+            targetWord: document.getElementById('target-word'),
+            ratingButtons: document.getElementById('rating-buttons'),
+            // 结果元素
+            positiveMeanRating: document.getElementById('positive-mean-rating'),
+            neutralMeanRating: document.getElementById('neutral-mean-rating'),
+            negativeMeanRating: document.getElementById('negative-mean-rating'),
+            primingIndex: document.getElementById('priming-index'),
+            primingIndexBar: document.getElementById('priming-index-bar'),
+            resultInterpretation: document.getElementById('result-interpretation'),
+            saveResult: document.getElementById('save-result'),
+            restartExperiment: document.getElementById('restart-experiment'),
+            backToHall: document.getElementById('back-to-hall')
+        };
+
+        // 实验数据
+        let experimentData = {
+            currentTrial: 0,
+            trials: [],
+            trialSequence: [],
+            targetTimeoutTimer: null,
+            usedTargets: new Set() // 记录已使用的目标词
+        };
+
+        // 绑定事件
+        function bindEvents() {
+            elements.startTutorial.addEventListener('click', startTutorial);
+            elements.startExperiment.addEventListener('click', startExperiment);
+            elements.restartExperiment.addEventListener('click', restartExperiment);
+            elements.saveResult.addEventListener('click', saveExperimentResult);
+            elements.backToHall.addEventListener('click', () => {
+                window.location.href = 'psychology_experiments.html';
+            });
+            
+            // 绑定评分按钮事件
+            document.querySelectorAll('#rating-buttons .rating-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    handleRating(parseInt(this.getAttribute('data-rating')));
+                });
+            });
+            
+            // 绑定教程评分按钮事件
+            document.querySelectorAll('#tutorial-ratings .rating-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    finishTutorial();
+                });
+            });
+        }
+
+        // 生成实验序列
+        function generateTrialSequence() {
+            const sequence = [];
+            
+            // 为每种启动类型创建指定数量的试次
+            Object.entries(config.trialDistribution).forEach(([type, count]) => {
+                for (let i = 0; i < count; i++) {
+                    sequence.push(type);
+                }
+            });
+            
+            // 随机打乱序列
+            return shuffleArray(sequence);
+        }
+
+        // 随机打乱数组
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // 获取随机情绪词
+        function getRandomWord(type) {
+            const words = config.words[type];
+            return words[Math.floor(Math.random() * words.length)];
+        }
+
+        // 获取随机目标词（避免重复使用）
+        function getRandomTarget() {
+            // 如果所有目标词都已使用，重置已使用集合
+            if (experimentData.usedTargets.size >= config.words.targets.length) {
+                experimentData.usedTargets.clear();
+            }
+            
+            let target;
+            do {
+                target = config.words.targets[Math.floor(Math.random() * config.words.targets.length)];
+            } while (experimentData.usedTargets.has(target));
+            
+            experimentData.usedTargets.add(target);
+            return target;
+        }
+
+        // 开始教程
+        function startTutorial() {
+            elements.preparation.classList.add('hidden');
+            elements.tutorial.classList.remove('hidden');
+            elements.experiment.classList.add('hidden');
+            elements.result.classList.add('hidden');
+            
+            // 运行教程演示
+            runTutorial();
+        }
+
+        // 运行教程演示
+        async function runTutorial() {
+            // 显示注视点（教程版：时间延长）
+            elements.tutorialFixation.classList.remove('hidden');
+            
+            // 延迟2秒
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // 隐藏注视点，显示情绪词（教程版：时间延长）
+            elements.tutorialFixation.classList.add('hidden');
+            elements.tutorialPrime.textContent = '快乐';
+            elements.tutorialPrime.classList.remove('hidden');
+            elements.tutorialPrime.classList.add('word-appear');
+            
+            // 延迟1秒（教程版）
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // 隐藏情绪词，显示掩码
+            elements.tutorialPrime.classList.add('hidden');
+            elements.tutorialPrime.classList.remove('word-appear');
+            elements.tutorialMask.classList.remove('hidden');
+            elements.tutorialMask.classList.add('mask-display');
+            
+            // 延迟0.5秒
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // 隐藏掩码，显示目标词
+            elements.tutorialMask.classList.add('hidden');
+            elements.tutorialMask.classList.remove('mask-display');
+            elements.tutorialTarget.textContent = '桌子';
+            elements.tutorialTarget.classList.remove('hidden');
+            elements.tutorialTarget.classList.add('fade-in');
+            
+            // 延迟1秒，然后显示评分按钮
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            elements.tutorialRatings.classList.remove('hidden');
+        }
+
+        // 完成教程
+        function finishTutorial() {
+            // 隐藏所有教程元素
+            elements.tutorialFixation.classList.add('hidden');
+            elements.tutorialPrime.classList.add('hidden');
+            elements.tutorialMask.classList.add('hidden');
+            elements.tutorialTarget.classList.add('hidden');
+            elements.tutorialRatings.classList.add('hidden');
+        }
+
+        // 开始实验
+        function startExperiment() {
+            elements.tutorial.classList.add('hidden');
+            elements.experiment.classList.remove('hidden');
+            elements.result.classList.add('hidden');
+            
+            // 重置实验数据
+            resetExperimentData();
+            
+            // 生成实验序列
+            experimentData.trialSequence = generateTrialSequence();
+            
+            // 开始第一轮实验
+            startNewTrial();
+        }
+
+        // 重置实验数据
+        function resetExperimentData() {
+            experimentData = {
+                currentTrial: 0,
+                trials: [],
+                trialSequence: [],
+                targetTimeoutTimer: null,
+                usedTargets: new Set()
+            };
+            
+            // 更新显示
+            elements.currentTrial.textContent = '1';
+            elements.totalTrials.textContent = config.totalTrials;
+            elements.progressBar.style.width = '0%';
+        }
+
+        // 开始新的实验轮次
+        function startNewTrial() {
+            // 增加当前轮次
+            experimentData.currentTrial++;
+            
+            // 更新显示
+            elements.currentTrial.textContent = experimentData.currentTrial;
+            elements.progressBar.style.width = `${((experimentData.currentTrial - 1) / config.totalTrials) * 100}%`;
+            
+            // 重置所有显示元素
+            elements.primeWord.classList.add('hidden');
+            elements.mask.classList.add('hidden');
+            elements.targetWord.classList.add('hidden');
+            elements.ratingButtons.classList.add('hidden');
+            
+            // 显示注视点
+            elements.fixationPoint.classList.remove('hidden');
+            
+            // 注视点显示后，显示情绪词
+            setTimeout(() => {
+                showPrimeWord();
+            }, config.timing.fixationTime);
+        }
+
+        // 显示情绪词
+        function showPrimeWord() {
+            // 获取当前试次的启动类型
+            const trialType = experimentData.trialSequence[experimentData.currentTrial - 1];
+            
+            // 获取随机情绪词
+            const primeWord = getRandomWord(trialType);
+            
+            // 设置情绪词样式
+            elements.primeWord.textContent = primeWord;
+            elements.primeWord.className = `text-4xl font-bold ${getPrimeColor(trialType)}`;
+            
+            // 隐藏注视点，显示情绪词
+            elements.fixationPoint.classList.add('hidden');
+            elements.primeWord.classList.remove('hidden');
+            elements.primeWord.classList.add('word-appear');
+            
+            // 情绪词短暂显示后，显示掩码
+            setTimeout(() => {
+                hidePrimeWord();
+            }, config.timing.primeDisplayTime);
+        }
+
+        // 获取情绪词颜色
+        function getPrimeColor(type) {
+            switch(type) {
+                case 'positive': return 'text-positive';
+                case 'negative': return 'text-negative';
+                case 'neutral': return 'text-dark';
+                default: return 'text-dark';
+            }
+        }
+
+        // 隐藏情绪词并显示掩码
+        function hidePrimeWord() {
+            // 隐藏情绪词
+            elements.primeWord.classList.add('hidden');
+            elements.primeWord.classList.remove('word-appear');
+            
+            // 显示掩码
+            elements.mask.classList.remove('hidden');
+            elements.mask.classList.add('mask-display');
+            
+            // 掩码显示后，显示目标词
+            setTimeout(() => {
+                showTargetWord();
+            }, config.timing.maskTime);
+        }
+
+        // 显示目标词
+        function showTargetWord() {
+            // 获取随机目标词
+            const targetWord = getRandomTarget();
+            
+            // 隐藏掩码，显示目标词
+            elements.mask.classList.add('hidden');
+            elements.mask.classList.remove('mask-display');
+            elements.targetWord.textContent = targetWord;
+            elements.targetWord.classList.remove('hidden');
+            elements.targetWord.classList.add('fade-in');
+            
+            // 短暂延迟后显示评分按钮
+            setTimeout(() => {
+                elements.ratingButtons.classList.remove('hidden');
+                
+                // 设置目标词超时
+                experimentData.targetTimeoutTimer = setTimeout(() => {
+                    handleTimeout();
+                }, config.timing.targetTime);
+            }, 100);
+        }
+
+        // 处理评分
+        function handleRating(rating) {
+            // 清除超时定时器
+            clearTimeout(experimentData.targetTimeoutTimer);
+            
+            // 获取当前试次信息
+            const trialType = experimentData.trialSequence[experimentData.currentTrial - 1];
+            const targetWord = elements.targetWord.textContent;
+            const reactionTime = Date.now(); // 记录反应时间（从开始显示目标词到点击）
+            
+            // 记录数据
+            experimentData.trials.push({
+                trialNumber: experimentData.currentTrial,
+                primeType: trialType,
+                targetWord: targetWord,
+                rating: rating,
+                reactionTime: reactionTime,
+                timestamp: new Date().toISOString()
+            });
+            
+            // 隐藏评分按钮和目标词
+            elements.ratingButtons.classList.add('hidden');
+            elements.targetWord.classList.add('hidden');
+            elements.targetWord.classList.remove('fade-in');
+            
+            // 短暂延迟后，检查是否完成所有轮次
+            setTimeout(() => {
+                if (experimentData.currentTrial >= config.totalTrials) {
+                    // 所有轮次完成，显示结果
+                    showResults();
+                } else {
+                    // 准备下一轮
+                    startNewTrial();
+                }
+            }, config.timing.feedbackTime);
+        }
+
+        // 处理超时
+        function handleTimeout() {
+            // 获取当前试次信息
+            const trialType = experimentData.trialSequence[experimentData.currentTrial - 1];
+            const targetWord = elements.targetWord.textContent;
+            
+            // 记录数据（超时使用中性评分）
+            experimentData.trials.push({
+                trialNumber: experimentData.currentTrial,
+                primeType: trialType,
+                targetWord: targetWord,
+                rating: 4, // 中性评分
+                isTimeout: true,
+                timestamp: new Date().toISOString()
+            });
+            
+            // 隐藏评分按钮和目标词
+            elements.ratingButtons.classList.add('hidden');
+            elements.targetWord.classList.add('hidden');
+            elements.targetWord.classList.remove('fade-in');
+            
+            // 短暂延迟后，检查是否完成所有轮次
+            setTimeout(() => {
+                if (experimentData.currentTrial >= config.totalTrials) {
+                    // 所有轮次完成，显示结果
+                    showResults();
+                } else {
+                    // 准备下一轮
+                    startNewTrial();
+                }
+            }, config.timing.feedbackTime);
+        }
+
+        // 显示结果
+        function showResults() {
+            // 隐藏实验阶段，显示结果阶段
+            elements.experiment.classList.add('hidden');
+            elements.result.classList.remove('hidden');
+            
+            // 计算统计数据
+            const stats = calculateStatistics();
+            
+            // 更新显示
+            elements.positiveMeanRating.textContent = stats.positiveMean.toFixed(1);
+            elements.neutralMeanRating.textContent = stats.neutralMean.toFixed(1);
+            elements.negativeMeanRating.textContent = stats.negativeMean.toFixed(1);
+            elements.primingIndex.textContent = `${stats.primingIndex.toFixed(1)}%`;
+            elements.primingIndexBar.style.width = `${Math.min(Math.max(stats.primingIndex + 50, 0), 100)}%`;
+            
+            // 生成结果解读
+            generateResultInterpretation(stats);
+            
+            // 绘制图表
+            drawPrimingEffectChart(stats);
+            drawRatingDistributionChart(stats);
+            
+            // 保存到localStorage（即使未登录）
+            if (window.API && window.API.saveExperimentResultToLocal) {
+                window.API.saveExperimentResultToLocal('affective-priming', {
+                    trials: experimentData.trials,
+                    statistics: stats,
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                // 降级到本地函数
+                saveToLocalStorage({
+                    trials: experimentData.trials,
+                    statistics: stats,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+
+        // 计算统计数据
+        function calculateStatistics() {
+            const trials = experimentData.trials;
+            
+            // 按启动类型分组计算平均评分
+            const positiveTrials = trials.filter(trial => trial.primeType === 'positive');
+            const neutralTrials = trials.filter(trial => trial.primeType === 'neutral');
+            const negativeTrials = trials.filter(trial => trial.primeType === 'negative');
+            
+            // 计算平均值
+            const positiveMean = positiveTrials.length > 0 
+                ? positiveTrials.reduce((sum, trial) => sum + trial.rating, 0) / positiveTrials.length 
+                : 0;
+            
+            const neutralMean = neutralTrials.length > 0 
+                ? neutralTrials.reduce((sum, trial) => sum + trial.rating, 0) / neutralTrials.length 
+                : 0;
+            
+            const negativeMean = negativeTrials.length > 0 
+                ? negativeTrials.reduce((sum, trial) => sum + trial.rating, 0) / negativeTrials.length 
+                : 0;
+            
+            // 计算启动效应指数
+            // 启动效应指数 = (积极启动平均评分 - 消极启动平均评分) / (积极启动平均评分 + 消极启动平均评分) × 100
+            // 为避免除以零，添加一个小的常数
+            const primingIndex = ((positiveMean - negativeMean) / (positiveMean + negativeMean + 0.001)) * 100;
+            
+            // 计算评分分布
+            const ratingDistribution = {
+                positive: new Array(7).fill(0),
+                neutral: new Array(7).fill(0),
+                negative: new Array(7).fill(0)
+            };
+            
+            trials.forEach(trial => {
+                const ratingIndex = trial.rating - 1; // 转换为0-6的索引
+                ratingDistribution[trial.primeType][ratingIndex]++;
+            });
+            
+            return {
+                positiveMean,
+                neutralMean,
+                negativeMean,
+                primingIndex,
+                ratingDistribution,
+                totalTrials: trials.length,
+                positiveCount: positiveTrials.length,
+                neutralCount: neutralTrials.length,
+                negativeCount: negativeTrials.length
+            };
+        }
+
+        // 生成结果解读
+        function generateResultInterpretation(stats) {
+            let interpretation = '';
+            
+            // 基于启动效应指数生成解读
+            if (stats.primingIndex > 20) {
+                interpretation += '你的情绪启动效应非常强烈！';
+                interpretation += ' 即使是在潜意识层面接触到情绪词，也会显著影响你对中性词语的评价。';
+                interpretation += ' 这表明你的情绪系统对环境中的情绪信息非常敏感，情绪状态容易受到周围环境的影响。';
+            } else if (stats.primingIndex > 10) {
+                interpretation += `你的情绪启动效应处于中等水平（指数为${stats.primingIndex.toFixed(1)}%）。`;
+                interpretation += ' 潜意识中的情绪刺激对你的评价有一定影响，但这种影响相对可控。';
+                interpretation += ' 你在决策时既有情绪的参与，也保持了一定的理性判断能力。';
+            } else if (stats.primingIndex > 0) {
+                interpretation += `你的情绪启动效应较弱（指数为${stats.primingIndex.toFixed(1)}%）。`;
+                interpretation += ' 潜意识中的情绪刺激对你的评价影响较小，你可能是一个比较理性的决策者。';
+                interpretation += ' 这种特质在需要客观判断的情境中可能是一种优势。';
+            } else {
+                interpretation += '你的情绪启动效应很弱，甚至出现了反向效应。';
+                interpretation += ' 这可能表明你对情绪信息有较强的抵抗力，或者在实验过程中采用了特定的策略。';
+                interpretation += ' 这种特质在需要保持客观、不受情绪干扰的任务中可能很有价值。';
+            }
+            
+            // 添加具体评分差异的分析
+            const positiveNeutralDiff = stats.positiveMean - stats.neutralMean;
+            const neutralNegativeDiff = stats.neutralMean - stats.negativeMean;
+            
+            if (positiveNeutralDiff > 0.5 && neutralNegativeDiff > 0.5) {
+                interpretation += ' 你对积极启动词和消极启动词的反应都很明显，表现出典型的情绪启动模式。';
+            } else if (positiveNeutralDiff > 0.5) {
+                interpretation += ' 你对积极情绪词的反应更为敏感，积极情绪似乎更容易影响你的判断。';
+            } else if (neutralNegativeDiff > 0.5) {
+                interpretation += ' 你对消极情绪词的反应更为敏感，消极情绪可能更容易影响你的评价。';
+            }
+            
+            elements.resultInterpretation.textContent = interpretation;
+        }
+
+        // 绘制启动效应对比图
+        async function drawPrimingEffectChart(stats) {
+            const ctx = document.getElementById('priming-effect-chart').getContext('2d');
+            
+            // 准备数据
+            const labels = ['积极启动', '中性启动', '消极启动'];
+            const data = [stats.positiveMean, stats.neutralMean, stats.negativeMean];
+            const colors = ['rgba(0, 180, 42, 0.7)', 'rgba(22, 93, 255, 0.7)', 'rgba(245, 63, 63, 0.7)'];
+            const borderColors = ['rgba(0, 180, 42, 1)', 'rgba(22, 93, 255, 1)', 'rgba(245, 63, 63, 1)'];
+            
+            // 获取群体平均数据
+            let groupAvgData = [4.8, 4.0, 3.5]; // 默认群体平均值
+            
+            // 尝试从API获取统计数据
+            if (window.API && window.API.getExperimentStats) {
+                try {
+                    const apiStats = await window.API.getExperimentStats('affective-priming');
+                    if (apiStats && apiStats.averageRatings) {
+                        groupAvgData = [
+                            apiStats.averageRatings.positive || 4.8,
+                            apiStats.averageRatings.neutral || 4.0,
+                            apiStats.averageRatings.negative || 3.5
+                        ];
+                    }
+                } catch (error) {
+                    console.error('获取统计数据失败，使用默认值:', error);
+                }
+            }
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '你的平均评分',
+                            data: data,
+                            backgroundColor: colors,
+                            borderColor: borderColors,
+                            borderWidth: 1
+                        },
+                        {
+                            label: '群体平均评分',
+                            data: groupAvgData,
+                            backgroundColor: 'rgba(134, 144, 156, 0.3)',
+                            borderColor: 'rgba(134, 144, 156, 0.8)',
+                            borderWidth: 1,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 7,
+                            title: {
+                                display: true,
+                                text: '平均愉悦度评分 (1-7)'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 绘制评分分布图
+        function drawRatingDistributionChart(stats) {
+            const ctx = document.getElementById('rating-distribution-chart').getContext('2d');
+            
+            // 准备数据
+            const labels = ['1', '2', '3', '4', '5', '6', '7'];
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '积极启动后评分',
+                            data: stats.ratingDistribution.positive,
+                            borderColor: 'rgba(0, 180, 42, 1)',
+                            backgroundColor: 'rgba(0, 180, 42, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        },
+                        {
+                            label: '中性启动后评分',
+                            data: stats.ratingDistribution.neutral,
+                            borderColor: 'rgba(22, 93, 255, 1)',
+                            backgroundColor: 'rgba(22, 93, 255, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        },
+                        {
+                            label: '消极启动后评分',
+                            data: stats.ratingDistribution.negative,
+                            borderColor: 'rgba(245, 63, 63, 1)',
+                            backgroundColor: 'rgba(245, 63, 63, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '次数'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '评分'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 保存到localStorage（降级方案）
+        function saveToLocalStorage(results) {
+            try {
+                // 获取现有记录
+                let experimentRecords = JSON.parse(localStorage.getItem('experimentRecords') || '[]');
+                
+                // 添加新记录
+                experimentRecords.push({
+                    type: 'affective-priming',
+                    results: results,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // 只保留最近20条记录
+                if (experimentRecords.length > 20) {
+                    experimentRecords = experimentRecords.slice(-20);
+                }
+                
+                // 保存回localStorage
+                localStorage.setItem('experimentRecords', JSON.stringify(experimentRecords));
+            } catch (error) {
+                console.error('保存实验结果到localStorage失败:', error);
+            }
+        }
+
+        // 保存实验结果到服务器
+        async function saveExperimentResult() {
+            // 检查用户是否登录
+            if (window.API && window.API.isAuthenticated) {
+                if (!window.API.isAuthenticated()) {
+                    // 显示登录提示
+                    if (confirm('登录后可保存实验记录，是否立即登录？')) {
+                        window.location.href = 'login.html';
+                    }
+                    return;
+                }
+            } else {
+                // 降级检查
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    if (confirm('登录后可保存实验记录，是否立即登录？')) {
+                        window.location.href = 'login.html';
+                    }
+                    return;
+                }
+            }
+            
+            // 获取最新的结果（从localStorage）
+            try {
+                let experimentRecords = JSON.parse(localStorage.getItem('experimentRecords') || '[]');
+                const latestResult = experimentRecords
+                    .filter(record => record.type === 'affective-priming')
+                    .pop();
+                
+                if (latestResult && window.API && window.API.saveExperimentResult) {
+                    // 调用API保存结果
+                    await window.API.saveExperimentResult('affective-priming', latestResult.results);
+                    
+                    // 显示成功提示
+                    alert('实验结果保存成功！');
+                    
+                    // 禁用保存按钮
+                    elements.saveResult.disabled = true;
+                    elements.saveResult.classList.add('opacity-50');
+                    elements.saveResult.textContent = '已保存';
+                } else {
+                    alert('保存失败，请稍后重试');
+                }
+            } catch (error) {
+                console.error('保存实验结果失败:', error);
+                alert('保存失败，请稍后重试');
+            }
+        }
+
+        // 重新开始实验
+        function restartExperiment() {
+            // 重置实验数据
+            resetExperimentData();
+            
+            // 隐藏结果阶段，显示实验阶段
+            elements.result.classList.add('hidden');
+            elements.experiment.classList.remove('hidden');
+            
+            // 重新启用保存按钮
+            elements.saveResult.disabled = false;
+            elements.saveResult.classList.remove('opacity-50');
+            elements.saveResult.textContent = '保存结果';
+            
+            // 生成新的实验序列
+            experimentData.trialSequence = generateTrialSequence();
+            
+            // 开始新一轮实验
+            startNewTrial();
+        }
+
+        // 初始化
+        function init() {
+            bindEvents();
+            
+            // 加载导航栏和页脚
+            if (typeof loadNavbar === 'function') {
+                loadNavbar();
+            }
+            if (typeof loadFooter === 'function') {
+                loadFooter();
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+<script src="update_experiment_navigation.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 立即强制同步登录状态
+            if (window.forceExperimentLoginSync) {
+                window.forceExperimentLoginSync();
+            }
+        });
+        
+        // 增强的登录检查函数
+        function enhancedCheckLogin() {
+            // 优先使用AuthManager
+            if (window.AuthManager) {
+                return window.AuthManager.isLoggedIn();
+            } else {
+                // 兼容旧的token检查和新的AuthManager格式
+                const authToken = localStorage.getItem('auth_token');
+                const oldToken = localStorage.getItem('token');
+                const isLogin = localStorage.getItem('isLogin') === 'true';
+                return authToken || oldToken || isLogin;
+            }
+        }
+        
+        // 监听全局登录事件，确保实验页面及时响应
+        window.addEventListener('userLoggedIn', () => {
+            console.log('实验页面检测到用户登录');
+            // 可以在这里更新UI，比如启用保存按钮
+            const saveButton = document.querySelector('#save-result');
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.classList.remove('opacity-50');
+            }
+        });
+    </script>
+    </body>
+</html>

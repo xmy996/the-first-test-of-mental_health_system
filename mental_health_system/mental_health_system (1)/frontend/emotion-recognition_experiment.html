@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心社区 - 心理健康支持平台</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 引入Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- Tailwind CSS配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        info: '#86909C',
+                        light: '#F2F3F5',
+                        dark: '#4E5969'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- 自定义样式 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .emotion-card {
+                transition: all 0.2s ease;
+            }
+            .emotion-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            }
+            .emotion-card.selected {
+                border-color: theme('colors.primary');
+                box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.2);
+            }
+            .face-display {
+                min-height: 300px;
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .countdown-animation {
+                animation: countDown 1s ease-in-out;
+            }
+            @keyframes countDown {
+                0% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.5); opacity: 0.8; }
+                100% { transform: scale(1); opacity: 0; }
+            }
+            .face-appear {
+                animation: fadeIn 0.3s ease-in;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: scale(0.9); }
+                to { opacity: 1; transform: scale(1); }
+            }
+            .face-disappear {
+                animation: fadeOut 0.3s ease-out;
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; transform: scale(1); }
+                to { opacity: 0; transform: scale(0.9); }
+            }
+            .feedback-animation {
+                animation: feedbackPulse 0.5s ease-in-out;
+            }
+            @keyframes feedbackPulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        }
+    </style>
+<link rel="stylesheet" href="experiments-responsive.css">
+<style>
+
+    /* 全局样式重置 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 全局颜色变量 */
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background-color: var(--bg-primary);
+    }
+    
+    /* 统一按钮样式 */
+    button {
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        outline: none;
+    }
+    
+    /* 主按钮样式 - 注册按钮 */
+    .btn-primary {
+        background-color: var(--secondary-color);
+        color: white;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #7c3aed;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
+    }
+    
+    /* 次要按钮样式 - 登录按钮 */
+    .btn-secondary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+        transform: translateY(-1px);
+    }
+    
+    /* 导航栏样式 */
+    nav {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .btn-primary,
+        .btn-secondary {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* 卡片样式 */
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+    }
+    
+    /* 输入框样式 */
+    input,
+    textarea,
+    select {
+        font-family: inherit;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+</style>
+</head>
+<body class="bg-light min-h-screen flex flex-col">
+    <!-- 导航栏组件 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav id="main-nav"></nav>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- 页面标题 -->
+        <div class="text-center mb-8">
+            <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-primary mb-2">面部表情识别任务</h1>
+            <p class="text-dark text-base">测量你对不同情绪的感知能力</p>
+        </div>
+
+        <!-- 实验容器 -->
+        <div class="bg-white rounded-xl shadow-md p-6 md:p-8 max-w-4xl mx-auto">
+            <!-- 准备阶段 -->
+            <div id="preparation-stage" class="space-y-6">
+                <div class="bg-light rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-dark mb-4">实验介绍</h2>
+                    <p class="text-dark mb-4">本实验基于保罗·艾克曼（Paul Ekman）的面部动作编码系统（FACS），测试你识别6种基础情绪的能力。情绪识别是社交互动中的重要技能，反映了你的情绪感知能力。</p>
+                    <p class="text-dark">这6种基础情绪包括：快乐、愤怒、悲伤、恐惧、惊讶和厌恶，它们在不同文化背景下都有普遍的表达和识别模式。</p>
+                </div>
+
+                <div class="bg-light rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-dark mb-4">实验步骤</h2>
+                    <ol class="list-decimal list-inside space-y-2 text-dark">
+                        <li>屏幕将显示一个面部图像，持续1.5秒</li>
+                        <li>图像消失后，请从下方6种情绪选项中选择正确的情绪</li>
+                        <li>实验共有24轮，每种情绪会出现4次</li>
+                        <li>请尽可能快速准确地做出判断</li>
+                    </ol>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="start-tutorial" class="bg-primary hover:bg-primary/90 text-white py-3 px-8 rounded-lg font-medium transition-all transform hover:scale-105">
+                        开始教程
+                    </button>
+                </div>
+            </div>
+
+            <!-- 教程阶段 -->
+            <div id="tutorial-stage" class="hidden space-y-6">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold text-dark mb-4">情绪示例</h2>
+                    <p class="text-dark">请熟悉以下6种基础情绪的面部表达</p>
+                </div>
+
+                <!-- 情绪示例展示 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="emotion-card bg-light rounded-lg p-4 text-center">
+                        <div class="w-32 h-32 bg-primary/10 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <i class="fa fa-smile-o text-6xl text-primary"></i>
+                        </div>
+                        <h3 class="font-bold text-dark">快乐</h3>
+                        <p class="text-info text-sm mt-1">嘴角上扬，眼角有皱纹</p>
+                    </div>
+                    <div class="emotion-card bg-light rounded-lg p-4 text-center">
+                        <div class="w-32 h-32 bg-danger/10 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <i class="fa fa-rage text-6xl text-danger"></i>
+                        </div>
+                        <h3 class="font-bold text-dark">愤怒</h3>
+                        <p class="text-info text-sm mt-1">眉头紧锁，双唇紧闭</p>
+                    </div>
+                    <div class="emotion-card bg-light rounded-lg p-4 text-center">
+                        <div class="w-32 h-32 bg-info/10 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <i class="fa fa-frown-o text-6xl text-info"></i>
+                        </div>
+                        <h3 class="font-bold text-dark">悲伤</h3>
+                        <p class="text-info text-sm mt-1">嘴角下垂，眼神低垂</p>
+                    </div>
+                    <div class="emotion-card bg-light rounded-lg p-4 text-center">
+                        <div class="w-32 h-32 bg-warning/10 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <i class="fa fa-meh-o text-6xl text-warning"></i>
+                        </div>
+                        <h3 class="font-bold text-dark">恐惧</h3>
+                        <p class="text-info text-sm mt-1">眼睛睁大，嘴巴微张</p>
+                    </div>
+                    <div class="emotion-card bg-light rounded-lg p-4 text-center">
+                        <div class="w-32 h-32 bg-secondary/10 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <i class="fa fa-surprise text-6xl text-secondary"></i>
+                        </div>
+                        <h3 class="font-bold text-dark">惊讶</h3>
+                        <p class="text-info text-sm mt-1">眉毛上扬，嘴巴大张</p>
+                    </div>
+                    <div class="emotion-card bg-light rounded-lg p-4 text-center">
+                        <div class="w-32 h-32 bg-dark/10 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <i class="fa fa-tired text-6xl text-dark"></i>
+                        </div>
+                        <h3 class="font-bold text-dark">厌恶</h3>
+                        <p class="text-info text-sm mt-1">鼻子皱起，嘴角下垂</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="start-experiment" class="bg-primary hover:bg-primary/90 text-white py-2 px-6 rounded-lg font-medium transition-all transform hover:scale-105">
+                        开始实验
+                    </button>
+                </div>
+            </div>
+
+            <!-- 实验阶段 -->
+            <div id="experiment-stage" class="hidden space-y-6">
+                <!-- 进度信息 -->
+                <div class="text-center">
+                    <div class="inline-block text-dark font-medium mb-2">
+                        试次: <span id="current-trial">1</span>/<span id="total-trials">24</span>
+                    </div>
+                    <div class="w-full bg-light rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- 面部显示区域 -->
+                <div class="flex justify-center">
+                    <div id="face-display" class="face-display bg-light rounded-lg w-full max-w-md">
+                        <!-- 注视点 -->
+                        <div id="fixation-point" class="absolute text-5xl font-bold text-dark">+</div>
+                        
+                        <!-- 倒计时 -->
+                        <div id="countdown" class="hidden text-6xl font-bold text-primary"></div>
+                        
+                        <!-- 面部图像 -->
+                        <div id="face-image-container" class="hidden w-64 h-64 md:w-80 md:h-80 rounded-full bg-white shadow-lg flex items-center justify-center">
+                            <div id="face-icon" class="text-9xl"></div>
+                        </div>
+                        
+                        <!-- 提示文字 -->
+                        <div id="instruction-text" class="hidden text-xl text-dark font-medium">
+                            请选择以下情绪
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 情绪选项 -->
+                <div id="emotion-options" class="hidden grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <button class="emotion-card bg-light p-3 rounded-lg text-center" data-emotion="happy">
+                        <i class="fa fa-smile-o text-2xl text-primary block mb-1"></i>
+                        <span class="text-dark">快乐</span>
+                    </button>
+                    <button class="emotion-card bg-light p-3 rounded-lg text-center" data-emotion="angry">
+                        <i class="fa fa-rage text-2xl text-danger block mb-1"></i>
+                        <span class="text-dark">愤怒</span>
+                    </button>
+                    <button class="emotion-card bg-light p-3 rounded-lg text-center" data-emotion="sad">
+                        <i class="fa fa-frown-o text-2xl text-info block mb-1"></i>
+                        <span class="text-dark">悲伤</span>
+                    </button>
+                    <button class="emotion-card bg-light p-3 rounded-lg text-center" data-emotion="fear">
+                        <i class="fa fa-meh-o text-2xl text-warning block mb-1"></i>
+                        <span class="text-dark">恐惧</span>
+                    </button>
+                    <button class="emotion-card bg-light p-3 rounded-lg text-center" data-emotion="surprised">
+                        <i class="fa fa-surprise text-2xl text-secondary block mb-1"></i>
+                        <span class="text-dark">惊讶</span>
+                    </button>
+                    <button class="emotion-card bg-light p-3 rounded-lg text-center" data-emotion="disgusted">
+                        <i class="fa fa-tired text-2xl text-dark block mb-1"></i>
+                        <span class="text-dark">厌恶</span>
+                    </button>
+                </div>
+
+                <!-- 反应时间显示 -->
+                <div id="reaction-time-display" class="hidden text-center text-dark font-medium">
+                    反应时间: <span id="reaction-time" class="text-primary font-bold"></span> ms
+                </div>
+
+                <!-- 反馈信息 -->
+                <div id="feedback-message" class="hidden text-center font-bold"></div>
+            </div>
+
+            <!-- 结果阶段 -->
+            <div id="result-stage" class="hidden space-y-6">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold text-dark mb-2">实验完成！</h2>
+                    <p class="text-dark">你的情绪识别能力分析</p>
+                </div>
+
+                <!-- 结果图表 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-light rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-dark mb-4">情绪识别准确率雷达图</h3>
+                        <div class="w-full h-64">
+                            <canvas id="emotion-radar-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-light rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-dark mb-4">反应时间对比</h3>
+                        <div class="w-full h-64">
+                            <canvas id="reaction-time-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 结果统计 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-light rounded-lg p-4 text-center">
+                        <p class="text-dark text-sm">总体准确率</p>
+                        <p id="total-accuracy" class="text-primary font-bold text-xl">0%</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4 text-center">
+                        <p class="text-dark text-sm">平均反应时</p>
+                        <p id="avg-reaction-time" class="text-primary font-bold text-xl">0 ms</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4 text-center">
+                        <p class="text-dark text-sm">最敏感情绪</p>
+                        <p id="best-emotion" class="text-primary font-bold text-xl">无</p>
+                    </div>
+                </div>
+
+                <!-- 情绪识别详情 -->
+                <div class="bg-light rounded-lg p-4">
+                    <h3 class="text-lg font-bold text-dark mb-3">情绪识别详情</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-dark">快乐</span>
+                                <span id="happy-accuracy" class="text-primary font-bold">0%</span>
+                            </div>
+                            <div class="w-full bg-light rounded-full h-2">
+                                <div id="happy-progress" class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-dark">愤怒</span>
+                                <span id="angry-accuracy" class="text-primary font-bold">0%</span>
+                            </div>
+                            <div class="w-full bg-light rounded-full h-2">
+                                <div id="angry-progress" class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-dark">悲伤</span>
+                                <span id="sad-accuracy" class="text-primary font-bold">0%</span>
+                            </div>
+                            <div class="w-full bg-light rounded-full h-2">
+                                <div id="sad-progress" class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-dark">恐惧</span>
+                                <span id="fear-accuracy" class="text-primary font-bold">0%</span>
+                            </div>
+                            <div class="w-full bg-light rounded-full h-2">
+                                <div id="fear-progress" class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-dark">惊讶</span>
+                                <span id="surprised-accuracy" class="text-primary font-bold">0%</span>
+                            </div>
+                            <div class="w-full bg-light rounded-full h-2">
+                                <div id="surprised-progress" class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-dark">厌恶</span>
+                                <span id="disgusted-accuracy" class="text-primary font-bold">0%</span>
+                            </div>
+                            <div class="w-full bg-light rounded-full h-2">
+                                <div id="disgusted-progress" class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 结果解读 -->
+                <div class="bg-light rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-dark mb-3">结果解读</h3>
+                    <p id="result-interpretation" class="text-dark">
+                        你的情绪识别模式表明...
+                    </p>
+                    <p class="text-info text-sm mt-3">*实验结果仅作科普参考，不构成心理诊断</p>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button id="save-result" class="bg-primary hover:bg-primary/90 text-white py-2 px-6 rounded-lg font-medium transition-all">
+                        <i class="fa fa-save mr-2"></i> 保存结果
+                    </button>
+                    <button id="restart-experiment" class="bg-info hover:bg-info/90 text-white py-2 px-6 rounded-lg font-medium transition-all">
+                        <i class="fa fa-refresh mr-2"></i> 重新开始
+                    </button>
+                    <button id="back-to-hall" class="bg-dark hover:bg-dark/90 text-white py-2 px-6 rounded-lg font-medium transition-all">
+                        <i class="fa fa-arrow-left mr-2"></i> 返回大厅
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚组件 -->
+    <!-- 统一页脚组件 -->
+<footer class="bg-[#1e293b] text-white py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <!-- 左侧Logo和文字 -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                    <i class="fa fa-heart"></i>
+                </div>
+                <span class="text-white">心社区</span>
+            </div>
+            
+            <!-- 中间版权信息 -->
+            <div class="text-center">
+                <p class="text-white">© 2025 心社区心理健康支持中心. 保留所有权利.</p>
+            </div>
+            
+            <!-- 右侧图标 -->
+            <div class="flex space-x-4">
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fa fa-bell"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- 引入公共脚本 -->
+    <script src="common.js"></script>
+    <!-- 引入API模块 -->
+    <script type="module">
+      // 导入API函数
+      import { 
+        isAuthenticated, 
+        saveExperimentResult, 
+        saveExperimentResultToLocal,
+        getExperimentStats 
+      } from './api.js';
+      
+      // 将API函数暴露给全局作用域，供后续脚本使用
+      window.API = {
+        isAuthenticated,
+        saveExperimentResult,
+        saveExperimentResultToLocal,
+        getExperimentStats
+      };
+    </script>
+    <!-- 实验脚本 -->
+    <script>
+        // 定义情绪图标映射
+        const emotionIcons = {
+            happy: { icon: 'fa-smile-o', color: 'text-primary' },
+            angry: { icon: 'fa-rage', color: 'text-danger' },
+            sad: { icon: 'fa-frown-o', color: 'text-info' },
+            fear: { icon: 'fa-meh-o', color: 'text-warning' },
+            surprised: { icon: 'fa-surprise', color: 'text-secondary' },
+            disgusted: { icon: 'fa-tired', color: 'text-dark' }
+        };
+
+        // 情绪中文名称映射
+        const emotionNames = {
+            happy: '快乐',
+            angry: '愤怒',
+            sad: '悲伤',
+            fear: '恐惧',
+            surprised: '惊讶',
+            disgusted: '厌恶'
+        };
+
+        // DOM元素
+        const elements = {
+            preparation: document.getElementById('preparation-stage'),
+            tutorial: document.getElementById('tutorial-stage'),
+            experiment: document.getElementById('experiment-stage'),
+            result: document.getElementById('result-stage'),
+            startTutorial: document.getElementById('start-tutorial'),
+            startExperiment: document.getElementById('start-experiment'),
+            faceDisplay: document.getElementById('face-display'),
+            fixationPoint: document.getElementById('fixation-point'),
+            countdown: document.getElementById('countdown'),
+            faceImageContainer: document.getElementById('face-image-container'),
+            faceIcon: document.getElementById('face-icon'),
+            instructionText: document.getElementById('instruction-text'),
+            emotionOptions: document.getElementById('emotion-options'),
+            currentTrial: document.getElementById('current-trial'),
+            totalTrials: document.getElementById('total-trials'),
+            progressBar: document.getElementById('progress-bar'),
+            reactionTimeDisplay: document.getElementById('reaction-time-display'),
+            reactionTime: document.getElementById('reaction-time'),
+            feedbackMessage: document.getElementById('feedback-message'),
+            totalAccuracy: document.getElementById('total-accuracy'),
+            avgReactionTime: document.getElementById('avg-reaction-time'),
+            bestEmotion: document.getElementById('best-emotion'),
+            resultInterpretation: document.getElementById('result-interpretation'),
+            saveResult: document.getElementById('save-result'),
+            restartExperiment: document.getElementById('restart-experiment'),
+            backToHall: document.getElementById('back-to-hall'),
+            // 情绪准确率元素
+            happyAccuracy: document.getElementById('happy-accuracy'),
+            angryAccuracy: document.getElementById('angry-accuracy'),
+            sadAccuracy: document.getElementById('sad-accuracy'),
+            fearAccuracy: document.getElementById('fear-accuracy'),
+            surprisedAccuracy: document.getElementById('surprised-accuracy'),
+            disgustedAccuracy: document.getElementById('disgusted-accuracy'),
+            // 情绪进度条元素
+            happyProgress: document.getElementById('happy-progress'),
+            angryProgress: document.getElementById('angry-progress'),
+            sadProgress: document.getElementById('sad-progress'),
+            fearProgress: document.getElementById('fear-progress'),
+            surprisedProgress: document.getElementById('surprised-progress'),
+            disgustedProgress: document.getElementById('disgusted-progress')
+        };
+
+        // 实验配置
+        const config = {
+            totalTrials: 24, // 总共24轮实验
+            emotions: ['happy', 'angry', 'sad', 'fear', 'surprised', 'disgusted'], // 6种情绪
+            trialsPerEmotion: 4, // 每种情绪出现4次
+            fixationTime: 1000, // 注视点显示时间（毫秒）
+            countdownTime: 1000, // 倒计时时间（毫秒）
+            faceDisplayTime: 1500, // 面部显示时间（毫秒）
+            responseTimeout: 5000 // 响应超时时间（毫秒）
+        };
+
+        // 实验数据
+        let experimentData = {
+            currentTrial: 0,
+            trials: [],
+            trialStartTime: null,
+            currentEmotion: null,
+            responseTimer: null,
+            trialSequence: [] // 预先生成的实验序列
+        };
+
+        // 绑定事件
+        function bindEvents() {
+            elements.startTutorial.addEventListener('click', startTutorial);
+            elements.startExperiment.addEventListener('click', startExperiment);
+            elements.restartExperiment.addEventListener('click', restartExperiment);
+            elements.saveResult.addEventListener('click', saveExperimentResult);
+            elements.backToHall.addEventListener('click', () => {
+                window.location.href = 'psychology_experiments.html';
+            });
+            
+            // 绑定情绪选项点击事件
+            document.querySelectorAll('.emotion-card[data-emotion]').forEach(card => {
+                card.addEventListener('click', function() {
+                    const emotion = this.getAttribute('data-emotion');
+                    handleEmotionSelection(emotion);
+                });
+            });
+        }
+
+        // 生成实验序列
+        function generateTrialSequence() {
+            const sequence = [];
+            
+            // 为每种情绪创建指定数量的试次
+            config.emotions.forEach(emotion => {
+                for (let i = 0; i < config.trialsPerEmotion; i++) {
+                    sequence.push(emotion);
+                }
+            });
+            
+            // 随机打乱序列
+            return shuffleArray(sequence);
+        }
+
+        // 随机打乱数组
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // 开始教程
+        function startTutorial() {
+            // 隐藏准备阶段，显示教程阶段
+            elements.preparation.classList.add('hidden');
+            elements.tutorial.classList.remove('hidden');
+            elements.experiment.classList.add('hidden');
+            elements.result.classList.add('hidden');
+        }
+
+        // 开始实验
+        function startExperiment() {
+            // 隐藏教程阶段，显示实验阶段
+            elements.tutorial.classList.add('hidden');
+            elements.experiment.classList.remove('hidden');
+            elements.result.classList.add('hidden');
+            
+            // 重置实验数据
+            resetExperimentData();
+            
+            // 生成实验序列
+            experimentData.trialSequence = generateTrialSequence();
+            
+            // 开始第一轮实验
+            startNewTrial();
+        }
+
+        // 重置实验数据
+        function resetExperimentData() {
+            experimentData = {
+                currentTrial: 0,
+                trials: [],
+                trialStartTime: null,
+                currentEmotion: null,
+                responseTimer: null,
+                trialSequence: []
+            };
+            
+            // 更新显示
+            elements.currentTrial.textContent = '1';
+            elements.totalTrials.textContent = config.totalTrials;
+            elements.progressBar.style.width = '0%';
+        }
+
+        // 开始新的实验轮次
+        function startNewTrial() {
+            // 增加当前轮次
+            experimentData.currentTrial++;
+            
+            // 更新显示
+            elements.currentTrial.textContent = experimentData.currentTrial;
+            elements.progressBar.style.width = `${((experimentData.currentTrial - 1) / config.totalTrials) * 100}%`;
+            
+            // 隐藏反馈
+            elements.reactionTimeDisplay.classList.add('hidden');
+            elements.feedbackMessage.classList.add('hidden');
+            
+            // 重置显示元素
+            elements.faceImageContainer.classList.add('hidden');
+            elements.emotionOptions.classList.add('hidden');
+            elements.instructionText.classList.add('hidden');
+            
+            // 移除所有情绪卡片的选中状态
+            document.querySelectorAll('.emotion-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 显示注视点
+            elements.fixationPoint.classList.remove('hidden');
+            
+            // 注视点显示后，显示倒计时
+            setTimeout(() => {
+                elements.fixationPoint.classList.add('hidden');
+                showCountdown();
+            }, config.fixationTime);
+        }
+
+        // 显示倒计时
+        function showCountdown() {
+            elements.countdown.textContent = '3';
+            elements.countdown.classList.remove('hidden');
+            elements.countdown.classList.add('countdown-animation');
+            
+            setTimeout(() => {
+                elements.countdown.textContent = '2';
+                elements.countdown.classList.remove('countdown-animation');
+                // 触发重绘
+                void elements.countdown.offsetWidth;
+                elements.countdown.classList.add('countdown-animation');
+                
+                setTimeout(() => {
+                    elements.countdown.textContent = '1';
+                    elements.countdown.classList.remove('countdown-animation');
+                    // 触发重绘
+                    void elements.countdown.offsetWidth;
+                    elements.countdown.classList.add('countdown-animation');
+                    
+                    setTimeout(() => {
+                        elements.countdown.classList.add('hidden');
+                        elements.countdown.classList.remove('countdown-animation');
+                        displayFace();
+                    }, config.countdownTime);
+                }, config.countdownTime);
+            }, config.countdownTime);
+        }
+
+        // 显示面部表情
+        function displayFace() {
+            // 从序列中获取当前情绪
+            experimentData.currentEmotion = experimentData.trialSequence[experimentData.currentTrial - 1];
+            
+            // 获取情绪配置
+            const emotionConfig = emotionIcons[experimentData.currentEmotion];
+            
+            // 更新面部图标
+            elements.faceIcon.className = `fa ${emotionConfig.icon} ${emotionConfig.color}`;
+            
+            // 显示面部图像
+            elements.faceImageContainer.classList.remove('hidden');
+            elements.faceImageContainer.classList.add('face-appear');
+            
+            // 记录开始时间
+            experimentData.trialStartTime = Date.now();
+            
+            // 面部显示一段时间后隐藏
+            setTimeout(() => {
+                elements.faceImageContainer.classList.add('face-disappear');
+                
+                setTimeout(() => {
+                    elements.faceImageContainer.classList.add('hidden');
+                    elements.faceImageContainer.classList.remove('face-appear', 'face-disappear');
+                    showEmotionOptions();
+                }, 300);
+            }, config.faceDisplayTime);
+        }
+
+        // 显示情绪选项
+        function showEmotionOptions() {
+            // 显示提示文字和选项
+            elements.instructionText.classList.remove('hidden');
+            elements.emotionOptions.classList.remove('hidden');
+            
+            // 设置响应超时
+            experimentData.responseTimer = setTimeout(() => {
+                handleTimeout();
+            }, config.responseTimeout);
+        }
+
+        // 处理情绪选择
+        function handleEmotionSelection(selectedEmotion) {
+            // 清除响应超时定时器
+            clearTimeout(experimentData.responseTimer);
+            
+            // 计算反应时间（从面部图像消失后开始计算）
+            const reactionTime = Date.now() - (experimentData.trialStartTime + config.faceDisplayTime);
+            
+            // 判断是否正确
+            const isCorrect = selectedEmotion === experimentData.currentEmotion;
+            
+            // 高亮选中的情绪卡片
+            document.querySelectorAll('.emotion-card').forEach(card => {
+                if (card.getAttribute('data-emotion') === selectedEmotion) {
+                    card.classList.add('selected');
+                }
+            });
+            
+            // 记录数据
+            experimentData.trials.push({
+                trialNumber: experimentData.currentTrial,
+                emotion: experimentData.currentEmotion,
+                selectedEmotion: selectedEmotion,
+                reactionTime: reactionTime,
+                isCorrect: isCorrect,
+                timestamp: new Date().toISOString()
+            });
+            
+            // 显示反应时间和反馈
+            showFeedback(reactionTime, isCorrect);
+            
+            // 检查是否完成所有轮次
+            if (experimentData.currentTrial >= config.totalTrials) {
+                // 所有轮次完成，显示结果
+                setTimeout(() => {
+                    showResults();
+                }, 1500);
+            } else {
+                // 准备下一轮
+                setTimeout(() => {
+                    startNewTrial();
+                }, 1500);
+            }
+        }
+
+        // 处理超时
+        function handleTimeout() {
+            // 记录数据（超时视为错误）
+            experimentData.trials.push({
+                trialNumber: experimentData.currentTrial,
+                emotion: experimentData.currentEmotion,
+                selectedEmotion: null,
+                reactionTime: config.responseTimeout,
+                isCorrect: false,
+                isTimeout: true,
+                timestamp: new Date().toISOString()
+            });
+            
+            // 显示超时反馈
+            elements.feedbackMessage.textContent = '超时！请更快地做出反应';
+            elements.feedbackMessage.className = 'text-center font-bold text-danger feedback-animation';
+            elements.feedbackMessage.classList.remove('hidden');
+            
+            // 检查是否完成所有轮次
+            if (experimentData.currentTrial >= config.totalTrials) {
+                // 所有轮次完成，显示结果
+                setTimeout(() => {
+                    showResults();
+                }, 1500);
+            } else {
+                // 准备下一轮
+                setTimeout(() => {
+                    startNewTrial();
+                }, 1500);
+            }
+        }
+
+        // 显示反馈
+        function showFeedback(reactionTime, isCorrect) {
+            // 显示反应时间
+            elements.reactionTime.textContent = reactionTime;
+            elements.reactionTimeDisplay.classList.remove('hidden');
+            
+            // 显示正确性反馈
+            elements.feedbackMessage.textContent = isCorrect ? '正确！' : `错误！正确情绪是 ${emotionNames[experimentData.currentEmotion]}`;
+            elements.feedbackMessage.className = `text-center font-bold feedback-animation ${isCorrect ? 'text-secondary' : 'text-danger'}`;
+            elements.feedbackMessage.classList.remove('hidden');
+        }
+
+        // 显示结果
+        function showResults() {
+            // 隐藏实验阶段，显示结果阶段
+            elements.experiment.classList.add('hidden');
+            elements.result.classList.remove('hidden');
+            
+            // 计算统计数据
+            const stats = calculateStatistics();
+            
+            // 更新显示
+            elements.totalAccuracy.textContent = `${stats.totalAccuracy}%`;
+            elements.avgReactionTime.textContent = `${stats.avgReactionTime} ms`;
+            elements.bestEmotion.textContent = emotionNames[stats.bestEmotion] || '无';
+            
+            // 更新各情绪准确率
+            updateEmotionAccuracyDisplays(stats.emotionStats);
+            
+            // 生成结果解读
+            generateResultInterpretation(stats);
+            
+            // 绘制图表
+            drawRadarChart(stats);
+            drawReactionTimeChart(stats);
+            
+            // 保存到localStorage（即使未登录）
+            if (window.API && window.API.saveExperimentResultToLocal) {
+                window.API.saveExperimentResultToLocal('emotion-recognition', {
+                    trials: experimentData.trials,
+                    statistics: stats,
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                // 降级到本地函数
+                saveToLocalStorage({
+                    trials: experimentData.trials,
+                    statistics: stats,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+
+        // 计算统计数据
+        function calculateStatistics() {
+            const trials = experimentData.trials;
+            
+            // 过滤掉超时的尝试
+            const validTrials = trials.filter(trial => !trial.isTimeout);
+            
+            // 计算总体准确率
+            const correctCount = trials.filter(trial => trial.isCorrect).length;
+            const totalAccuracy = Math.round((correctCount / trials.length) * 100);
+            
+            // 计算平均反应时间
+            const totalReactionTime = validTrials.reduce((sum, trial) => sum + trial.reactionTime, 0);
+            const avgReactionTime = validTrials.length > 0 ? Math.round(totalReactionTime / validTrials.length) : 0;
+            
+            // 计算每种情绪的统计数据
+            const emotionStats = {};
+            config.emotions.forEach(emotion => {
+                const emotionTrials = trials.filter(trial => trial.emotion === emotion);
+                const correctEmotionTrials = emotionTrials.filter(trial => trial.isCorrect);
+                const validEmotionTrials = emotionTrials.filter(trial => !trial.isTimeout);
+                
+                const correctCount = correctEmotionTrials.length;
+                const accuracy = Math.round((correctCount / emotionTrials.length) * 100);
+                
+                const reactionTimes = validEmotionTrials.map(trial => trial.reactionTime);
+                const avgRT = reactionTimes.length > 0 ? 
+                    Math.round(reactionTimes.reduce((sum, rt) => sum + rt, 0) / reactionTimes.length) : 0;
+                
+                emotionStats[emotion] = {
+                    accuracy: accuracy,
+                    avgReactionTime: avgRT,
+                    correct: correctCount,
+                    total: emotionTrials.length
+                };
+            });
+            
+            // 找出最佳和最差的情绪识别
+            let bestEmotion = null;
+            let bestAccuracy = -1;
+            let worstEmotion = null;
+            let worstAccuracy = 101;
+            
+            Object.entries(emotionStats).forEach(([emotion, stats]) => {
+                if (stats.accuracy > bestAccuracy) {
+                    bestAccuracy = stats.accuracy;
+                    bestEmotion = emotion;
+                }
+                if (stats.accuracy < worstAccuracy) {
+                    worstAccuracy = stats.accuracy;
+                    worstEmotion = emotion;
+                }
+            });
+            
+            return {
+                totalAccuracy,
+                avgReactionTime,
+                emotionStats,
+                bestEmotion,
+                worstEmotion,
+                correctCount,
+                totalTrials: trials.length,
+                validTrials: validTrials.length
+            };
+        }
+
+        // 更新情绪准确率显示
+        function updateEmotionAccuracyDisplays(emotionStats) {
+            config.emotions.forEach(emotion => {
+                const accuracyElement = elements[`${emotion}Accuracy`];
+                const progressElement = elements[`${emotion}Progress`];
+                
+                if (accuracyElement && progressElement) {
+                    const accuracy = emotionStats[emotion].accuracy;
+                    accuracyElement.textContent = `${accuracy}%`;
+                    progressElement.style.width = `${accuracy}%`;
+                }
+            });
+        }
+
+        // 生成结果解读
+        function generateResultInterpretation(stats) {
+            let interpretation = '';
+            
+            // 基于总体准确率生成解读
+            if (stats.totalAccuracy >= 90) {
+                interpretation += '你的情绪识别能力非常出色！准确率达到90%以上，说明你对各种情绪的面部表达有敏锐的感知。';
+                interpretation += ' 这种能力在社交互动中非常重要，有助于你准确理解他人的情感状态。';
+            } else if (stats.totalAccuracy >= 75) {
+                interpretation += `你的情绪识别能力处于良好水平，总体准确率为${stats.totalAccuracy}%。`;
+                interpretation += ' 你能够较为准确地识别大多数基本情绪，这是社交能力的重要组成部分。';
+            } else {
+                interpretation += `你的情绪识别准确率为${stats.totalAccuracy}%，可能需要更多的练习来提高情绪感知能力。`;
+                interpretation += ' 观察日常生活中的面部表情并尝试识别他人的情绪状态，有助于提高这一能力。';
+            }
+            
+            // 添加最佳和最差情绪识别的分析
+            if (stats.bestEmotion && stats.worstEmotion) {
+                const bestAccuracy = stats.emotionStats[stats.bestEmotion].accuracy;
+                const worstAccuracy = stats.emotionStats[stats.worstEmotion].accuracy;
+                
+                interpretation += ` 你对${emotionNames[stats.bestEmotion]}的识别最为准确（${bestAccuracy}%），`;
+                interpretation += `而对${emotionNames[stats.worstEmotion]}的识别相对较弱（${worstAccuracy}%）。`;
+                
+                // 根据特定情绪的强弱提供进一步解读
+                if (stats.bestEmotion === 'happy' || stats.bestEmotion === 'surprised') {
+                    interpretation += ' 你对积极情绪的敏感度较高，可能更容易感受到他人的正面情绪。';
+                } else if (stats.bestEmotion === 'sad' || stats.bestEmotion === 'fear') {
+                    interpretation += ' 你对消极情绪的敏感度较高，可能更善于察觉他人的痛苦或不适。';
+                }
+            }
+            
+            elements.resultInterpretation.textContent = interpretation;
+        }
+
+        // 绘制雷达图
+        async function drawRadarChart(stats) {
+            const ctx = document.getElementById('emotion-radar-chart').getContext('2d');
+            
+            // 准备数据
+            const labels = config.emotions.map(emotion => emotionNames[emotion]);
+            const data = config.emotions.map(emotion => stats.emotionStats[emotion].accuracy);
+            
+            // 获取群体平均数据
+            let groupAvgData = [85, 75, 80, 70, 90, 75]; // 默认群体平均值
+            
+            // 尝试从API获取统计数据
+            if (window.API && window.API.getExperimentStats) {
+                try {
+                    const apiStats = await window.API.getExperimentStats('emotion-recognition');
+                    if (apiStats && apiStats.averageAccuracies) {
+                        groupAvgData = config.emotions.map(emotion => apiStats.averageAccuracies[emotion] || 0);
+                    }
+                } catch (error) {
+                    console.error('获取统计数据失败，使用默认值:', error);
+                }
+            }
+            
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '你的准确率',
+                            data: data,
+                            backgroundColor: 'rgba(22, 93, 255, 0.2)',
+                            borderColor: 'rgba(22, 93, 255, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(22, 93, 255, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(22, 93, 255, 1)'
+                        },
+                        {
+                            label: '群体平均',
+                            data: groupAvgData,
+                            backgroundColor: 'rgba(134, 144, 156, 0.2)',
+                            borderColor: 'rgba(134, 144, 156, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(134, 144, 156, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(134, 144, 156, 1)',
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        // 绘制反应时间图表
+        function drawReactionTimeChart(stats) {
+            const ctx = document.getElementById('reaction-time-chart').getContext('2d');
+            
+            // 准备数据
+            const labels = config.emotions.map(emotion => emotionNames[emotion]);
+            const data = config.emotions.map(emotion => stats.emotionStats[emotion].avgReactionTime);
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '平均反应时间 (ms)',
+                            data: data,
+                            backgroundColor: [
+                                'rgba(22, 93, 255, 0.7)',
+                                'rgba(245, 63, 63, 0.7)',
+                                'rgba(134, 144, 156, 0.7)',
+                                'rgba(255, 125, 0, 0.7)',
+                                'rgba(0, 180, 42, 0.7)',
+                                'rgba(78, 89, 105, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(22, 93, 255, 1)',
+                                'rgba(245, 63, 63, 1)',
+                                'rgba(134, 144, 156, 1)',
+                                'rgba(255, 125, 0, 1)',
+                                'rgba(0, 180, 42, 1)',
+                                'rgba(78, 89, 105, 1)'
+                            ],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '反应时间 (毫秒)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 保存到localStorage（降级方案）
+        function saveToLocalStorage(results) {
+            try {
+                // 获取现有记录
+                let experimentRecords = JSON.parse(localStorage.getItem('experimentRecords') || '[]');
+                
+                // 添加新记录
+                experimentRecords.push({
+                    type: 'emotion-recognition',
+                    results: results,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // 只保留最近20条记录
+                if (experimentRecords.length > 20) {
+                    experimentRecords = experimentRecords.slice(-20);
+                }
+                
+                // 保存回localStorage
+                localStorage.setItem('experimentRecords', JSON.stringify(experimentRecords));
+            } catch (error) {
+                console.error('保存实验结果到localStorage失败:', error);
+            }
+        }
+
+        // 保存实验结果到服务器
+        async function saveExperimentResult() {
+            // 检查用户是否登录
+            if (window.API && window.API.isAuthenticated) {
+                if (!window.API.isAuthenticated()) {
+                    // 显示登录提示
+                    if (confirm('登录后可保存实验记录，是否立即登录？')) {
+                        window.location.href = 'login.html';
+                    }
+                    return;
+                }
+            } else {
+                // 降级检查
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    if (confirm('登录后可保存实验记录，是否立即登录？')) {
+                        window.location.href = 'login.html';
+                    }
+                    return;
+                }
+            }
+            
+            // 获取最新的结果（从localStorage）
+            try {
+                let experimentRecords = JSON.parse(localStorage.getItem('experimentRecords') || '[]');
+                const latestResult = experimentRecords
+                    .filter(record => record.type === 'emotion-recognition')
+                    .pop();
+                
+                if (latestResult && window.API && window.API.saveExperimentResult) {
+                    // 调用API保存结果
+                    await window.API.saveExperimentResult('emotion-recognition', latestResult.results);
+                    
+                    // 显示成功提示
+                    alert('实验结果保存成功！');
+                    
+                    // 禁用保存按钮
+                    elements.saveResult.disabled = true;
+                    elements.saveResult.classList.add('opacity-50');
+                    elements.saveResult.textContent = '已保存';
+                } else {
+                    alert('保存失败，请稍后重试');
+                }
+            } catch (error) {
+                console.error('保存实验结果失败:', error);
+                alert('保存失败，请稍后重试');
+            }
+        }
+
+        // 重新开始实验
+        function restartExperiment() {
+            // 重置实验数据
+            resetExperimentData();
+            
+            // 隐藏结果阶段，显示实验阶段
+            elements.result.classList.add('hidden');
+            elements.experiment.classList.remove('hidden');
+            
+            // 重新启用保存按钮
+            elements.saveResult.disabled = false;
+            elements.saveResult.classList.remove('opacity-50');
+            elements.saveResult.textContent = '保存结果';
+            
+            // 生成新的实验序列
+            experimentData.trialSequence = generateTrialSequence();
+            
+            // 开始新一轮实验
+            startNewTrial();
+        }
+
+        // 初始化
+        function init() {
+            bindEvents();
+            
+            // 加载导航栏和页脚
+            if (typeof loadNavbar === 'function') {
+                loadNavbar();
+            }
+            if (typeof loadFooter === 'function') {
+                loadFooter();
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+<script src="update_experiment_navigation.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 立即强制同步登录状态
+            if (window.forceExperimentLoginSync) {
+                window.forceExperimentLoginSync();
+            }
+        });
+        
+        // 增强的登录检查函数
+        function enhancedCheckLogin() {
+            // 优先使用AuthManager
+            if (window.AuthManager) {
+                return window.AuthManager.isLoggedIn();
+            } else {
+                // 兼容旧的token检查和新的AuthManager格式
+                const authToken = localStorage.getItem('auth_token');
+                const oldToken = localStorage.getItem('token');
+                const isLogin = localStorage.getItem('isLogin') === 'true';
+                return authToken || oldToken || isLogin;
+            }
+        }
+        
+        // 监听全局登录事件，确保实验页面及时响应
+        window.addEventListener('userLoggedIn', () => {
+            console.log('实验页面检测到用户登录');
+            // 可以在这里更新UI，比如启用保存按钮
+            const saveButton = document.querySelector('#save-result');
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.classList.remove('opacity-50');
+            }
+        });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿希从众实验 - 心社区</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 引入Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- Tailwind CSS配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        info: '#86909C',
+                        light: '#F2F3F5',
+                        dark: '#4E5969'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- 自定义样式 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .line-display {
+                min-height: 400px;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: white;
+                border-radius: 8px;
+            }
+            .standard-line {
+                height: 2px;
+                background-color: #165DFF;
+                position: absolute;
+                top: 100px;
+            }
+            .comparison-line {
+                height: 2px;
+                background-color: #4E5969;
+                position: absolute;
+                bottom: 100px;
+            }
+            .participant {
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+            .participant.active {
+                border-color: #165DFF;
+                background-color: rgba(22, 93, 255, 0.1);
+            }
+            .participant.selected {
+                border-color: #00B42A;
+                background-color: rgba(0, 180, 42, 0.1);
+            }
+            .participant.conflict {
+                border-color: #F53F3F;
+                background-color: rgba(245, 63, 63, 0.1);
+            }
+            .line-button {
+                transition: all 0.2s ease;
+            }
+            .line-button:hover {
+                transform: scale(1.05);
+            }
+            .line-button:active {
+                transform: scale(0.98);
+            }
+            .fade-in {
+                animation: fadeIn 0.5s ease-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            .slide-in {
+                animation: slideIn 0.3s ease-out;
+            }
+            @keyframes slideIn {
+                from { transform: translateY(10px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            .pulse {
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        }
+    </style>
+<link rel="stylesheet" href="experiments-responsive.css">
+</head>
+<body class="bg-light min-h-screen flex flex-col">
+    <!-- 导航栏组件 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav id="main-nav"></nav>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- 页面标题 -->
+        <div class="text-center mb-8">
+            <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-primary mb-2">阿希从众实验</h1>
+            <p class="text-dark text-base">探索群体压力如何影响个人判断</p>
+        </div>
+
+        <!-- 实验容器 -->
+        <div class="bg-white rounded-xl shadow-md p-6 md:p-8 max-w-4xl mx-auto">
+            <!-- 准备阶段 -->
+            <div id="preparation-stage" class="space-y-6">
+                <div class="bg-light rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-dark mb-4">实验介绍</h2>
+                    <p class="text-dark mb-4">本实验基于所罗门·阿希（Solomon Asch）1951年的经典从众研究，旨在探索群体压力对个人判断的影响。</p>
+                    <p class="text-dark">在这个实验中，你将与其他6名参与者一起判断线段的长度。所有参与者会依次说出自己的答案，你是最后一个回答的。请仔细观察线段，并根据你的判断做出选择。</p>
+                </div>
+
+                <div class="bg-light rounded-lg p-6">
+                    <h2 class="text-xl font-bold text-dark mb-4">实验步骤</h2>
+                    <ol class="list-decimal list-inside space-y-2 text-dark">
+                        <li>屏幕上方会显示一条标准线段</li>
+                        <li>屏幕下方会显示三条不同长度的线段（A、B、C）</li>
+                        <li>请仔细观察，找出与标准线段长度相同的线段</li>
+                        <li>实验共有6轮，每轮请根据你的判断选择答案</li>
+                    </ol>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="start-tutorial" class="bg-primary hover:bg-primary/90 text-white py-3 px-8 rounded-lg font-medium transition-all transform hover:scale-105">
+                        开始教程
+                    </button>
+                </div>
+            </div>
+
+            <!-- 教程阶段 -->
+            <div id="tutorial-stage" class="hidden space-y-6 slide-in">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold text-dark mb-4">实验演示</h2>
+                    <p class="text-dark">请了解实验的具体流程</p>
+                </div>
+
+                <!-- 参与者显示区域 -->
+                <div class="flex flex-wrap justify-center gap-4 mb-6">
+                    <div class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者1</span>
+                    </div>
+                    <div class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者2</span>
+                    </div>
+                    <div class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者3</span>
+                    </div>
+                    <div class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者4</span>
+                    </div>
+                    <div class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者5</span>
+                    </div>
+                    <div class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者6</span>
+                    </div>
+                    <div class="participant w-20 h-20 flex items-center justify-center rounded-full bg-primary/10 border-2 border-primary">
+                        <span class="text-primary font-bold">你</span>
+                    </div>
+                </div>
+
+                <!-- 线段显示区域 -->
+                <div class="line-display mb-6">
+                    <!-- 标准线段 -->
+                    <div class="standard-line w-32"></div>
+                    <div class="absolute top-80 left-0 right-0 text-center font-medium text-dark">标准线段</div>
+                    
+                    <!-- 比较线段 -->
+                    <div class="comparison-line w-32 left-[calc(50%-120px)]"></div>
+                    <div class="comparison-line w-48 left-[calc(50%-48px)]"></div>
+                    <div class="comparison-line w-24 right-[calc(50%-120px)]"></div>
+                    
+                    <!-- 标签 -->
+                    <div class="absolute bottom-80 left-[calc(50%-120px)] text-center font-medium text-dark">A</div>
+                    <div class="absolute bottom-80 left-[calc(50%-48px)] text-center font-medium text-dark">B</div>
+                    <div class="absolute bottom-80 right-[calc(50%-120px)] text-center font-medium text-dark">C</div>
+                </div>
+
+                <!-- 说明 -->
+                <div class="bg-light rounded-lg p-4">
+                    <p class="text-dark text-sm">
+                        <i class="fa fa-info-circle text-primary mr-2"></i>
+                        实验中，你将看到上方的标准线段和下方的三条比较线段。你需要找出与标准线段长度相同的那条线段。
+                        其他参与者会先回答，你是最后一个回答的。请根据你的真实判断做出选择，不要受他人影响。
+                    </p>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="start-experiment" class="bg-primary hover:bg-primary/90 text-white py-2 px-6 rounded-lg font-medium transition-all transform hover:scale-105">
+                        开始实验
+                    </button>
+                </div>
+            </div>
+
+            <!-- 实验阶段 -->
+            <div id="experiment-stage" class="hidden space-y-6">
+                <!-- 进度信息 -->
+                <div class="text-center">
+                    <div class="inline-block text-dark font-medium mb-2">
+                        试次: <span id="current-trial">1</span>/<span id="total-trials">6</span>
+                    </div>
+                    <div class="w-full bg-light rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- 参与者显示区域 -->
+                <div id="participants-container" class="flex flex-wrap justify-center gap-4 mb-6">
+                    <div id="participant-1" class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者1</span>
+                    </div>
+                    <div id="participant-2" class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者2</span>
+                    </div>
+                    <div id="participant-3" class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者3</span>
+                    </div>
+                    <div id="participant-4" class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者4</span>
+                    </div>
+                    <div id="participant-5" class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者5</span>
+                    </div>
+                    <div id="participant-6" class="participant w-16 h-16 flex items-center justify-center rounded-full bg-light border-2 border-gray-300">
+                        <span class="text-dark font-medium">参与者6</span>
+                    </div>
+                    <div id="participant-you" class="participant w-20 h-20 flex items-center justify-center rounded-full bg-primary/10 border-2 border-primary">
+                        <span class="text-primary font-bold">你</span>
+                    </div>
+                </div>
+
+                <!-- 线段显示区域 -->
+                <div id="lines-container" class="line-display mb-6">
+                    <!-- 标准线段 -->
+                    <div id="standard-line" class="standard-line w-32"></div>
+                    <div class="absolute top-80 left-0 right-0 text-center font-medium text-dark">标准线段</div>
+                    
+                    <!-- 比较线段 -->
+                    <div id="comparison-line-a" class="comparison-line w-32 left-[calc(50%-120px)]"></div>
+                    <div id="comparison-line-b" class="comparison-line w-48 left-[calc(50%-48px)]"></div>
+                    <div id="comparison-line-c" class="comparison-line w-24 right-[calc(50%-120px)]"></div>
+                    
+                    <!-- 标签 -->
+                    <div class="absolute bottom-80 left-[calc(50%-120px)] text-center font-medium text-dark">A</div>
+                    <div class="absolute bottom-80 left-[calc(50%-48px)] text-center font-medium text-dark">B</div>
+                    <div class="absolute bottom-80 right-[calc(50%-120px)] text-center font-medium text-dark">C</div>
+                </div>
+
+                <!-- 答案提示区域 -->
+                <div id="answer-indicator" class="hidden text-center mb-4">
+                    <div id="current-participant-name" class="text-primary font-medium mb-2"></div>
+                    <div id="answer-feedback" class="text-dark"></div>
+                </div>
+
+                <!-- 用户选择区域 -->
+                <div id="user-selection" class="hidden grid grid-cols-3 gap-4 max-w-md mx-auto">
+                    <button id="select-a" class="line-button bg-light hover:bg-primary/10 p-4 rounded-lg text-center border border-gray-300" data-line="A">
+                        <span class="block font-bold text-xl mb-2">A</span>
+                        <span class="text-xs text-dark">选择线段A</span>
+                    </button>
+                    <button id="select-b" class="line-button bg-light hover:bg-primary/10 p-4 rounded-lg text-center border border-gray-300" data-line="B">
+                        <span class="block font-bold text-xl mb-2">B</span>
+                        <span class="text-xs text-dark">选择线段B</span>
+                    </button>
+                    <button id="select-c" class="line-button bg-light hover:bg-primary/10 p-4 rounded-lg text-center border border-gray-300" data-line="C">
+                        <span class="block font-bold text-xl mb-2">C</span>
+                        <span class="text-xs text-dark">选择线段C</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 结果阶段 -->
+            <div id="result-stage" class="hidden space-y-6 fade-in">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold text-dark mb-2">实验完成！</h2>
+                    <p class="text-dark">你的从众倾向分析</p>
+                </div>
+
+                <!-- 结果图表 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-light rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-dark mb-4">从众率对比</h3>
+                        <div class="w-full h-64">
+                            <canvas id="conformity-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-light rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-dark mb-4">每轮判断</h3>
+                        <div class="w-full h-64">
+                            <canvas id="trial-decision-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 结果统计 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-light rounded-lg p-4 text-center">
+                        <p class="text-dark text-sm">从众率</p>
+                        <p id="conformity-rate" class="text-primary font-bold text-xl">0%</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4 text-center">
+                        <p class="text-dark text-sm">独立判断次数</p>
+                        <p id="independent-count" class="text-secondary font-bold text-xl">0</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4 text-center">
+                        <p class="text-dark text-sm">反应时间均值</p>
+                        <p id="avg-reaction-time" class="text-dark font-bold text-xl">0ms</p>
+                    </div>
+                </div>
+
+                <!-- 详细结果 -->
+                <div class="bg-light rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-dark mb-3">每轮详细结果</h3>
+                    <div id="detailed-results" class="space-y-2">
+                        <!-- 这里将动态填充每轮的结果 -->
+                    </div>
+                </div>
+
+                <!-- 结果解读 -->
+                <div class="bg-light rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-dark mb-3">结果解读</h3>
+                    <p id="result-interpretation" class="text-dark">
+                        你的从众行为表明...
+                    </p>
+                    <p class="text-info text-sm mt-3">*实验结果仅作科普参考，不构成心理诊断</p>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button id="save-result" class="bg-primary hover:bg-primary/90 text-white py-2 px-6 rounded-lg font-medium transition-all">
+                        <i class="fa fa-save mr-2"></i> 保存结果
+                    </button>
+                    <button id="restart-experiment" class="bg-info hover:bg-info/90 text-white py-2 px-6 rounded-lg font-medium transition-all">
+                        <i class="fa fa-refresh mr-2"></i> 重新开始
+                    </button>
+                    <button id="back-to-hall" class="bg-dark hover:bg-dark/90 text-white py-2 px-6 rounded-lg font-medium transition-all">
+                        <i class="fa fa-arrow-left mr-2"></i> 返回大厅
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚组件 -->
+    <footer id="main-footer"></footer>
+
+    <!-- 引入公共脚本 -->
+    <script src="common.js"></script>
+    <!-- 引入API模块 -->
+    <script type="module">
+      // 导入API函数
+      import { 
+        isAuthenticated, 
+        saveExperimentResult, 
+        saveExperimentResultToLocal,
+        getExperimentStats 
+      } from './api.js';
+      
+      // 将API函数暴露给全局作用域，供后续脚本使用
+      window.API = {
+        isAuthenticated,
+        saveExperimentResult,
+        saveExperimentResultToLocal,
+        getExperimentStats
+      };
+    </script>
+    <!-- 实验脚本 -->
+    <script>
+        // 实验配置
+        const config = {
+            totalTrials: 6, // 总共6轮实验
+            // 线段配置（前2轮正确，后4轮群体一致错误）
+            trials: [
+                { // 轮次1：群体正确
+                    standardLineLength: 8, // 英寸（用于计算比例）
+                    comparisonLines: {
+                        A: 8,   // 正确答案
+                        B: 10,  // 更长
+                        C: 6    // 更短
+                    },
+                    groupAnswers: ['A', 'A', 'A', 'A', 'A', 'A'], // 群体一致正确
+                    correctAnswer: 'A'
+                },
+                { // 轮次2：群体正确
+                    standardLineLength: 6,
+                    comparisonLines: {
+                        A: 5,
+                        B: 6,   // 正确答案
+                        C: 7
+                    },
+                    groupAnswers: ['B', 'B', 'B', 'B', 'B', 'B'], // 群体一致正确
+                    correctAnswer: 'B'
+                },
+                { // 轮次3：群体一致错误
+                    standardLineLength: 7,
+                    comparisonLines: {
+                        A: 9,   // 错误答案（群体选这个）
+                        B: 7,   // 正确答案
+                        C: 5
+                    },
+                    groupAnswers: ['A', 'A', 'A', 'A', 'A', 'A'], // 群体一致错误
+                    correctAnswer: 'B'
+                },
+                { // 轮次4：群体一致错误
+                    standardLineLength: 9,
+                    comparisonLines: {
+                        A: 10,
+                        B: 9,   // 正确答案
+                        C: 7    // 错误答案（群体选这个）
+                    },
+                    groupAnswers: ['C', 'C', 'C', 'C', 'C', 'C'], // 群体一致错误
+                    correctAnswer: 'B'
+                },
+                { // 轮次5：群体一致错误
+                    standardLineLength: 5,
+                    comparisonLines: {
+                        A: 5,   // 正确答案
+                        B: 4,
+                        C: 7    // 错误答案（群体选这个）
+                    },
+                    groupAnswers: ['C', 'C', 'C', 'C', 'C', 'C'], // 群体一致错误
+                    correctAnswer: 'A'
+                },
+                { // 轮次6：群体一致错误
+                    standardLineLength: 10,
+                    comparisonLines: {
+                        A: 8,   // 错误答案（群体选这个）
+                        B: 10,  // 正确答案
+                        C: 11
+                    },
+                    groupAnswers: ['A', 'A', 'A', 'A', 'A', 'A'], // 群体一致错误
+                    correctAnswer: 'B'
+                }
+            ],
+            // 时间配置（毫秒）
+            timing: {
+                participantDelay: 1000,  // 参与者之间的延迟
+                selectionTimeout: 30000,  // 用户选择超时时间
+                feedbackTime: 1000        // 反馈显示时间
+            },
+            // 比例配置（英寸转像素）
+            scale: 40 // 1英寸 = 40像素
+        };
+
+        // DOM元素
+        const elements = {
+            preparation: document.getElementById('preparation-stage'),
+            tutorial: document.getElementById('tutorial-stage'),
+            experiment: document.getElementById('experiment-stage'),
+            result: document.getElementById('result-stage'),
+            startTutorial: document.getElementById('start-tutorial'),
+            startExperiment: document.getElementById('start-experiment'),
+            // 实验元素
+            currentTrial: document.getElementById('current-trial'),
+            totalTrials: document.getElementById('total-trials'),
+            progressBar: document.getElementById('progress-bar'),
+            participantsContainer: document.getElementById('participants-container'),
+            standardLine: document.getElementById('standard-line'),
+            comparisonLineA: document.getElementById('comparison-line-a'),
+            comparisonLineB: document.getElementById('comparison-line-b'),
+            comparisonLineC: document.getElementById('comparison-line-c'),
+            answerIndicator: document.getElementById('answer-indicator'),
+            currentParticipantName: document.getElementById('current-participant-name'),
+            answerFeedback: document.getElementById('answer-feedback'),
+            userSelection: document.getElementById('user-selection'),
+            selectA: document.getElementById('select-a'),
+            selectB: document.getElementById('select-b'),
+            selectC: document.getElementById('select-c'),
+            // 结果元素
+            conformityRate: document.getElementById('conformity-rate'),
+            independentCount: document.getElementById('independent-count'),
+            avgReactionTime: document.getElementById('avg-reaction-time'),
+            detailedResults: document.getElementById('detailed-results'),
+            resultInterpretation: document.getElementById('result-interpretation'),
+            saveResult: document.getElementById('save-result'),
+            restartExperiment: document.getElementById('restart-experiment'),
+            backToHall: document.getElementById('back-to-hall')
+        };
+
+        // 实验数据
+        let experimentData = {
+            currentTrial: 0,
+            results: [],
+            currentParticipantIndex: 0,
+            startTime: null,
+            selectionTimeoutTimer: null
+        };
+
+        // 绑定事件
+        function bindEvents() {
+            elements.startTutorial.addEventListener('click', startTutorial);
+            elements.startExperiment.addEventListener('click', startExperiment);
+            elements.restartExperiment.addEventListener('click', restartExperiment);
+            elements.saveResult.addEventListener('click', saveExperimentResult);
+            elements.backToHall.addEventListener('click', () => {
+                window.location.href = 'psychology_experiments.html';
+            });
+            
+            // 绑定选择按钮事件
+            elements.selectA.addEventListener('click', () => handleUserSelection('A'));
+            elements.selectB.addEventListener('click', () => handleUserSelection('B'));
+            elements.selectC.addEventListener('click', () => handleUserSelection('C'));
+        }
+
+        // 开始教程
+        function startTutorial() {
+            elements.preparation.classList.add('hidden');
+            elements.tutorial.classList.remove('hidden');
+            elements.experiment.classList.add('hidden');
+            elements.result.classList.add('hidden');
+        }
+
+        // 开始实验
+        function startExperiment() {
+            elements.tutorial.classList.add('hidden');
+            elements.experiment.classList.remove('hidden');
+            elements.result.classList.add('hidden');
+            
+            // 重置实验数据
+            resetExperimentData();
+            
+            // 开始第一轮实验
+            startNewTrial();
+        }
+
+        // 重置实验数据
+        function resetExperimentData() {
+            experimentData = {
+                currentTrial: 0,
+                results: [],
+                currentParticipantIndex: 0,
+                startTime: null,
+                selectionTimeoutTimer: null
+            };
+            
+            // 更新显示
+            elements.currentTrial.textContent = '1';
+            elements.totalTrials.textContent = config.totalTrials;
+            elements.progressBar.style.width = '0%';
+        }
+
+        // 开始新的实验轮次
+        function startNewTrial() {
+            // 增加当前轮次
+            experimentData.currentTrial++;
+            
+            // 更新显示
+            elements.currentTrial.textContent = experimentData.currentTrial;
+            elements.progressBar.style.width = `${((experimentData.currentTrial - 1) / config.totalTrials) * 100}%`;
+            
+            // 重置参与者显示
+            resetParticipantsDisplay();
+            
+            // 重置答案指示
+            elements.answerIndicator.classList.add('hidden');
+            elements.currentParticipantName.textContent = '';
+            elements.answerFeedback.textContent = '';
+            
+            // 隐藏用户选择区域
+            elements.userSelection.classList.add('hidden');
+            
+            // 获取当前轮次配置
+            const trialConfig = config.trials[experimentData.currentTrial - 1];
+            
+            // 设置线段长度
+            elements.standardLine.style.width = `${trialConfig.standardLineLength * config.scale}px`;
+            elements.comparisonLineA.style.width = `${trialConfig.comparisonLines.A * config.scale}px`;
+            elements.comparisonLineB.style.width = `${trialConfig.comparisonLines.B * config.scale}px`;
+            elements.comparisonLineC.style.width = `${trialConfig.comparisonLines.C * config.scale}px`;
+            
+            // 重置参与者索引
+            experimentData.currentParticipantIndex = 0;
+            
+            // 短暂延迟后开始显示参与者回答
+            setTimeout(() => {
+                showNextParticipantAnswer();
+            }, 1000);
+        }
+
+        // 重置参与者显示
+        function resetParticipantsDisplay() {
+            for (let i = 1; i <= 6; i++) {
+                const participant = document.getElementById(`participant-${i}`);
+                participant.classList.remove('active', 'selected', 'conflict');
+                participant.classList.add('bg-light');
+            }
+            
+            const userParticipant = document.getElementById('participant-you');
+            userParticipant.classList.remove('active', 'selected', 'conflict');
+            userParticipant.classList.add('bg-primary/10');
+        }
+
+        // 显示下一个参与者的回答
+        function showNextParticipantAnswer() {
+            // 隐藏前一个活跃的参与者
+            const previousParticipant = document.getElementById(`participant-${experimentData.currentParticipantIndex}`);
+            if (previousParticipant) {
+                previousParticipant.classList.remove('active');
+            }
+            
+            // 检查是否所有模拟参与者都已回答
+            if (experimentData.currentParticipantIndex >= 6) {
+                // 所有模拟参与者已回答，轮到用户回答
+                startUserSelection();
+                return;
+            }
+            
+            // 获取当前轮次配置
+            const trialConfig = config.trials[experimentData.currentTrial - 1];
+            const participantAnswer = trialConfig.groupAnswers[experimentData.currentParticipantIndex];
+            
+            // 高亮当前参与者
+            const currentParticipant = document.getElementById(`participant-${experimentData.currentParticipantIndex + 1}`);
+            currentParticipant.classList.add('active');
+            
+            // 显示答案指示
+            elements.answerIndicator.classList.remove('hidden');
+            elements.currentParticipantName.textContent = `参与者${experimentData.currentParticipantIndex + 1}正在回答...`;
+            elements.answerFeedback.textContent = '';
+            
+            // 延迟后显示答案
+            setTimeout(() => {
+                elements.answerFeedback.textContent = `选择了线段 ${participantAnswer}`;
+                
+                // 标记参与者选择的答案
+                currentParticipant.classList.add('selected');
+                
+                // 增加参与者索引
+                experimentData.currentParticipantIndex++;
+                
+                // 延迟后显示下一个参与者
+                setTimeout(() => {
+                    showNextParticipantAnswer();
+                }, config.timing.participantDelay);
+            }, 500);
+        }
+
+        // 开始用户选择
+        function startUserSelection() {
+            // 高亮用户
+            const userParticipant = document.getElementById('participant-you');
+            userParticipant.classList.add('active');
+            
+            // 更新答案指示
+            elements.currentParticipantName.textContent = '现在轮到你回答了';
+            elements.answerFeedback.textContent = '请选择与标准线段长度相同的线段';
+            
+            // 显示用户选择区域
+            elements.userSelection.classList.remove('hidden');
+            
+            // 记录开始时间（用于计算反应时间）
+            experimentData.startTime = Date.now();
+            
+            // 设置超时
+            experimentData.selectionTimeoutTimer = setTimeout(() => {
+                handleSelectionTimeout();
+            }, config.timing.selectionTimeout);
+        }
+
+        // 处理用户选择
+        function handleUserSelection(selectedLine) {
+            // 清除超时定时器
+            clearTimeout(experimentData.selectionTimeoutTimer);
+            
+            // 计算反应时间
+            const reactionTime = Date.now() - experimentData.startTime;
+            
+            // 获取当前轮次配置
+            const trialConfig = config.trials[experimentData.currentTrial - 1];
+            const isCorrect = selectedLine === trialConfig.correctAnswer;
+            
+            // 获取群体选择的答案（所有群体成员都选同一个）
+            const groupAnswer = trialConfig.groupAnswers[0];
+            const isConformity = selectedLine === groupAnswer && groupAnswer !== trialConfig.correctAnswer;
+            const isIndependent = selectedLine === trialConfig.correctAnswer && groupAnswer !== trialConfig.correctAnswer;
+            
+            // 记录结果
+            experimentData.results.push({
+                trialNumber: experimentData.currentTrial,
+                userAnswer: selectedLine,
+                correctAnswer: trialConfig.correctAnswer,
+                groupAnswer: groupAnswer,
+                isCorrect: isCorrect,
+                isConformity: isConformity,
+                isIndependent: isIndependent,
+                reactionTime: reactionTime,
+                timestamp: new Date().toISOString()
+            });
+            
+            // 更新显示
+            elements.answerFeedback.textContent = `你选择了线段 ${selectedLine}`;
+            
+            // 标记用户选择
+            const userParticipant = document.getElementById('participant-you');
+            userParticipant.classList.remove('active');
+            
+            if (isConformity) {
+                // 从众
+                userParticipant.classList.add('conflict');
+            } else if (isIndependent) {
+                // 独立判断
+                userParticipant.classList.add('selected');
+            } else {
+                // 正确（且群体也正确）
+                userParticipant.classList.add('selected');
+            }
+            
+            // 隐藏选择按钮
+            elements.userSelection.classList.add('hidden');
+            
+            // 短暂延迟后，检查是否完成所有轮次
+            setTimeout(() => {
+                if (experimentData.currentTrial >= config.totalTrials) {
+                    // 所有轮次完成，显示结果
+                    showResults();
+                } else {
+                    // 准备下一轮
+                    startNewTrial();
+                }
+            }, config.timing.feedbackTime);
+        }
+
+        // 处理选择超时
+        function handleSelectionTimeout() {
+            // 获取当前轮次配置
+            const trialConfig = config.trials[experimentData.currentTrial - 1];
+            
+            // 超时处理：记录为中性选择
+            experimentData.results.push({
+                trialNumber: experimentData.currentTrial,
+                userAnswer: 'B', // 默认选中间线段
+                correctAnswer: trialConfig.correctAnswer,
+                groupAnswer: trialConfig.groupAnswers[0],
+                isCorrect: false,
+                isConformity: false,
+                isIndependent: false,
+                isTimeout: true,
+                timestamp: new Date().toISOString()
+            });
+            
+            // 更新显示
+            elements.answerFeedback.textContent = '时间已到，自动选择了线段 B';
+            
+            // 隐藏选择按钮
+            elements.userSelection.classList.add('hidden');
+            
+            // 短暂延迟后，检查是否完成所有轮次
+            setTimeout(() => {
+                if (experimentData.currentTrial >= config.totalTrials) {
+                    // 所有轮次完成，显示结果
+                    showResults();
+                } else {
+                    // 准备下一轮
+                    startNewTrial();
+                }
+            }, config.timing.feedbackTime);
+        }
+
+        // 显示结果
+        function showResults() {
+            // 隐藏实验阶段，显示结果阶段
+            elements.experiment.classList.add('hidden');
+            elements.result.classList.remove('hidden');
+            
+            // 计算统计数据
+            const stats = calculateStatistics();
+            
+            // 更新显示
+            elements.conformityRate.textContent = `${stats.conformityRate}%`;
+            elements.independentCount.textContent = stats.independentCount;
+            elements.avgReactionTime.textContent = `${stats.avgReactionTime}ms`;
+            
+            // 生成详细结果
+            generateDetailedResults();
+            
+            // 生成结果解读
+            generateResultInterpretation(stats);
+            
+            // 绘制图表
+            drawConformityChart(stats);
+            drawTrialDecisionChart(stats);
+            
+            // 保存到localStorage（即使未登录）
+            if (window.API && window.API.saveExperimentResultToLocal) {
+                window.API.saveExperimentResultToLocal('asch-conformity', {
+                    trials: experimentData.results,
+                    statistics: stats,
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                // 降级到本地函数
+                saveToLocalStorage({
+                    trials: experimentData.results,
+                    statistics: stats,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+
+        // 计算统计数据
+        function calculateStatistics() {
+            const results = experimentData.results;
+            
+            // 过滤出群体错误的轮次（第3-6轮）
+            const conflictTrials = results.filter((_, index) => index >= 2);
+            
+            // 计算从众次数（在群体错误的情况下，用户跟随了错误答案）
+            const conformityCount = conflictTrials.filter(trial => trial.isConformity).length;
+            
+            // 计算独立判断次数（在群体错误的情况下，用户坚持了正确答案）
+            const independentCount = conflictTrials.filter(trial => trial.isIndependent).length;
+            
+            // 计算从众率
+            const conformityRate = conflictTrials.length > 0 
+                ? Math.round((conformityCount / conflictTrials.length) * 100) 
+                : 0;
+            
+            // 计算平均反应时间（排除超时的情况）
+            const validTrials = results.filter(trial => !trial.isTimeout);
+            const avgReactionTime = validTrials.length > 0
+                ? Math.round(validTrials.reduce((sum, trial) => sum + (trial.reactionTime || 0), 0) / validTrials.length)
+                : 0;
+            
+            // 计算正确率
+            const correctCount = results.filter(trial => trial.isCorrect).length;
+            const accuracyRate = results.length > 0
+                ? Math.round((correctCount / results.length) * 100)
+                : 0;
+            
+            return {
+                conformityCount,
+                conformityRate,
+                independentCount,
+                accuracyRate,
+                avgReactionTime,
+                totalTrials: results.length,
+                correctCount,
+                // 按轮次分类的决策类型
+                trialDecisions: results.map(trial => {
+                    if (trial.isTimeout) return '超时';
+                    if (trial.isConformity) return '从众';
+                    if (trial.isIndependent) return '独立';
+                    if (trial.isCorrect) return '正确';
+                    return '错误';
+                })
+            };
+        }
+
+        // 生成详细结果
+        function generateDetailedResults() {
+            const results = experimentData.results;
+            let html = '';
+            
+            results.forEach((trial, index) => {
+                // 确定样式类
+                let className = 'bg-light';
+                let decisionText = '';
+                let decisionClass = '';
+                
+                if (trial.isTimeout) {
+                    decisionText = '超时';
+                    decisionClass = 'text-info';
+                } else if (trial.isConformity) {
+                    className = 'bg-danger/10';
+                    decisionText = '从众（跟随错误）';
+                    decisionClass = 'text-danger';
+                } else if (trial.isIndependent) {
+                    className = 'bg-secondary/10';
+                    decisionText = '独立（坚持正确）';
+                    decisionClass = 'text-secondary';
+                } else if (trial.isCorrect) {
+                    className = 'bg-primary/10';
+                    decisionText = '正确';
+                    decisionClass = 'text-primary';
+                } else {
+                    className = 'bg-warning/10';
+                    decisionText = '错误';
+                    decisionClass = 'text-warning';
+                }
+                
+                // 构建HTML
+                html += `
+                <div class="${className} rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-dark">轮次 ${trial.trialNumber}</span>
+                        <span class="${decisionClass} font-bold">${decisionText}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm mt-2">
+                        <span class="text-dark">你的选择：${trial.userAnswer}</span>
+                        <span class="text-dark">正确答案：${trial.correctAnswer}</span>
+                        <span class="text-dark">群体选择：${trial.groupAnswer}</span>
+                        ${trial.reactionTime ? `<span class="text-dark">反应时间：${trial.reactionTime}ms</span>` : ''}
+                    </div>
+                </div>
+                `;
+            });
+            
+            elements.detailedResults.innerHTML = html;
+        }
+
+        // 生成结果解读
+        function generateResultInterpretation(stats) {
+            let interpretation = '';
+            
+            // 基于从众率生成解读
+            if (stats.conformityRate >= 75) {
+                interpretation += '你的从众倾向很强（从众率为' + stats.conformityRate + '%）。';
+                interpretation += ' 在面对群体一致的错误答案时，你更倾向于跟随大多数人的选择，即使这与你的直觉判断相冲突。';
+                interpretation += ' 这可能表明你非常重视社会和谐，或者在不确定的情况下倾向于依赖群体的判断。';
+            } else if (stats.conformityRate >= 50) {
+                interpretation += '你的从众倾向处于中等水平（从众率为' + stats.conformityRate + '%）。';
+                interpretation += ' 你在部分情况下会跟随群体的选择，但也能够在某些时候坚持自己的独立判断。';
+                interpretation += ' 这种平衡表明你既重视社会认同，又保持一定的独立思考能力。';
+            } else if (stats.conformityRate > 0) {
+                interpretation += '你的从众倾向较弱（从众率为' + stats.conformityRate + '%）。';
+                interpretation += ' 大多数情况下，你能够坚持自己的独立判断，不轻易受群体压力的影响。';
+                interpretation += ' 这种特质表明你具有较强的自信心和独立思考能力。';
+            } else {
+                interpretation += '你表现出极高的独立性，完全没有从众行为。';
+                interpretation += ' 即使面对所有其他人的一致错误选择，你仍然坚持自己的正确判断。';
+                interpretation += ' 这种罕见的独立性可能表明你具有很强的自我确信和抗压力能力。';
+            }
+            
+            // 补充独立判断的分析
+            if (stats.independentCount === 4) {
+                interpretation += ' 在4次群体错误的情况下，你全部坚持了正确的判断，这是非常难得的。';
+            } else if (stats.independentCount >= 2) {
+                interpretation += ' 你在' + stats.independentCount + '次群体错误的情况下坚持了正确的判断，显示出良好的独立思考能力。';
+            }
+            
+            // 群体对比
+            const typicalConformityRate = 37; // 经典阿希实验的平均从众率
+            if (stats.conformityRate > typicalConformityRate) {
+                interpretation += ' 与经典阿希实验中约' + typicalConformityRate + '%的平均从众率相比，你的从众倾向略高。';
+            } else if (stats.conformityRate < typicalConformityRate) {
+                interpretation += ' 与经典阿希实验中约' + typicalConformityRate + '%的平均从众率相比，你的从众倾向明显较低。';
+            } else {
+                interpretation += ' 你的从众率与经典阿希实验中的平均水平相当。';
+            }
+            
+            // 心理学解释
+            interpretation += ' 从众行为是一种正常的社会适应机制，在不确定的情况下，群体的一致性选择往往提供了重要的社会信息。';
+            interpretation += ' 适度的从众有助于社会协作，但过度的从众可能抑制创新思维。';
+            
+            elements.resultInterpretation.textContent = interpretation;
+        }
+
+        // 绘制从众率对比图
+        async function drawConformityChart(stats) {
+            const ctx = document.getElementById('conformity-chart').getContext('2d');
+            
+            // 准备数据
+            const labels = ['你的从众率', '经典实验平均'];
+            const data = [stats.conformityRate, 37]; // 经典阿希实验的平均从众率
+            
+            // 获取群体平均数据
+            let groupAvgData = 37; // 默认群体平均值
+            
+            // 尝试从API获取统计数据
+            if (window.API && window.API.getExperimentStats) {
+                try {
+                    const apiStats = await window.API.getExperimentStats('asch-conformity');
+                    if (apiStats && apiStats.averageConformityRate) {
+                        groupAvgData = apiStats.averageConformityRate;
+                    }
+                } catch (error) {
+                    console.error('获取统计数据失败，使用默认值:', error);
+                }
+            }
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '从众率 (%)',
+                        data: [stats.conformityRate, groupAvgData],
+                        backgroundColor: [
+                            'rgba(22, 93, 255, 0.7)',
+                            'rgba(134, 144, 156, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(22, 93, 255, 1)',
+                            'rgba(134, 144, 156, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: '从众率 (%)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 绘制每轮决策图表
+        function drawTrialDecisionChart(stats) {
+            const ctx = document.getElementById('trial-decision-chart').getContext('2d');
+            
+            // 准备数据
+            const labels = [];
+            const conformityData = [];
+            const independentData = [];
+            const correctData = [];
+            const errorData = [];
+            const timeoutData = [];
+            
+            // 填充数据
+            for (let i = 1; i <= stats.trialDecisions.length; i++) {
+                labels.push(`轮次 ${i}`);
+                const decision = stats.trialDecisions[i - 1];
+                
+                conformityData.push(decision === '从众' ? 1 : 0);
+                independentData.push(decision === '独立' ? 1 : 0);
+                correctData.push(decision === '正确' ? 1 : 0);
+                errorData.push(decision === '错误' ? 1 : 0);
+                timeoutData.push(decision === '超时' ? 1 : 0);
+            }
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '从众',
+                            data: conformityData,
+                            backgroundColor: 'rgba(245, 63, 63, 0.7)',
+                            borderColor: 'rgba(245, 63, 63, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '独立',
+                            data: independentData,
+                            backgroundColor: 'rgba(0, 180, 42, 0.7)',
+                            borderColor: 'rgba(0, 180, 42, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '正确',
+                            data: correctData,
+                            backgroundColor: 'rgba(22, 93, 255, 0.7)',
+                            borderColor: 'rgba(22, 93, 255, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '错误',
+                            data: errorData,
+                            backgroundColor: 'rgba(255, 125, 0, 0.7)',
+                            borderColor: 'rgba(255, 125, 0, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '超时',
+                            data: timeoutData,
+                            backgroundColor: 'rgba(134, 144, 156, 0.7)',
+                            borderColor: 'rgba(134, 144, 156, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    return value === 1 ? '是' : '否';
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: '决策类型'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 保存到localStorage（降级方案）
+        function saveToLocalStorage(results) {
+            try {
+                // 获取现有记录
+                let experimentRecords = JSON.parse(localStorage.getItem('experimentRecords') || '[]');
+                
+                // 添加新记录
+                experimentRecords.push({
+                    type: 'asch-conformity',
+                    results: results,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // 只保留最近20条记录
+                if (experimentRecords.length > 20) {
+                    experimentRecords = experimentRecords.slice(-20);
+                }
+                
+                // 保存回localStorage
+                localStorage.setItem('experimentRecords', JSON.stringify(experimentRecords));
+            } catch (error) {
+                console.error('保存实验结果到localStorage失败:', error);
+            }
+        }
+
+        // 保存实验结果到服务器
+        async function saveExperimentResult() {
+            // 检查用户是否登录
+            if (window.API && window.API.isAuthenticated) {
+                if (!window.API.isAuthenticated()) {
+                    // 显示登录提示
+                    if (confirm('登录后可保存实验记录，是否立即登录？')) {
+                        window.location.href = 'login.html';
+                    }
+                    return;
+                }
+            } else {
+                // 降级检查
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    if (confirm('登录后可保存实验记录，是否立即登录？')) {
+                        window.location.href = 'login.html';
+                    }
+                    return;
+                }
+            }
+            
+            // 获取最新的结果（从localStorage）
+            try {
+                let experimentRecords = JSON.parse(localStorage.getItem('experimentRecords') || '[]');
+                const latestResult = experimentRecords
+                    .filter(record => record.type === 'asch-conformity')
+                    .pop();
+                
+                if (latestResult && window.API && window.API.saveExperimentResult) {
+                    // 调用API保存结果
+                    await window.API.saveExperimentResult('asch-conformity', latestResult.results);
+                    
+                    // 显示成功提示
+                    alert('实验结果保存成功！');
+                    
+                    // 禁用保存按钮
+                    elements.saveResult.disabled = true;
+                    elements.saveResult.classList.add('opacity-50');
+                    elements.saveResult.textContent = '已保存';
+                } else {
+                    alert('保存失败，请稍后重试');
+                }
+            } catch (error) {
+                console.error('保存实验结果失败:', error);
+                alert('保存失败，请稍后重试');
+            }
+        }
+
+        // 重新开始实验
+        function restartExperiment() {
+            // 重置实验数据
+            resetExperimentData();
+            
+            // 隐藏结果阶段，显示实验阶段
+            elements.result.classList.add('hidden');
+            elements.experiment.classList.remove('hidden');
+            
+            // 重新启用保存按钮
+            elements.saveResult.disabled = false;
+            elements.saveResult.classList.remove('opacity-50');
+            elements.saveResult.textContent = '保存结果';
+            
+            // 开始新一轮实验
+            startNewTrial();
+        }
+
+        // 初始化
+        function init() {
+            bindEvents();
+            
+            // 加载导航栏和页脚
+            if (typeof loadNavbar === 'function') {
+                loadNavbar();
+            }
+            if (typeof loadFooter === 'function') {
+                loadFooter();
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+<script src="update_experiment_navigation.js"></script>
+    </body>
+</html>
