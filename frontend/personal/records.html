@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 评测记录</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/personal.css">
+    <style>
+        /* 评测记录页面特定样式 */
+        .records-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+
+        .records-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .records-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .search-filter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box input {
+            padding: 8px 12px 8px 36px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 240px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-select:hover,
+        .filter-select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        /* 表格样式 */
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .records-table th,
+        .records-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.3s;
+        }
+
+        .records-table th {
+            background-color: #fafafa;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .records-table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .records-table tbody tr {
+            transition: all 0.3s;
+        }
+
+        /* 状态标签样式 */
+        .status-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-normal {
+            background-color: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .status-attention {
+            background-color: #fff7e6;
+            color: #fa8c16;
+        }
+
+        .status-warning {
+            background-color: #fff1f0;
+            color: #f5222d;
+        }
+
+        .status-excellent {
+            background-color: #f6ffed;
+            color: #52c41a;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-view,
+        .btn-share {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .btn-view {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background-color: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-share {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
+        .btn-share:hover {
+            background-color: #e6e6e6;
+            transform: translateY(-1px);
+        }
+
+        /* 分页样式 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 24px;
+            gap: 8px;
+        }
+
+        .pagination button {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .pagination button.active {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .pagination-info {
+            margin: 0 16px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 空状态样式 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .records-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .records-table {
+                font-size: 12px;
+            }
+
+            .records-table th,
+            .records-table td {
+                padding: 8px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .btn-view,
+            .btn-share {
+                padding: 2px 8px;
+                font-size: 11px;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+            }
+
+            .pagination-info {
+                order: -1;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 12px;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .records-container {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .records-table tbody tr {
+            opacity: 0;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .records-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+        .records-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+        .records-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+        .records-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+        .records-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #f0f0f0;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="top-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="../assets/images/logo.png" alt="心理健康系统">
+                <span class="logo-text">心理健康系统</span>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="../index.html">首页</a></li>
+                    <li><a href="../assessment/index.html">心理测评</a></li>
+                    <li><a href="../courses/index.html">心理课程</a></li>
+                    <li><a href="../community/index.html">社区互助</a></li>
+                </ul>
+            </nav>
+            <div class="user-area">
+                <div class="user-info">
+                    <img src="../assets/images/avatar.png" alt="用户头像" class="avatar">
+                    <span class="username">张三</span>
+                    <i class="icon-dropdown"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="main-content">
+        <div class="container">
+            <div class="sidebar">
+                <div class="user-profile">
+                    <img src="../assets/images/avatar.png" alt="用户头像" class="profile-avatar">
+                    <h3>张三</h3>
+                    <p>普通用户</p>
+                </div>
+                <nav class="side-nav">
+                    <ul>
+                        <li><a href="profile.html"><i class="icon-user"></i>个人信息</a></li>
+                        <li class="active"><a href="records.html"><i class="icon-list"></i>评测记录</a></li>
+                        <li><a href="courses.html"><i class="icon-book"></i>我的课程</a></li>
+                        <li><a href="favorites.html"><i class="icon-heart"></i>我的收藏</a></li>
+                        <li><a href="settings.html"><i class="icon-settings"></i>账号设置</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- 评测记录内容 -->
+            <div class="content-area">
+                <div class="records-container">
+                    <div class="records-header">
+                        <h2>评测记录</h2>
+                        <div class="search-filter">
+                            <div class="search-box">
+                                <i class="icon-search"></i>
+                                <input type="text" placeholder="搜索评测名称或类型...">
+                            </div>
+                            <select class="filter-select">
+                                <option value="all">全部类型</option>
+                                <option value="depression">抑郁自评</option>
+                                <option value="anxiety">焦虑自评</option>
+                                <option value="stress">压力评估</option>
+                                <option value="sleep">睡眠质量</option>
+                                <option value="personality">人格测试</option>
+                            </select>
+                            <select class="filter-select">
+                                <option value="all">全部时间</option>
+                                <option value="week">近一周</option>
+                                <option value="month">近一月</option>
+                                <option value="quarter">近三月</option>
+                                <option value="year">近一年</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 表格内容 -->
+                    <div id="records-content">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <span>正在加载评测记录...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>心理健康系统</h3>
+                    <p>关注心理健康，拥抱美好生活</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#">关于我们</a>
+                    <a href="#">使用帮助</a>
+                    <a href="#">隐私政策</a>
+                    <a href="#">联系我们</a>
+                </div>
+                <div class="footer-copyright">
+                    <p>&copy; 2024 心理健康系统 版权所有</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 脚本 -->
+    <script>
+        // 模拟数据
+        const mockRecords = [
+            {
+                id: 1,
+                name: '抑郁自评量表(SDS)',
+                type: '抑郁自评',
+                date: '2024-11-05 14:30',
+                score: 45,
+                level: '轻度抑郁',
+                status: 'attention'
+            },
+            {
+                id: 2,
+                name: '焦虑自评量表(SAS)',
+                type: '焦虑自评',
+                date: '2024-11-02 09:15',
+                score: 38,
+                level: '正常范围',
+                status: 'normal'
+            },
+            {
+                id: 3,
+                name: '压力评估量表',
+                type: '压力评估',
+                date: '2024-10-28 16:45',
+                score: 72,
+                level: '高压力',
+                status: 'warning'
+            },
+            {
+                id: 4,
+                name: '睡眠质量指数',
+                type: '睡眠质量',
+                date: '2024-10-25 21:30',
+                score: 22,
+                level: '良好',
+                status: 'excellent'
+            },
+            {
+                id: 5,
+                name: '大五人格测试',
+                type: '人格测试',
+                date: '2024-10-20 11:20',
+                score: 85,
+                level: '性格稳定',
+                status: 'excellent'
+            },
+            {
+                id: 6,
+                name: '抑郁自评量表(SDS)',
+                type: '抑郁自评',
+                date: '2024-10-15 15:40',
+                score: 52,
+                level: '中度抑郁',
+                status: 'warning'
+            },
+            {
+                id: 7,
+                name: '焦虑自评量表(SAS)',
+                type: '焦虑自评',
+                date: '2024-10-10 10:00',
+                score: 42,
+                level: '轻度焦虑',
+                status: 'attention'
+            },
+            {
+                id: 8,
+                name: '压力评估量表',
+                type: '压力评估',
+                date: '2024-10-05 17:20',
+                score: 68,
+                level: '中高压力',
+                status: 'attention'
+            }
+        ];
+
+        // 页面加载后渲染数据
+        document.addEventListener('DOMContentLoaded', () => {
+            // 模拟API加载延迟
+            setTimeout(() => {
+                renderRecords(mockRecords);
+            }, 800);
+        });
+
+        // 渲染评测记录
+        function renderRecords(records) {
+            const recordsContent = document.getElementById('records-content');
+            
+            if (records.length === 0) {
+                recordsContent.innerHTML = `
+                    <div class="empty-state">
+                        <i class="icon-empty"></i>
+                        <h3>暂无评测记录</h3>
+                        <p>您还没有进行过任何心理评测<br>快去开始您的第一次评测吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 创建表格
+            const tableHtml = `
+                <table class="records-table">
+                    <thead>
+                        <tr>
+                            <th>评测名称</th>
+                            <th>评测类型</th>
+                            <th>评测时间</th>
+                            <th>得分</th>
+                            <th>评估结果</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${records.map(record => `
+                            <tr>
+                                <td>${record.name}</td>
+                                <td>${record.type}</td>
+                                <td>${record.date}</td>
+                                <td>${record.score}</td>
+                                <td>
+                                    <span class="status-tag status-${record.status}">
+                                        ${record.level}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-view" data-id="${record.id}">
+                                            查看详情
+                                        </button>
+                                        <button class="btn-share" data-id="${record.id}">
+                                            分享
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    <button disabled>&laquo;</button>
+                    <button class="active">1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <span class="pagination-info">共 8 条记录，第 1/3 页</span>
+                    <button>&raquo;</button>
+                </div>
+            `;
+
+            recordsContent.innerHTML = tableHtml;
+
+            // 绑定事件
+            bindEvents();
+        }
+
+        // 绑定事件
+        function bindEvents() {
+            // 查看详情按钮点击事件
+            document.querySelectorAll('.btn-view').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const recordId = this.getAttribute('data-id');
+                    alert(`查看评测记录ID: ${recordId} 的详情`);
+                    // 这里可以跳转到详情页面或显示详情弹窗
+                });
+            });
+
+            // 分享按钮点击事件
+            document.querySelectorAll('.btn-share').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const recordId = this.getAttribute('data-id');
+                    alert(`分享评测记录ID: ${recordId}`);
+                    // 这里可以实现分享功能
+                });
+            });
+
+            // 分页按钮点击事件
+            document.querySelectorAll('.pagination button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (this.hasAttribute('disabled')) return;
+                    
+                    // 移除所有按钮的active状态
+                    document.querySelectorAll('.pagination button').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    
+                    // 添加当前按钮的active状态
+                    this.classList.add('active');
+                    
+                    // 模拟分页加载
+                    document.getElementById('records-content').innerHTML = `
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <span>正在加载第${this.textContent}页...</span>
+                        </div>
+                    `;
+                    
+                    setTimeout(() => {
+                        renderRecords(mockRecords);
+                    }, 500);
+                });
+            });
+
+            // 搜索框事件
+            const searchInput = document.querySelector('.search-box input');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                const filteredRecords = mockRecords.filter(record => 
+                    record.name.toLowerCase().includes(searchTerm) || 
+                    record.type.toLowerCase().includes(searchTerm)
+                );
+                
+                // 模拟搜索延迟
+                setTimeout(() => {
+                    renderRecords(filteredRecords);
+                }, 300);
+            });
+
+            // 筛选下拉框事件
+            const filterSelects = document.querySelectorAll('.filter-select');
+            filterSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    // 模拟筛选延迟
+                    setTimeout(() => {
+                        renderRecords(mockRecords);
+                    }, 300);
+                });
+            });
+        }
+
+        // 简单的响应式处理
+        function handleResponsive() {
+            const sidebar = document.querySelector('.sidebar');
+            const contentArea = document.querySelector('.content-area');
+            
+            if (window.innerWidth <= 768) {
+                sidebar.style.width = '100%';
+                sidebar.style.marginBottom = '20px';
+                contentArea.style.width = '100%';
+            } else {
+                sidebar.style.width = '260px';
+                sidebar.style.marginBottom = '0';
+                contentArea.style.width = 'calc(100% - 280px)';
+            }
+        }
+
+        // 监听窗口大小变化
+        window.addEventListener('resize', handleResponsive);
+        
+        // 初始化响应式布局
+        handleResponsive();
+    </script>
+</body>
+</html>

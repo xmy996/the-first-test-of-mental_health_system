@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的测评记录 - 心社区</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 引入 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#8b5cf6',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        info: '#3b82f6',
+                        dark: '#1f2937',
+                        light: '#f9fafb',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .profile-card {
+                @apply bg-white rounded-xl p-6 shadow-md border border-gray-100;
+            }
+            .stat-card {
+                @apply bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center justify-between;
+            }
+            .stat-icon {
+                @apply w-12 h-12 rounded-full flex items-center justify-center bg-primary/10 text-primary text-xl;
+            }
+            .stat-title {
+                @apply text-gray-500 text-sm font-medium;
+            }
+            .stat-value {
+                @apply text-2xl font-bold text-gray-800;
+            }
+            .stat-change {
+                @apply text-xs font-medium;
+            }
+            .stat-change.positive {
+                @apply text-success;
+            }
+            .stat-change.negative {
+                @apply text-danger;
+            }
+            .primary-btn {
+                @apply bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow;
+            }
+            .secondary-btn {
+                @apply bg-white text-primary border border-primary px-4 py-2 rounded-lg font-medium hover:bg-primary/5 transition-all duration-200;
+            }
+            .section-title {
+                @apply text-xl font-bold text-gray-800 mb-4;
+            }
+            .hidden {
+                @apply hidden;
+            }
+            .hover-lift {
+                @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+            }
+        }
+    </style>
+    
+    <!-- 额外样式 -->
+    <style>
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 卡片动画 */
+        .profile-card {
+            transition: all 0.3s ease;
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- 导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-1">
+                <i class="fa fa-heartbeat text-primary text-2xl"></i>
+                <span class="text-xl font-bold text-primary">心社区</span>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-gray-600 hover:text-primary transition-colors">首页</a>
+                <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">测评中心</a>
+                <a href="#" class="text-gray-600 hover:text-primary transition-colors">心理咨询</a>
+                <a href="#" class="text-gray-600 hover:text-primary transition-colors">心理资源</a>
+                <a href="#" class="text-gray-600 hover:text-primary transition-colors">社区互助</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <button class="secondary-btn hidden md:block">登录</button>
+                <button class="primary-btn hidden md:block">注册</button>
+                
+                <!-- 用户头像下拉菜单 -->
+                <div class="relative">
+                    <button class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <img src="https://picsum.photos/id/64/200/200" alt="用户头像" class="w-full h-full object-cover rounded-full">
+                    </button>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <button class="md:hidden text-gray-600 hover:text-primary text-2xl">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- 左侧用户信息 -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- 用户信息卡片 -->
+                <div class="profile-card">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="relative mb-4">
+                            <img src="https://picsum.photos/id/64/200/200" alt="用户头像" class="w-24 h-24 rounded-full object-cover border-4 border-primary/10">
+                            <span class="absolute bottom-0 right-0 w-5 h-5 bg-success rounded-full border-2 border-white"></span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-1">1743383354</h3>
+                        <p class="text-gray-500 text-sm mb-3">普通会员</p>
+                        
+                        <div class="flex justify-center space-x-4 mb-4">
+                            <button class="primary-btn text-sm py-1 px-3">
+                                <i class="fa fa-user-circle mr-1"></i> 完善资料
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 导航菜单 -->
+                <div class="profile-card">
+                    <ul class="space-y-1">
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fa fa-user-o w-5 text-center mr-3"></i>
+                                <span>个人概览</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium">
+                                <i class="fa fa-line-chart w-5 text-center mr-3"></i>
+                                <span>测评记录</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fa fa-calendar-check-o w-5 text-center mr-3"></i>
+                                <span>预约记录</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fa fa-trophy w-5 text-center mr-3"></i>
+                                <span>活动报名</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fa fa-id-card-o w-5 text-center mr-3"></i>
+                                <span>个人资料</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fa fa-cog w-5 text-center mr-3"></i>
+                                <span>账号设置</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 右侧主内容 -->
+            <div class="lg:col-span-3 space-y-8">
+                <!-- 页面标题和统计卡片 -->
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800 mb-6">我的测评记录</h1>
+                    <p class="text-gray-600 mb-6">查看您的心理健康历史记录，了解自己的心理健康状况变化。</p>
+                    
+                    <!-- 统计卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="stat-card hover-lift">
+                            <div>
+                                <div class="stat-title">总测评次数</div>
+                                <div class="stat-value">5</div>
+                                <div class="stat-change positive">较上月增长 2 次 <i class="fa fa-arrow-up"></i></div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa fa-check-square-o"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card hover-lift">
+                            <div>
+                                <div class="stat-title">平均得分</div>
+                                <div class="stat-value">82</div>
+                                <div class="stat-change positive">较上次提升 5 分 <i class="fa fa-arrow-up"></i></div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa fa-star-o"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card hover-lift">
+                            <div>
+                                <div class="stat-title">最近测评</div>
+                                <div class="stat-value">2025-11-01</div>
+                                <div class="stat-change positive">情绪健康测评 - 良好</div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 心理健康趋势图表 -->
+                <section id="mentalHealthTrendSection">
+                    <h2 class="section-title">心理健康趋势</h2>
+                    <div class="profile-card">
+                        <div class="relative">
+                            <!-- 加载状态 -->
+                            <div id="mentalHealthChartLoader" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10 hidden">
+                                <div class="flex flex-col items-center">
+                                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-3"></div>
+                                    <p class="text-gray-600">加载中...</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 错误状态 -->
+                            <div id="mentalHealthChartError" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10 hidden">
+                                <div class="text-center p-4">
+                                    <i class="fa fa-exclamation-triangle text-4xl text-warning mb-3"></i>
+                                    <p class="text-gray-600 mb-2">数据加载失败</p>
+                                    <button id="retryMentalHealthChart" class="primary-btn py-1 px-4 text-sm">重试</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 图表容器 -->
+                            <div class="h-96">
+                                <canvas id="mentalHealthChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- 图表说明 -->
+                        <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <h3 class="font-medium text-primary mb-2">趋势分析说明</h3>
+                            <p class="text-sm text-gray-700">
+                                上图展示了您近6个月的心理健康趋势变化。数据点为实际测评结果，连接线表示趋势发展。
+                                点击图例可以切换不同维度数据的显示/隐藏，帮助您更直观地了解各维度的变化情况。
+                            </p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 测评维度分析 -->
+                <section id="assessmentDimensionsSection">
+                    <h2 class="section-title">测评维度分析</h2>
+                    <div class="profile-card">
+                        <div class="relative">
+                            <!-- 加载状态 -->
+                            <div id="dimensionsChartLoader" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10 hidden">
+                                <div class="flex flex-col items-center">
+                                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-3"></div>
+                                    <p class="text-gray-600">加载中...</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 错误状态 -->
+                            <div id="dimensionsChartError" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10 hidden">
+                                <div class="text-center p-4">
+                                    <i class="fa fa-exclamation-triangle text-4xl text-warning mb-3"></i>
+                                    <p class="text-gray-600 mb-2">数据加载失败</p>
+                                    <button id="retryDimensionsChart" class="primary-btn py-1 px-4 text-sm">重试</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 图表容器 -->
+                            <div class="h-80">
+                                <canvas id="assessmentDimensionsChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- 维度深度分析 -->
+                        <div class="space-y-4 mt-6">
+                            <h3 class="font-semibold">维度深度分析</h3>
+                            
+                            <!-- 情绪健康 -->
+                            <div class="flex items-start">
+                                <i class="fa fa-trophy text-primary mt-1 mr-2"></i>
+                                <div>
+                                    <span class="font-medium">情绪健康</span>
+                                    <p class="text-sm text-gray-600">您在情绪健康方面表现优秀，显著高于平均水平。最近一个月有显著提升，继续保持！</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 压力管理 -->
+                            <div class="flex items-start">
+                                <i class="fa fa-exclamation-circle text-warning mt-1 mr-2"></i>
+                                <div>
+                                    <span class="font-medium text-warning">压力管理</span>
+                                    <p class="text-sm text-gray-600">您在压力管理方面表现一般，有提升空间。最近一个月有所提升，建议继续加强。</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 睡眠质量 -->
+                            <div class="flex items-start">
+                                <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                <div>
+                                    <span class="font-medium">睡眠质量</span>
+                                    <p class="text-sm text-gray-600">您在睡眠质量方面表现良好，处于健康水平。最近一个月有显著提升，继续保持良好习惯！</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 社交功能 -->
+                            <div class="flex items-start">
+                                <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                <div>
+                                    <span class="font-medium">社交功能</span>
+                                    <p class="text-sm text-gray-600">您在社交功能方面表现良好，处于健康水平。保持良好的社交互动有助于整体心理健康。</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 心理韧性 -->
+                            <div class="flex items-start">
+                                <i class="fa fa-trophy text-primary mt-1 mr-2"></i>
+                                <div>
+                                    <span class="font-medium">心理韧性</span>
+                                    <p class="text-sm text-gray-600">您在心理韧性方面表现优秀，显著高于平均水平。较强的心理韧性有助于应对生活中的挑战。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-1 mb-4">
+                        <i class="fa fa-heartbeat text-primary text-xl"></i>
+                        <span class="text-xl font-bold text-primary">心社区</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">专业的心理健康服务平台，致力于为您提供全面的心理健康支持。</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-4">服务项目</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-600 hover:text-primary">心理健康测评</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary">在线心理咨询</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary">心理课程学习</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary">社区互助支持</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-4">关于我们</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-600 hover:text-primary">平台介绍</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary">专家团队</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary">媒体报道</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary">加入我们</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-4">联系我们</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center text-gray-600"><i class="fa fa-phone mr-2 text-primary"></i> 400-123-4567</li>
+                        <li class="flex items-center text-gray-600"><i class="fa fa-envelope-o mr-2 text-primary"></i> contact@xincommunity.com</li>
+                        <li class="flex items-center text-gray-600"><i class="fa fa-map-marker mr-2 text-primary"></i> 北京市海淀区中关村大街1号</li>
+                    </ul>
+                    
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-primary text-xl"><i class="fa fa-weibo"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary text-xl"><i class="fa fa-wechat"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary text-xl"><i class="fa fa-qq"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-200 mt-8 pt-6 text-center text-gray-500 text-sm">
+                <p>© 2025 心社区. 保留所有权利 | 京ICP备12345678号-1</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 引入心理健康趋势分析脚本 -->
+    <script src="mental_health_trend_analysis.js"></script>
+    
+    <!-- 页面初始化 -->
+    <script>
+        // 页面加载完成后初始化分析功能
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，初始化心理健康分析功能...');
+            
+            // 检查是否已加载了初始化函数
+            if (window.initializeMentalHealthAnalysis) {
+                // 初始化心理健康分析
+                window.initializeMentalHealthAnalysis();
+            } else {
+                console.error('初始化函数未加载，请检查脚本引入是否正确');
+            }
+        });
+    </script>
+</body>
+</html>

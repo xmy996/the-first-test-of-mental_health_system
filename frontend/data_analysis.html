@@ -79,6 +79,18 @@
             .badge-error {
                 @apply bg-error/10 text-error;
             }
+            /* 管理员侧边栏样式 */
+            .admin-sidebar-item {
+                @apply flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-300 hover:bg-gray-100 hover:text-primary;
+            }
+            
+            .admin-sidebar-item.active {
+                @apply bg-primary/10 text-primary font-medium;
+            }
+            
+            .admin-sidebar-item i {
+                @apply w-5 h-5 mr-3 flex-shrink-0;
+            }
         }
     </style>
 <style>
@@ -204,16 +216,16 @@
     <!-- 页面容器 -->
     <div class="flex flex-1 overflow-hidden">
         <!-- 侧边栏导航 -->
-        <aside class="hidden md:block w-64 bg-white border-r border-gray-200 flex-shrink-0 overflow-y-auto">
-            <div class="p-4 border-b">
-                <div class="flex items-center justify-center">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
-                        <i class="fa fa-heart-o text-xl"></i>
+        <aside id="sidebar" class="hidden md:block w-64 bg-white border-r border-gray-200 flex-shrink-0 overflow-y-auto transition-all duration-300">
+            <div class="p-5 border-b border-gray-100">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-primary/10">
+                        <i class="fa fa-heart text-xl"></i>
                     </div>
                     <h1 class="ml-3 text-xl font-bold text-primary">心社区管理</h1>
                 </div>
             </div>
-            <nav class="p-4 space-y-2">
+            <nav class="p-4 space-y-1">
                 <a href="admin_dashboard.html" class="admin-sidebar-item">
                     <i class="fa fa-dashboard"></i>
                     <span>仪表盘概览</span>
@@ -258,8 +270,8 @@
                     <i class="fa fa-cog"></i>
                     <span>系统设置</span>
                 </a>
-                <div class="pt-4 border-t border-gray-200">
-                    <button id="logout-button" class="admin-sidebar-item w-full justify-center">
+                <div class="pt-4 mt-4 border-t border-gray-100">
+                    <button id="logout-button" class="admin-sidebar-item w-full hover:text-error transition-colors duration-300">
                         <i class="fa fa-sign-out"></i>
                         <span>退出登录</span>
                     </button>
@@ -679,7 +691,8 @@
             const userMenu = document.getElementById('user-menu');
             
             if (userMenuButton && userMenu) {
-                userMenuButton.addEventListener('click', function() {
+                userMenuButton.addEventListener('click', function(event) {
+                    event.stopPropagation(); // 阻止事件冒泡
                     userMenu.classList.toggle('hidden');
                 });
                 
@@ -689,12 +702,23 @@
                         userMenu.classList.add('hidden');
                     }
                 });
+                
+                // 阻止用户菜单内部点击事件冒泡
+                userMenu.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                });
             }
             
             // 退出登录处理
-            document.querySelector('.logout-btn')?.addEventListener('click', function() {
-                alert('已退出登录');
-                window.location.href = 'admin_login.html';
+            const logoutButtons = document.querySelectorAll('#logout-button, .logout-btn');
+            logoutButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 平滑过渡效果
+                    document.body.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                    setTimeout(() => {
+                        window.location.href = 'admin_login.html';
+                    }, 300);
+                });
             });
             
             // 初始化活跃度趋势图

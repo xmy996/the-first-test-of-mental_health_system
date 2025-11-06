@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>心社区 - 心理健康支持平台</title>
+    <title>心社区 - 心理实验管理</title>
     <!-- Tailwind CSS v3 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -18,31 +18,29 @@
     <link rel="stylesheet" href="admin_common.css">
     <!-- 管理员页面统一功能 -->
     <script src="admin_common.js"></script>
-    <!-- 统一的 Tailwind配置 -->
+    <!-- 引入增强UI样式以保持一致性 -->
+    <link rel="stylesheet" href="enhanced_ui.css">
+    <!-- 统一的 Tailwind配置，与用户端保持一致 -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#6366f1',
-                        secondary: '#8b5cf6',
-                        accent: '#ec4899',
-                        success: '#10b981',
-                        warning: '#f59e0b',
-                        error: '#ef4444',
-                        info: '#3b82f6',
-                        dark: '#1e293b',
-                        light: '#f8fafc',
-                        'primary-dark': '#4f46e5',
-                        'secondary-dark': '#7c3aed',
+                        primary: '#165DFF',
+                        secondary: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        neutral: '#4E5969',
+                        light: '#F2F3F5',
+                        dark: '#1D2129'
                     },
                     fontFamily: {
-                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif']
                     },
                     boxShadow: {
                         'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                        'card-glow': '0 0 20px rgba(99, 102, 241, 0.1)',
+                        'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                        'card-glow': '0 0 20px rgba(22, 93, 255, 0.1)',
                     }
                 }
             }
@@ -72,34 +70,34 @@
                 @apply px-4 py-2 rounded-lg font-medium transition-all-300 duration-300;
             }
             .admin-btn-primary {
-                @apply bg-gradient-to-r from-primary to-indigo-600 text-white hover:shadow-lg transform hover:scale-[1.02];
+                @apply bg-primary text-white hover:bg-primary/90 hover:shadow-lg transition-all;
             }
             .admin-btn-secondary {
-                @apply bg-gradient-to-r from-secondary to-purple-600 text-white hover:shadow-lg transform hover:scale-[1.02];
+                @apply bg-light text-dark hover:bg-gray-200 transition-all;
             }
             .admin-btn-outline {
                 @apply border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400;
             }
             .admin-btn-danger {
-                @apply bg-gradient-to-r from-error to-red-600 text-white hover:shadow-lg transform hover:scale-[1.02];
+                @apply bg-danger text-white hover:bg-danger/90 hover:shadow-lg transition-all;
             }
             .admin-badge {
                 @apply px-2 py-1 text-xs font-medium rounded-full;
             }
             .admin-badge-success {
-                @apply bg-success/10 text-success font-medium;
+                @apply bg-secondary/10 text-secondary font-medium;
             }
             .admin-badge-warning {
                 @apply bg-warning/10 text-warning font-medium;
             }
             .admin-badge-danger {
-                @apply bg-error/10 text-error font-medium;
+                @apply bg-danger/10 text-danger font-medium;
             }
             .admin-badge-info {
-                @apply bg-info/10 text-info font-medium;
+                @apply bg-primary/10 text-primary font-medium;
             }
             .admin-table-header {
-                @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+                @apply px-6 py-3 text-left text-xs font-medium text-neutral uppercase tracking-wider;
             }
             .admin-table-cell {
                 @apply px-6 py-4 whitespace-nowrap text-sm text-gray-600;
@@ -122,135 +120,26 @@
             .admin-modal-footer {
                 @apply flex justify-end p-6 border-t;
             }
+            .admin-table-row {
+                @apply border-b border-gray-200 hover:bg-light/50 transition-colors;
+            }
+            .stats-card {
+                @apply bg-white rounded-xl shadow-card p-5 flex flex-col;
+            }
+            .stats-icon {
+                @apply w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary;
+            }
         }
     </style>
-<style>
-
-    /* 全局样式重置 */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    
-    /* 全局颜色变量 */
-    :root {
-        --primary-color: #6366f1;
-        --secondary-color: #8b5cf6;
-        --text-primary: #1e293b;
-        --text-secondary: #475569;
-        --bg-primary: #ffffff;
-        --bg-secondary: #f8fafc;
-        --border-color: #e2e8f0;
-    }
-    
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        line-height: 1.6;
-        color: var(--text-primary);
-        background-color: var(--bg-primary);
-    }
-    
-    /* 统一按钮样式 */
-    button {
-        font-family: inherit;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: none;
-        outline: none;
-    }
-    
-    /* 主按钮样式 - 注册按钮 */
-    .btn-primary {
-        background-color: var(--secondary-color);
-        color: white;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-    
-    .btn-primary:hover {
-        background-color: #7c3aed;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2);
-    }
-    
-    /* 次要按钮样式 - 登录按钮 */
-    .btn-secondary {
-        background-color: transparent;
-        color: var(--primary-color);
-        border: 1px solid var(--primary-color);
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-    
-    .btn-secondary:hover {
-        background-color: rgba(99, 102, 241, 0.05);
-        transform: translateY(-1px);
-    }
-    
-    /* 导航栏样式 */
-    nav {
-        background-color: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    /* 响应式设计 */
-    @media (max-width: 768px) {
-        .btn-primary,
-        .btn-secondary {
-            padding: 6px 12px;
-            font-size: 0.875rem;
-        }
-    }
-    
-    /* 卡片样式 */
-    .card {
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        padding: 1.5rem;
-    }
-    
-    /* 输入框样式 */
-    input,
-    textarea,
-    select {
-        font-family: inherit;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 8px 12px;
-        transition: border-color 0.3s ease;
-    }
-    
-    input:focus,
-    textarea:focus,
-    select:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-
-</style>
 </head>
-<body class="bg-gray-50 font-sans min-h-screen flex flex-col">
+<body class="bg-light font-sans min-h-screen flex flex-col">
     <!-- 管理系统主布局 -->
     <div class="flex h-screen overflow-hidden">
         <!-- 侧边栏导航 -->
         <aside class="hidden md:block w-64 bg-white border-r border-gray-200 flex-shrink-0 overflow-y-auto">
             <div class="p-4 border-b">
                 <div class="flex items-center justify-center">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
                         <i class="fa fa-heart-o text-xl"></i>
                     </div>
                     <h1 class="ml-3 text-xl font-bold text-primary">心社区管理</h1>
@@ -312,90 +201,325 @@
 
         <!-- 主内容区 -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- 顶部导航栏 -->
-            <header class="bg-white border-b border-gray-200 py-4 px-6 flex justify-between items-center">
-                <!-- 移动端菜单按钮 -->
-                <button id="mobile-menu-button" class="md:hidden text-gray-600 hover:text-primary">
-                    <i class="fa fa-bars text-xl"></i>
-                </button>
-                
-                <!-- 页面标题 -->
-                <h1 class="text-xl font-bold text-gray-800">心理实验管理</h1>
-                
-                <!-- 右侧操作区 -->
-                <div class="flex items-center space-x-4">
-                    <!-- 搜索按钮 -->
-                    <button class="text-gray-600 hover:text-primary p-2 rounded-full hover:bg-gray-100">
-                        <i class="fa fa-search"></i>
-                    </button>
-                    
-                    <!-- 通知按钮 -->
-                    <button class="text-gray-600 hover:text-primary p-2 rounded-full hover:bg-gray-100 relative">
-                        <i class="fa fa-bell"></i>
-                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                    </button>
-                    
-                    <!-- 用户信息 -->
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                            <i class="fa fa-user"></i>
+            <!-- 顶部导航栏 - 统一风格 -->
+            <nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 glass-effect nav-shadow transition-all duration-500 py-4 px-6">
+                <div class="flex justify-between items-center">
+                    <!-- Logo区域 -->
+                    <div class="flex items-center space-x-2 focus-within:outline focus-within:outline-primary focus-within:outline-offset-2 rounded-lg">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white transition-transform duration-300 hover:scale-110">
+                            <i class="fa fa-heart-o text-xl"></i>
                         </div>
-                        <span class="ml-2 text-gray-700 hidden sm:block">管理员</span>
+                        <a href="admin_dashboard.html" class="text-xl font-bold text-primary tracking-wide transition-colors duration-300 hover:text-indigo-600">心社区管理</a>
+                    </div>
+                    
+                    <!-- 页面标题 -->
+                    <h1 class="text-xl font-bold text-dark hidden md:block">心理实验管理</h1>
+                    
+                    <!-- 右侧操作区 -->
+                    <div class="flex items-center space-x-2">
+                        <!-- 搜索按钮 -->
+                        <button class="text-gray-600 hover:text-primary p-2 rounded-full hover:bg-gray-100 transition-all-300">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                        <!-- 通知按钮 -->
+                        <button class="text-gray-600 hover:text-primary p-2 rounded-full hover:bg-gray-100 relative transition-all-300">
+                            <i class="fa fa-bell"></i>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+                        </button>
+                        
+                        <!-- 移动端菜单按钮 -->
+                        <button id="mobile-menu-button" class="md:hidden text-gray-600 hover:text-primary p-2 rounded-full hover:bg-gray-100 transition-all-300">
+                            <i class="fa fa-bars text-xl"></i>
+                        </button>
+                        
+                        <!-- 用户信息 - 管理端样式 -->
+                        <div class="relative hidden md:block">
+                            <button id="admin-user-menu-button" class="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 group">
+                                <div class="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white transition-transform duration-300 hover:scale-110">
+                                    <i class="fa fa-user-circle"></i>
+                                </div>
+                                <span class="text-gray-700 group-hover:text-primary transition-colors">管理员</span>
+                                <i class="fa fa-angle-down text-gray-500 group-hover:text-primary transition-colors"></i>
+                            </button>
+                            <div id="admin-user-dropdown" class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl z-50 py-2">
+                                <a href="admin_dashboard.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                                    <i class="fa fa-dashboard mr-2"></i>仪表盘
+                                </a>
+                                <a href="system_settings.html" class="block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                                    <i class="fa fa-cog mr-2"></i>系统设置
+                                </a>
+                                <hr class="border-gray-200 my-1">
+                                <button id="logout-button" class="w-full text-left block px-4 py-3 text-gray-700 hover:bg-white/50 transition-all-300">
+                                    <i class="fa fa-sign-out mr-2"></i>退出登录
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </header>
+            </nav>
 
             <!-- 页面内容 -->
             <main class="flex-1 overflow-y-auto p-6">
                 <!-- 页面内容将在这里动态生成 -->
                 <div id="page-content">
-                    <div class="flex flex-wrap justify-between items-center mb-6">
-    <div class="mb-4 md:mb-0">
-        <h2 class="text-lg font-bold">心理实验管理</h2>
-        <p class="text-gray-500 text-sm">管理心理健康实验项目</p>
-    </div>
-    <div class="flex space-x-4">
-        <button class="admin-btn admin-btn-primary">
-            <i class="fa fa-plus mr-2"></i>创建实验
-        </button>
-    </div>
-</div>
-
-<!-- 实验列表 -->
-<div class="admin-card">
-    <div class="overflow-x-auto">
-        <table class="data-table w-full">
-            <thead>
-                <tr>
-                    <th class="admin-table-header">实验ID</th>
-                    <th class="admin-table-header">实验名称</th>
-                    <th class="admin-table-header">类型</th>
-                    <th class="admin-table-header">参与人数</th>
-                    <th class="admin-table-header">状态</th>
-                    <th class="admin-table-header">操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="admin-table-cell">E001</td>
-                    <td class="admin-table-cell">情绪识别实验</td>
-                    <td class="admin-table-cell">认知实验</td>
-                    <td class="admin-table-cell">128</td>
-                    <td class="admin-table-cell">
-                        <span class="admin-badge admin-badge-success">进行中</span>
-                    </td>
-                    <td class="admin-table-cell">
-                        <div class="flex space-x-2">
-                            <button class="text-primary hover:text-primary-dark">查看</button>
-                            <button class="text-gray-500 hover:text-gray-700">编辑</button>
-                            <button class="text-danger hover:text-red-700">删除</button>
+                    <!-- 顶部Banner -->
+                    <div class="relative mb-8">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h2 class="text-2xl font-bold text-primary mb-2">心理实验管理</h2>
+                                <p class="text-neutral">管理和配置系统中的心理学实验项目</p>
+                            </div>
+                            <button class="admin-btn admin-btn-primary">
+                                <i class="fa fa-plus mr-2"></i>创建实验
+                            </button>
                         </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+                    </div>
+
+                    <!-- 统计信息卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="stats-card">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-sm text-neutral">实验总数</p>
+                                    <h3 class="text-2xl font-bold text-dark">8</h3>
+                                </div>
+                                <div class="stats-icon">
+                                    <i class="fa fa-flask"></i>
+                                </div>
+                            </div>
+                            <div class="text-xs text-green-500 flex items-center">
+                                <i class="fa fa-arrow-up mr-1"></i>
+                                <span>较上月增加 2 个</span>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-sm text-neutral">总参与次数</p>
+                                    <h3 class="text-2xl font-bold text-dark">1,256</h3>
+                                </div>
+                                <div class="stats-icon">
+                                    <i class="fa fa-users"></i>
+                                </div>
+                            </div>
+                            <div class="text-xs text-green-500 flex items-center">
+                                <i class="fa fa-arrow-up mr-1"></i>
+                                <span>较上月增长 15.3%</span>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-sm text-neutral">平均完成率</p>
+                                    <h3 class="text-2xl font-bold text-dark">87.5%</h3>
+                                </div>
+                                <div class="stats-icon">
+                                    <i class="fa fa-line-chart"></i>
+                                </div>
+                            </div>
+                            <div class="text-xs text-red-500 flex items-center">
+                                <i class="fa fa-arrow-down mr-1"></i>
+                                <span>较上月下降 2.1%</span>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-sm text-neutral">用户满意度</p>
+                                    <h3 class="text-2xl font-bold text-dark">4.8/5</h3>
+                                </div>
+                                <div class="stats-icon">
+                                    <i class="fa fa-star"></i>
+                                </div>
+                            </div>
+                            <div class="text-xs text-green-500 flex items-center">
+                                <i class="fa fa-arrow-up mr-1"></i>
+                                <span>较上月提升 0.2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 分类管理和搜索 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 mb-6">
+                        <div class="flex flex-wrap justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-dark mb-4 md:mb-0">实验分类</h3>
+                            <div class="relative w-full md:w-64">
+                                <input 
+                                    type="text" 
+                                    placeholder="搜索实验..." 
+                                    class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                                >
+                                <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            <button class="px-4 py-2 bg-primary text-white rounded-lg text-sm">全部实验</button>
+                            <button class="px-4 py-2 bg-light text-dark rounded-lg text-sm hover:bg-gray-200">认知实验</button>
+                            <button class="px-4 py-2 bg-light text-dark rounded-lg text-sm hover:bg-gray-200">情绪实验</button>
+                            <button class="px-4 py-2 bg-light text-dark rounded-lg text-sm hover:bg-gray-200">社会实验</button>
+                            <button class="px-4 py-2 bg-light text-dark rounded-lg text-sm hover:bg-gray-200">人格实验</button>
+                        </div>
+                    </div>
+
+                    <!-- 实验列表 -->
+                    <div class="admin-card">
+                        <div class="overflow-x-auto">
+                            <table class="data-table w-full">
+                                <thead>
+                                    <tr class="bg-gray-50">
+                                        <th class="admin-table-header">实验ID</th>
+                                        <th class="admin-table-header">实验名称</th>
+                                        <th class="admin-table-header">类型</th>
+                                        <th class="admin-table-header">参与人数</th>
+                                        <th class="admin-table-header">平均完成时间</th>
+                                        <th class="admin-table-header">状态</th>
+                                        <th class="admin-table-header">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="admin-table-row">
+                                        <td class="admin-table-cell font-medium">E001</td>
+                                        <td class="admin-table-cell">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">
+                                                    <i class="fa fa-heartbeat"></i>
+                                                </div>
+                                                <span>情绪识别实验</span>
+                                            </div>
+                                        </td>
+                                        <td class="admin-table-cell">认知实验</td>
+                                        <td class="admin-table-cell">128</td>
+                                        <td class="admin-table-cell">4.2 分钟</td>
+                                        <td class="admin-table-cell">
+                                            <span class="admin-badge admin-badge-success">进行中</span>
+                                        </td>
+                                        <td class="admin-table-cell">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:underline"><i class="fa fa-eye mr-1"></i>查看</button>
+                                                <button class="text-neutral hover:underline"><i class="fa fa-pencil mr-1"></i>编辑</button>
+                                                <button class="text-danger hover:underline"><i class="fa fa-trash mr-1"></i>删除</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="admin-table-row">
+                                        <td class="admin-table-cell font-medium">E002</td>
+                                        <td class="admin-table-cell">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">
+                                                    <i class="fa fa-brain"></i>
+                                                </div>
+                                                <span>斯特鲁普实验</span>
+                                            </div>
+                                        </td>
+                                        <td class="admin-table-cell">认知实验</td>
+                                        <td class="admin-table-cell">256</td>
+                                        <td class="admin-table-cell">3.8 分钟</td>
+                                        <td class="admin-table-cell">
+                                            <span class="admin-badge admin-badge-success">进行中</span>
+                                        </td>
+                                        <td class="admin-table-cell">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:underline"><i class="fa fa-eye mr-1"></i>查看</button>
+                                                <button class="text-neutral hover:underline"><i class="fa fa-pencil mr-1"></i>编辑</button>
+                                                <button class="text-danger hover:underline"><i class="fa fa-trash mr-1"></i>删除</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="admin-table-row">
+                                        <td class="admin-table-cell font-medium">E003</td>
+                                        <td class="admin-table-cell">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">
+                                                    <i class="fa fa-users"></i>
+                                                </div>
+                                                <span>阿希从众实验</span>
+                                            </div>
+                                        </td>
+                                        <td class="admin-table-cell">社会实验</td>
+                                        <td class="admin-table-cell">189</td>
+                                        <td class="admin-table-cell">5.1 分钟</td>
+                                        <td class="admin-table-cell">
+                                            <span class="admin-badge admin-badge-warning">审核中</span>
+                                        </td>
+                                        <td class="admin-table-cell">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:underline"><i class="fa fa-eye mr-1"></i>查看</button>
+                                                <button class="text-neutral hover:underline"><i class="fa fa-pencil mr-1"></i>编辑</button>
+                                                <button class="text-danger hover:underline"><i class="fa fa-trash mr-1"></i>删除</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="admin-table-row">
+                                        <td class="admin-table-cell font-medium">E004</td>
+                                        <td class="admin-table-cell">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">
+                                                    <i class="fa fa-brain"></i>
+                                                </div>
+                                                <span>内隐联想测试(IAT)</span>
+                                            </div>
+                                        </td>
+                                        <td class="admin-table-cell">认知实验</td>
+                                        <td class="admin-table-cell">143</td>
+                                        <td class="admin-table-cell">6.5 分钟</td>
+                                        <td class="admin-table-cell">
+                                            <span class="admin-badge admin-badge-success">进行中</span>
+                                        </td>
+                                        <td class="admin-table-cell">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:underline"><i class="fa fa-eye mr-1"></i>查看</button>
+                                                <button class="text-neutral hover:underline"><i class="fa fa-pencil mr-1"></i>编辑</button>
+                                                <button class="text-danger hover:underline"><i class="fa fa-trash mr-1"></i>删除</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="admin-table-row">
+                                        <td class="admin-table-cell font-medium">E005</td>
+                                        <td class="admin-table-cell">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">
+                                                    <i class="fa fa-heartbeat"></i>
+                                                </div>
+                                                <span>情感启动实验</span>
+                                            </div>
+                                        </td>
+                                        <td class="admin-table-cell">情绪实验</td>
+                                        <td class="admin-table-cell">97</td>
+                                        <td class="admin-table-cell">4.8 分钟</td>
+                                        <td class="admin-table-cell">
+                                            <span class="admin-badge admin-badge-danger">已暂停</span>
+                                        </td>
+                                        <td class="admin-table-cell">
+                                            <div class="flex space-x-2">
+                                                <button class="text-primary hover:underline"><i class="fa fa-eye mr-1"></i>查看</button>
+                                                <button class="text-neutral hover:underline"><i class="fa fa-pencil mr-1"></i>编辑</button>
+                                                <button class="text-danger hover:underline"><i class="fa fa-trash mr-1"></i>删除</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 分页 -->
+                        <div class="mt-6 flex justify-between items-center">
+                            <div class="text-sm text-neutral">
+                                显示 1-5 条，共 8 条
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" disabled>
+                                    <i class="fa fa-chevron-left text-xs"></i>
+                                </button>
+                                <button class="px-3 py-1 rounded border border-primary bg-primary text-white">1</button>
+                                <button class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-600 hover:bg-gray-50">2</button>
+                                <button class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-600 hover:bg-gray-50">
+                                    <i class="fa fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -406,7 +530,7 @@
         <div class="p-4 border-b">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
                         <i class="fa fa-heart-o text-xl"></i>
                     </div>
                     <h1 class="ml-3 text-xl font-bold text-primary">心社区管理</h1>
@@ -445,6 +569,18 @@
                 <i class="fa fa-robot"></i>
                 <span>AI智能助手</span>
             </a>
+            <a href="psychology_experiment_management.html" class="admin-sidebar-item active">
+                <i class="fa fa-flask"></i>
+                <span>心理实验管理</span>
+            </a>
+            <a href="data_analysis.html" class="admin-sidebar-item">
+                <i class="fa fa-bar-chart"></i>
+                <span>数据统计分析</span>
+            </a>
+            <a href="sandbox_simulation_management.html" class="admin-sidebar-item">
+                <i class="fa fa-cubes"></i>
+                <span>沙箱模拟管理</span>
+            </a>
             <a href="system_settings.html" class="admin-sidebar-item">
                 <i class="fa fa-cog"></i>
                 <span>系统设置</span>
@@ -458,8 +594,29 @@
         </nav>
     </aside>
 
-    <!-- 统一的管理系统JavaScript -->
+    <!-- 页面初始化脚本 -->
     <script>
+        // 添加导航栏必要的样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            .nav-shadow {
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+            .transition-all-300 {
+                transition: all 0.3s ease;
+            }
+            /* 调整主内容区域的padding，避免被固定导航栏遮挡 */
+            main {
+                padding-top: 80px;
+            }
+        `;
+        document.head.appendChild(style);
+        
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             // 处理移动端菜单切换
@@ -467,18 +624,44 @@
             const closeMobileMenuButton = document.getElementById('close-mobile-menu');
             const mobileSidebar = document.querySelector('aside.fixed');
             
-            if (mobileMenuButton && closeMobileMenuButton && mobileSidebar) {
+            if (mobileMenuButton && mobileSidebar) {
                 mobileMenuButton.addEventListener('click', function() {
-                    mobileSidebar.classList.remove('hidden');
+                    mobileSidebar.classList.toggle('hidden');
+                    mobileSidebar.classList.toggle('fixed');
                 });
-                
+            }
+            
+            if (closeMobileMenuButton && mobileSidebar) {
                 closeMobileMenuButton.addEventListener('click', function() {
                     mobileSidebar.classList.add('hidden');
                 });
             }
             
+            // 管理员用户菜单交互
+            const adminUserMenuButton = document.getElementById('admin-user-menu-button');
+            const adminUserDropdown = document.getElementById('admin-user-dropdown');
+            
+            if (adminUserMenuButton && adminUserDropdown) {
+                adminUserMenuButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    adminUserDropdown.classList.toggle('hidden');
+                });
+                
+                // 点击其他区域关闭下拉菜单
+                document.addEventListener('click', function() {
+                    if (!adminUserDropdown.classList.contains('hidden')) {
+                        adminUserDropdown.classList.add('hidden');
+                    }
+                });
+                
+                // 阻止下拉菜单内部点击事件冒泡
+                adminUserDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+            
             // 退出登录处理
-            const logoutButtons = document.querySelectorAll('#logout-button, #mobile-logout-button');
+            const logoutButtons = document.querySelectorAll('#logout-button');
             logoutButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     // 这里应该有退出登录的逻辑

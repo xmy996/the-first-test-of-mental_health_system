@@ -100,6 +100,8 @@
             }
         }
     </style>
+    <!-- 沉浸式沙盘CSS -->
+    <link rel="stylesheet" href="immersive_sandbox.css">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -2598,10 +2600,6 @@ document.head.appendChild(navbarScript);
             <div class="tool-btn save-btn" title="保存场景"><i class="fas fa-save"></i></div>
             <div class="tool-btn load-btn" title="加载场景"><i class="fas fa-folder-open"></i></div>
             <div class="tool-btn analyze-btn" title="AI解读"><i class="fas fa-brain"></i></div>
-            <div class="tool-btn bring-forward-btn" title="上移一层"><i class="fas fa-arrow-up"></i></div>
-            <div class="tool-btn send-backward-btn" title="下移一层"><i class="fas fa-arrow-down"></i></div>
-            <div class="tool-btn bring-to-front-btn" title="置顶"><i class="fas fa-arrow-to-top"></i></div>
-            <div class="tool-btn send-to-back-btn" title="置底"><i class="fas fa-arrow-to-bottom"></i></div>
             <div class="tool-btn music-toggle-btn" title="背景音乐开关"><i class="fas fa-music"></i></div>
             <div class="tool-btn mute-btn" title="静音/取消静音"><i class="fas fa-volume-up"></i></div>
             <!-- 音量控制滑块 -->
@@ -2625,6 +2623,9 @@ document.head.appendChild(navbarScript);
         </div>
     </main>
 
+    <!-- 修复沙盘UI的脚本 -->
+    <script src="fix_sandbox_ui.js"></script>
+    
     <!-- 页脚 -->
     <!-- 统一页脚组件 -->
 <footer class="bg-[#1e293b] text-white py-4">
@@ -4926,50 +4927,6 @@ document.head.appendChild(navbarScript);
                 }
             });
 
-            // 层级调整功能函数
-            function bringForward() {
-                if (!currentItem) return;
-                const parent = currentItem.parentNode;
-                const siblings = Array.from(parent.children).filter(child => child.classList.contains('sandbox-item'));
-                const currentIndex = siblings.indexOf(currentItem);
-                
-                if (currentIndex < siblings.length - 1) {
-                    // 上移一层
-                    parent.insertBefore(currentItem, siblings[currentIndex + 1].nextSibling);
-                    playSound('click');
-                }
-            }
-            
-            function sendBackward() {
-                if (!currentItem) return;
-                const parent = currentItem.parentNode;
-                const siblings = Array.from(parent.children).filter(child => child.classList.contains('sandbox-item'));
-                const currentIndex = siblings.indexOf(currentItem);
-                
-                if (currentIndex > 0) {
-                    // 下移一层
-                    parent.insertBefore(currentItem, siblings[currentIndex - 1]);
-                    playSound('click');
-                }
-            }
-            
-            function bringToFront() {
-                if (!currentItem) return;
-                const parent = currentItem.parentNode;
-                parent.appendChild(currentItem);
-                playSound('click');
-            }
-            
-            function sendToBack() {
-                if (!currentItem) return;
-                const parent = currentItem.parentNode;
-                const firstItem = parent.querySelector('.sandbox-item');
-                if (firstItem && firstItem !== currentItem) {
-                    parent.insertBefore(currentItem, firstItem);
-                    playSound('click');
-                }
-            }
-            
             // 全局工具按钮事件
             document.querySelector('.reset-btn').addEventListener('click', () => {
                 const items = document.querySelectorAll('.sandbox-item');
@@ -5411,12 +5368,6 @@ document.head.appendChild(navbarScript);
             document.getElementById('close-analysis').addEventListener('click', () => {
                 analysisPanel.classList.remove('visible');
             });
-            
-            // 层级调整按钮事件监听
-            document.querySelector('.bring-forward-btn').addEventListener('click', bringForward);
-            document.querySelector('.send-backward-btn').addEventListener('click', sendBackward);
-            document.querySelector('.bring-to-front-btn').addEventListener('click', bringToFront);
-            document.querySelector('.send-to-back-btn').addEventListener('click', sendToBack);
 
             // 生成AI解读 - 增强版
             function generateAIAnalysis() {
@@ -6292,5 +6243,7 @@ document.head.appendChild(navbarScript);
             }
         }
     </style>
+    <!-- 沉浸式沙盘JavaScript -->
+    <script src="immersive_sandbox.js"></script>
 </body>
 </html>
